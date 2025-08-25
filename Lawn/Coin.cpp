@@ -48,6 +48,8 @@ void Coin::CoinInitialize(int theX, int theY, CoinType theCoinType, CoinMotion t
 	mHasBouncyArrow = false;
 	mHitGround = false;
 	mTimesDropped = 0;
+    mIsBeingStolen = false;
+    mTargetZombieID = ZOMBIEID_NULL;
 	mPottedPlantSpec.InitializePottedPlant(SeedType::SEED_NONE);
 
     if (IsSun())
@@ -55,6 +57,16 @@ void Coin::CoinInitialize(int theX, int theY, CoinType theCoinType, CoinMotion t
         float aPosX = mWidth * 0.5f;
         float aPosY = mHeight * 0.5f;
         Reanimation* aSunReanim = mApp->AddReanimation(0.0f, 0.0f, 0, ReanimationType::REANIM_SUN);
+
+        if (mType == CoinType::COIN_WHITE_SUN)
+        {
+            aSunReanim->mColorOverride = Color(255, 255, 255, 255);
+            aSunReanim->mFilterEffect = FilterEffect::FILTER_EFFECT_WHITE;
+            aSunReanim->mExtraOverlayColor = Color(200, 200, 200, 150);
+            mWidth = 78;
+            mHeight = 78;
+        }
+
         aSunReanim->SetPosition(mPosX + aPosX, mPosY + aPosY);
         aSunReanim->mLoopType = ReanimLoopType::REANIM_LOOP;
         aSunReanim->mAnimRate = 6.0f;
@@ -411,7 +423,7 @@ bool Coin::IsMoney()
 
 bool Coin::IsSun()
 {
-    return mType == CoinType::COIN_SUN || mType == CoinType::COIN_SMALLSUN || mType == CoinType::COIN_LARGESUN;
+    return mType == CoinType::COIN_SUN || mType == CoinType::COIN_SMALLSUN || mType == CoinType::COIN_LARGESUN || mType == CoinType::COIN_WHITE_SUN;
 }
 
 bool Coin::IsPresentWithAdvice()
@@ -589,6 +601,34 @@ void Coin::UpdateFall()
             mScale = aFinalScale;
         }
     }
+
+    if (mIsBeingStolen) // Add this new else if block
+    {
+        Zombie* aZombie = mBoard->ZombieTryToGet(mTargetZombieID);
+        if (aZombie == nullptr || aZombie->IsDeadOrDying())
+        {
+            mIsBeingStolen = false;
+            mTargetZombieID = ZOMBIEID_NULL;
+            return;
+        }
+
+        // Smoother movement towards the zombie's head
+        float aTargetX = aZombie->mPosX + 40;
+        float aTargetY = aZombie->mPosY + 20; // Aim for the head
+
+        // Calculate the vector towards the target and move the sun
+        SexyVector2 aDirection(aTargetX - mPosX, aTargetY - mPosY);
+        aDirection.Normalize();
+        aDirection *= 4.0f; // Control the speed of the pull
+        mPosX += aDirection.x;
+        mPosY += aDirection.y;
+
+        // If the sun is very close to the zombie, let it be "collected" and disappear
+        if (abs(mPosX - aTargetX) < 10 && abs(mPosY - aTargetY) < 10)
+        {
+            Die();
+        }
+    }
 }
 
 void Coin::UpdateCollected()
@@ -724,6 +764,23 @@ void Coin::Update()
     if (mFadeCount != 0)
     {
         UpdateFade();
+    }
+    else if (mIsBeingStolen)
+    {
+        Zombie* aZombie = mBoard->ZombieTryToGet(mTargetZombieID);
+        if (aZombie == nullptr || aZombie->IsDeadOrDying())
+        {
+            mIsBeingStolen = false;
+            mTargetZombieID = ZOMBIEID_NULL;
+            return;
+        }
+
+        // Move towards the zombie's head
+        float aTargetX = aZombie->mPosX + 40;
+        float aTargetY = aZombie->mPosY + 20;
+
+        mPosX += (aTargetX - mPosX) * 0.04f;
+        mPosY += (aTargetY - mPosY) * 0.04f;
     }
     else if (!mIsBeingCollected)
     {
@@ -868,6 +925,27 @@ void Coin::Draw(Graphics* g)
     }
     else if (IsSun())
     {
+        if (mIsBeingStolen)
+        {
+            g->SetColorizeImages(true);
+            g->SetColor(Color(255, 100, 100, 255)); // Reddish tint
+        }
+        // [ADD-END]
+
+        // This is an existing check, just make sure your new code is before it
+        if (mAttachmentID != AttachmentID::ATTACHMENTID_NULL)
+        {
+            Graphics theAttachmentGraphics(*g);
+            MakeParentGraphicsFrame(&theAttachmentGraphics);
+            AttachmentDraw(mAttachmentID, &theAttachmentGraphics, false);
+        }
+
+        // [ADD-START]
+        if (mIsBeingStolen)
+        {
+            g->SetColorizeImages(false); // Reset the colorization
+        }
+
         return;
     }
     else if (mType == CoinType::COIN_FINAL_SEED_PACKET)
@@ -914,6 +992,10 @@ void Coin::Draw(Graphics* g)
     else if (mType == CoinType::COIN_CHOCOLATE || mType == CoinType::COIN_AWARD_CHOCOLATE)
     {
         aImage = IMAGE_CHOCOLATE;
+    }
+    else if (mType == CoinType::COIN_FERTILIZER)
+    {
+        aImage = IMAGE_FERTILIZER;
     }
     else if (mType == CoinType::COIN_TROPHY)
     {
@@ -1149,6 +1231,14 @@ void Coin::Collect()
 
         return;
     }
+    else if (mType == CoinType::COIN_FERTILIZER)
+    {
+        TOD_ASSERT(mBoard);
+        mApp->mPlayerInfo->mPurchases[(int)StoreItem::STORE_ITEM_FERTILIZER]++;
+        mApp->AddTodParticle(mPosX + 30.0f, mPosY + 30.0f, mRenderOrder + 1, ParticleEffect::PARTICLE_PRESENT_PICKUP);
+        StartFade();
+        return;
+    }
 
     if (IsLevelAward())
     {
@@ -1286,7 +1376,7 @@ float Coin::GetSunScale()
 
 int Coin::GetSunValue()
 {
-    return mType == CoinType::COIN_SUN ? 25 : mType == CoinType::COIN_SMALLSUN ? 15 : mType == CoinType::COIN_LARGESUN ? 50 : 0;
+    return mType == CoinType::COIN_SUN ? 25 : mType == CoinType::COIN_SMALLSUN ? 15 : mType == CoinType::COIN_LARGESUN ? 50 : mType == CoinType::COIN_WHITE_SUN ? 100 : 0;
 }
 
 int Coin::GetCoinValue(CoinType theCoinType)
@@ -1346,7 +1436,8 @@ void Coin::PlayCollectSound()
         mType == CoinType::COIN_PRESENT_PLANT || 
         IsPresentWithAdvice() || 
         mType == CoinType::COIN_AWARD_PRESENT || 
-        mType == CoinType::COIN_AWARD_CHOCOLATE)
+        mType == CoinType::COIN_AWARD_CHOCOLATE ||
+        mType == CoinType::COIN_FERTILIZER)
     {
         mApp->PlayFoley(FoleyType::FOLEY_PRIZE);
         return;
@@ -1372,8 +1463,18 @@ void Coin::DroppedUsableSeed()
 
 void Coin::MouseDown(int x, int y, int theClickCount)
 {
-    if (mBoard == nullptr || mBoard->mPaused || mApp->mGameScene != GameScenes::SCENE_PLAYING || mDead)
+    if (mBoard == nullptr || mIsBeingCollected || mBoard->mPaused || mApp->mGameScene != GameScenes::SCENE_PLAYING || mDead)
     {
+        return;
+    }
+
+    if (mIsBeingStolen)
+    {
+        mIsBeingStolen = false;
+        mTargetZombieID = ZOMBIEID_NULL;
+
+        PlayCollectSound();
+        Collect();
         return;
     }
 

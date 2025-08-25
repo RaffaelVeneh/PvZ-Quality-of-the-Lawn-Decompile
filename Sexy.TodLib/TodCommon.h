@@ -143,3 +143,14 @@ inline void				SetBit(uint& theNum, int theIdx, bool theValue = true)		{ if (the
 inline bool				TestBit(uint theNum, int theIdx)							{ return theNum & (1 << theIdx); }
 //#define SetBit(num, idx, val) { if (val) (num) |= 1 << (idx); else (num) &= ~(1 << (idx)); }
 //#define TestBit(num, idx) ((num) & (1 - (idx)))
+
+inline float TodAnimateMove(float theCurrent, float theTarget, float theRate)
+{
+	if (theCurrent == theTarget)
+		return theCurrent;
+	float aDelta = theTarget - theCurrent;
+	float aMove = aDelta * theRate;
+	if (fabs(aMove) < 0.01f)
+		return theTarget;
+	return theCurrent + aMove;
+}

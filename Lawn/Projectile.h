@@ -50,7 +50,14 @@ public:
     float                   mCobTargetX;            
     int                     mCobTargetRow;          
     ZombieID                mTargetZombieID;        
-    int                     mLastPortalX;           
+    int                     mLastPortalX;
+    bool                    mIsGrapeshot;
+    bool                    mHasBounced;
+    int                     mPierceCounter;
+    ZombieID                mHitZombies[10];
+    PlantID                 mHitPlants[10];
+    MagnetItemType          mArmorType;
+    float                   mScale;
 
 public:
     Projectile();
@@ -76,6 +83,10 @@ public:
     Plant*                  FindCollisionTargetPlant();
     void                    ConvertToFireball(int theGridX);
     void                    ConvertToPea(int theGridX);
+    void                    ConvertToRedFirePea(int theGridX);
+    void                    ConvertToBlueFirePea(int theGridX);
+    void                    ConvertToWhiteFirePea(int theGridX);
+    void                    ConvertToBlackFirePea(int theGridX);
     bool                    IsSplashDamage(Zombie* theZombie/* = nullptr*/);
     void                    PlayImpactSound(Zombie* theZombie);
     bool                    IsZombieHitBySplash(Zombie* theZombie);

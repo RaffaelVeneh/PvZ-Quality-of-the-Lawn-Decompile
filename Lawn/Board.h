@@ -186,7 +186,9 @@ public:
 	int								mBoardRandSeed;											
 	ParticleSystemID				mPoolSparklyParticleID;									
 	ReanimationID					mFwooshID[MAX_GRID_SIZE_Y][12];							
-	int								mFwooshCountDown;										
+	int								mFwooshCountDown;
+	int								mFwooshColumnCountDown;
+	ReanimationID					mFwooshColumnID[MAX_GRID_SIZE_Y];
 	int								mTimeStopCounter;										
 	bool							mDroppedFirstCoin;										
 	int								mFinalWaveSoundCounter;									
@@ -227,6 +229,7 @@ public:
 	bool							mCoinFaded;
 	int								mAchievementCoinCount;
 	int								mGargantuarsKilled;
+	bool							mGravesMayRise;
 
 public:
 	Board(LawnApp* theApp);
@@ -311,6 +314,7 @@ public:
 	void							DrawLevel(Graphics* g);
 	void							DrawShovel(Graphics* g);
 	void							UpdateZombieSpawning();
+	void							UpgradePlant(int theGridX, int theGridY);
 	void							UpdateSunSpawning();
 	/*inline*/ void					ClearAdvice(AdviceType theHelpIndex);
 	bool							RowCanHaveZombieType(int theRow, ZombieType theZombieType);
@@ -349,6 +353,7 @@ public:
 	void							DrawUIBottom(Graphics* g);
 	void							DrawUITop(Graphics* g);
 	void							KillAllPlantsInRadius(int theX, int theY, int theRadius);
+	void							DamageAllPlantsInRadius(int theX, int theY, int theRadius, int theDamage);
 	Plant*							GetPumpkinAt(int theGridX, int theGridY);
 	Plant*							GetFlowerPotAt(int theGridX, int theGridY);
 	bool							LawnHasNocturnal();
@@ -380,7 +385,9 @@ public:
 	Plant*							FindUmbrellaPlant(int theGridX, int theGridY);
 	void							SetTutorialState(TutorialState theTutorialState);
 	void							DoFwoosh(int theRow);
+	void							DoFwooshColumn(int theCol);
 	void							UpdateFwoosh();
+	void							UpdateFwooshColumn();
 	Plant*							SpecialPlantHitTest(int x, int y);
 	void							UpdateMousePosition();
 	/*inline*/ Plant*				ToolHitTestHelper(HitResult* theHitResult);
@@ -400,6 +407,7 @@ public:
 	bool							IsValidCobCannonSpotHelper(int theGridX, int theGridY);
 	void							MouseDownCobcannonFire(int x, int y, int theClickCount);
 	void							KillAllZombiesInRadius(int theRow, int theX, int theY, int theRadius, int theRowRange, bool theBurn, int theDamageRangeFlags);
+	void							DamageAllZombiesInRadius(int theRow, int theX, int theY, int theRadius, int theDamage, int theRowRange, bool theBurn, int theDamageRangeFlags);
 	int								GetAllZombiesInRadius(int theRow, int theX, int theY, int theRadius, int theRowRange, int theDamageRangeFlags);
 	/*inline*/ int					GetSeedBankExtraWidth();
 	bool							IsFlagWave(int theWaveNumber);
@@ -419,6 +427,7 @@ public:
 	/*inline*/ void					PutZombieInWave(ZombieType theZombieType, int theWaveNumber, ZombiePicker* theZombiePicker);
 	/*inline*/ void					PutInMissingZombies(int theWaveNumber, ZombiePicker* theZombiePicker);
 	Rect							GetShovelButtonRect();
+	Rect							GetFertilizerButtonRect();
 	void							GetZenButtonRect(GameObjectType theObjectType, Rect& theRect);
 	Plant*							NewPlant(int theGridX, int theGridY, SeedType theSeedType, SeedType theImitaterType = SeedType::SEED_NONE);
 	void							DoPlantingEffects(int theGridX, int theGridY, Plant* thePlant);
@@ -485,6 +494,9 @@ public:
 	int								CountZombieByType(ZombieType theZombieType);
 	static /*inline*/ bool			IsZombieTypeSpawnedOnly(ZombieType theZombieType);
 	void							DrawHealthbar(Graphics* g, Rect rect, Color maxColor, int maxNumber, Color baseColor, int baseNumber, int barWidth, int barHeight, int barOffsetX, int barOffsetY, Color textColor, Font* textFont, int textOffsetY, Color textOutlineColor, int textOutlineOffset, bool drawBarOutline);
+	TodParticleSystem*				AddAttachedParticle(GameObject* pObject, int thePosX, int thePosY, int theRenderOrder, ParticleEffect theEffect);
+	void                            DamageRow(int theRow, int theDamage);
+	void                            PushPlantsInRow(int theRow);
 };
 extern bool gShownMoreSunTutorial;
 

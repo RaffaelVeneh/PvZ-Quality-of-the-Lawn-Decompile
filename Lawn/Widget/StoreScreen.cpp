@@ -185,8 +185,10 @@ bool StoreScreen::IsItemSoldOut(StoreItem theStoreItem)
         return false;
     else if (theStoreItem == STORE_ITEM_PACKET_UPGRADE)
         return aPlayer->mPurchases[STORE_ITEM_PACKET_UPGRADE] >= 4;
-    else if (theStoreItem == STORE_ITEM_FERTILIZER || theStoreItem == STORE_ITEM_BUG_SPRAY)
+    else if (theStoreItem == STORE_ITEM_BUG_SPRAY)
         return aPlayer->mPurchases[theStoreItem] - PURCHASE_COUNT_OFFSET > 15;
+    else if (theStoreItem == STORE_ITEM_FERTILIZER)
+        return aPlayer->mPurchases[theStoreItem] - PURCHASE_COUNT_OFFSET >= 5;
     else if (theStoreItem == STORE_ITEM_TREE_FOOD)
         return aPlayer->mPurchases[STORE_ITEM_TREE_FOOD] - PURCHASE_COUNT_OFFSET > 10;
     else if (theStoreItem == STORE_ITEM_BONUS_LAWN_MOWER)
@@ -345,7 +347,7 @@ void StoreScreen::DrawItemIcon(Graphics* g, int theItemPosition, StoreItem theIt
     else if (theItemType == STORE_ITEM_FERTILIZER)
     {
         g->DrawImage(Sexy::IMAGE_FERTILIZER, aPosX - 11, aPosY - 2);
-        TodDrawString(g, _S("x5"), aPosX + 56, aPosY + 62, Sexy::FONT_HOUSEOFTERROR16, Color::White, DS_ALIGN_RIGHT);
+        TodDrawString(g, _S(""), aPosX + 56, aPosY + 62, Sexy::FONT_HOUSEOFTERROR16, Color::White, DS_ALIGN_RIGHT);
     }
     else if (theItemType == STORE_ITEM_PHONOGRAPH)
     {
@@ -867,7 +869,7 @@ int StoreScreen::GetItemCost(StoreItem theStoreItem)
     case STORE_ITEM_POTTED_MARIGOLD_2:                  return 250;
     case STORE_ITEM_POTTED_MARIGOLD_3:                  return 250;
     case STORE_ITEM_GOLD_WATERINGCAN:                   return 1000;
-    case STORE_ITEM_FERTILIZER:                         return 75;
+    case STORE_ITEM_FERTILIZER:                         return 10000;
     case STORE_ITEM_BUG_SPRAY:                          return 100;
     case STORE_ITEM_PHONOGRAPH:                         return 1500;
     case STORE_ITEM_GARDENING_GLOVE:                    return 100;
@@ -877,7 +879,7 @@ int StoreScreen::GetItemCost(StoreItem theStoreItem)
     case STORE_ITEM_PACKET_UPGRADE:
     {
         int aPurchase = gLawnApp->mPlayerInfo->mPurchases[STORE_ITEM_PACKET_UPGRADE];
-        return aPurchase == 0 ? 75 : aPurchase == 1 ? 500 : aPurchase == 2 ? 2000 : 8000;
+        return aPurchase == 0 ? 75 : aPurchase == 1 ? 500 : aPurchase == 2 ? 1000 : 5000;
     }
     case STORE_ITEM_POOL_CLEANER:                       return 100;
     case STORE_ITEM_ROOF_CLEANER:                       return 300;
@@ -954,13 +956,17 @@ void StoreScreen::PurchaseItem(StoreItem theStoreItem)
             {
                 mApp->mPlayerInfo->mPurchases[theStoreItem] = _time32(nullptr);
             }
-            else if (theStoreItem == STORE_ITEM_FERTILIZER || theStoreItem == STORE_ITEM_BUG_SPRAY)
+            else if (theStoreItem == STORE_ITEM_BUG_SPRAY)
             {
                 if (mApp->mPlayerInfo->mPurchases[theStoreItem] < PURCHASE_COUNT_OFFSET)
                 {
                     mApp->mPlayerInfo->mPurchases[theStoreItem] = PURCHASE_COUNT_OFFSET;
                 }
                 mApp->mPlayerInfo->mPurchases[theStoreItem] += 5;
+            }
+            else if (theStoreItem == STORE_ITEM_FERTILIZER)
+            {
+                mApp->mPlayerInfo->mPurchases[STORE_ITEM_FERTILIZER]++;
             }
             else if (theStoreItem == STORE_ITEM_TREE_FOOD)
             {

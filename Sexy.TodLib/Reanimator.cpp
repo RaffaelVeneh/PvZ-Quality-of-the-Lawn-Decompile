@@ -159,7 +159,22 @@ ReanimationParams gLawnReanimationArray[(int)ReanimationType::NUM_REANIMS] = {
 	{ ReanimationType::REANIM_CREDITS_ANYHOUR,                      "reanim\\Credits_Anyhour.reanim",                   3 },
 	{ ReanimationType::REANIM_CREDITS_WEARETHEUNDEAD,               "reanim\\Credits_WeAreTheUndead.reanim",            1 },
 	{ ReanimationType::REANIM_CREDITS_DISCOLIGHTS,                  "reanim\\Credits_DiscoLights.reanim",               1 },
-	{ ReanimationType::REANIM_FLAG,                                 "reanim\\Zombie_FlagPole.reanim",                   0 }
+	{ ReanimationType::REANIM_FLAG,                                 "reanim\\Zombie_FlagPole.reanim",                   0 },
+	{ ReanimationType::REANIM_FIRESHOOTER,							"reanim\\FireShooter.reanim",						0 },
+	{ ReanimationType::REANIM_EXPLODE_O_NUT,						"reanim\\ExplodeONut.reanim",						0 },
+	{ ReanimationType::REANIM_RED_POTATO_MINE,                      "reanim\\PotatoMineRed.reanim",                     0 },
+	{ ReanimationType::REANIM_ICEPEA,								"reanim\\IcePea.reanim",							0 },
+	{ ReanimationType::REANIM_SUPER_CHOMPER,						"reanim\\SuperChomper.reanim",						0 },
+	{ ReanimationType::REANIM_HYPNOGIGA,							"reanim\\HypnoGiga.reanim",							0 },
+	{ ReanimationType::REANIM_BOMBSQUASH,							"reanim\\BombSquash.reanim",						0 },
+	{ ReanimationType::REANIM_BLACK_THREEPEATER,					"reanim\\BlackThreepeater.reanim",					0 },
+	{ ReanimationType::REANIM_BLUE_TORCHWOOD,						"reanim\\BlueTorchwood.reanim",						0 },
+	{ ReanimationType::REANIM_DOOM_NUT,								"reanim\\Doomnut.reanim",							0 },
+	{ ReanimationType::REANIM_ICE_PLANTERN,							"reanim\\IcePlantern.reanim",						0 },
+	{ ReanimationType::REANIM_MAD_CACTUS,							"reanim\\MadCactus.reanim",							0 },
+	{ ReanimationType::REANIM_SOUR_STARFRUIT,						"reanim\\SourStarfruit.reanim",						0 },
+	{ ReanimationType::REANIM_POISONPULT,							"reanim\\Poisonpult.reanim",						0 },
+	{ ReanimationType::REANIM_CORROSION_GARLIC,						"reanim\\CorrosionGarlic.reanim",					0 },
 };
 
 ReanimatorTransform::ReanimatorTransform() :

@@ -118,6 +118,7 @@ ParticleParams gLawnParticleArray[(int)ParticleEffect::NUM_PARTICLES] = {
 	{ ParticleEffect::PARTICLE_STARBURST, "particles\\Starburst.xml" },
 	{ ParticleEffect::PARTICLE_CREDITS_FOG, "particles\\Credits_fog.xml" },
 	{ ParticleEffect::PARTICLE_PERSENT_PICK_UP_ARROW, "particles\\UpsellArrow.xml" },
+	{ ParticleEffect::PARTICLE_FUMECLOUD_LEFT, "particles\\LeftFumeCloud.xml" },
 };  
 
 bool TodParticleLoadADef(TodParticleDefinition* theParticleDef, const char* theParticleFileName)

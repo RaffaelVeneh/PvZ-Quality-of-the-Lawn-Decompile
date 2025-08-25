@@ -34,6 +34,10 @@ enum PlantState
     STATE_SQUASH_RISING,
     STATE_SQUASH_FALLING,
     STATE_SQUASH_DONE_FALLING,
+    STATE_DOOM_NUT_PRE_LAUNCH,
+    STATE_DOOM_NUT_RISING,
+    STATE_DOOM_NUT_FALLING,
+    STATE_DOOM_NUT_DONE_FALLING,
     STATE_GRAVEBUSTER_LANDING,
     STATE_GRAVEBUSTER_EATING,
     STATE_CHOMPER_BITING,
@@ -54,6 +58,7 @@ enum PlantState
     STATE_SUNSHROOM_BIG,
     STATE_MAGNETSHROOM_SUCKING,
     STATE_MAGNETSHROOM_CHARGING,
+    STATE_MAGNETSHROOM_FIRING,
     STATE_BOWLING_UP,
     STATE_BOWLING_DOWN,
     STATE_CACTUS_LOW,
@@ -66,6 +71,7 @@ enum PlantState
     STATE_COBCANNON_READY,
     STATE_COBCANNON_FIRING,
     STATE_KERNELPULT_BUTTER,
+    STATE_KERNELPULT_BIG_BUTTER,
     STATE_UMBRELLA_TRIGGERED,
     STATE_UMBRELLA_REFLECTING,
     STATE_IMITATER_MORPHING,
@@ -109,6 +115,15 @@ enum MagnetItemType
     MAGNET_ITEM_DOOR_1,
     MAGNET_ITEM_DOOR_2,
     MAGNET_ITEM_DOOR_3,
+    MAGNET_ITEM_BLACK_CONE_1,
+    MAGNET_ITEM_BLACK_CONE_2,
+    MAGNET_ITEM_BLACK_CONE_3,
+    MAGNET_ITEM_BLACK_PAIL_1,
+    MAGNET_ITEM_BLACK_PAIL_2,
+    MAGNET_ITEM_BLACK_PAIL_3,
+    MAGNET_ITEM_BLACK_DOOR_1,
+    MAGNET_ITEM_BLACK_DOOR_2,
+    MAGNET_ITEM_BLACK_DOOR_3,
     //MAGNET_ITEM_PROPELLER,
     MAGNET_ITEM_POGO_1,
     MAGNET_ITEM_POGO_2,
@@ -161,7 +176,7 @@ public:
     Rect                    mPlantAttackRect;               
     int                     mTargetX;                       
     int                     mTargetY;                       
-    int                     mStartRow;                      
+    int                     mStartRow;
     ParticleSystemID        mParticleID;                    
     int                     mShootingCounter;               
     ReanimationID           mBodyReanimID;      // main reanimation of the plant            
@@ -188,7 +203,26 @@ public:
     bool                    mSquished;                      
     bool                    mIsAsleep;                      
     bool                    mIsOnBoard;                     
-    bool                    mHighlighted;                   
+    bool                    mHighlighted;               
+    bool                    mIsRandom;
+    int                     mGreenFilterEffect;
+    int                     mSquashJumpCount;
+    int                     mHealCountdown;
+    int                     mPlantMaxHealthOriginal;
+    bool                    mIsBoostedByPlantern;
+    bool                    mIsOnPotAndLily;
+    bool                    mIsBoosted;
+    int                     mBoostCounter;
+    bool                    mWasShoveled;
+    int                     mBlackThreepeaterShotCount;
+    int                     mIcePlanternChillCounter;
+    bool                    mIsIceBoosted;
+    int                     mSourStarfruitShotCount;
+    int                     mChilledCounter;
+    int                     mFrozenCounter;
+    int                     mButteredCounter;
+    float                   mButterX;
+    float                   mButterY;
 
 public:
     Plant();
@@ -201,11 +235,14 @@ public:
     void                    DoSpecial();
     void                    Fire(Zombie* theTargetZombie, int theRow, PlantWeapon thePlantWeapon = PlantWeapon::WEAPON_PRIMARY);
     Zombie*                 FindTargetZombie(int theRow, PlantWeapon thePlantWeapon = PlantWeapon::WEAPON_PRIMARY);
+    Zombie*                 FindSuperChomperTarget();
+    Zombie*                 FindClosestZombieInRow(int theRow);
     void                    Die();
     void                    UpdateProductionPlant();
     void                    UpdateShooter();
     bool                    FindTargetAndFire(int theRow, PlantWeapon thePlantWeapon = PlantWeapon::WEAPON_PRIMARY);
     void                    LaunchThreepeater();
+    void                    FireBlackThreepeater();
     static Image*           GetImage(SeedType theSeedType);
     static int              GetCost(SeedType theSeedType, SeedType theImitaterType = SeedType::SEED_NONE);
     static SexyString       GetNameString(SeedType theSeedType, SeedType theImitaterType = SeedType::SEED_NONE);
@@ -216,16 +253,22 @@ public:
     static /*inline*/ bool  IsFlying(SeedType theSeedtype);
     static /*inline*/ bool  IsUpgrade(SeedType theSeedtype);
     void                    UpdateAbilities();
+    static bool             IsUpgradable(SeedType theSeedType);
     void                    Squish();
     void                    DoRowAreaDamage(int theDamage, unsigned int theDamageFlags);
     int                     GetDamageRangeFlags(PlantWeapon thePlantWeapon = PlantWeapon::WEAPON_PRIMARY);
     Rect                    GetPlantRect();
     Rect                    GetPlantAttackRect(PlantWeapon thePlantWeapon = PlantWeapon::WEAPON_PRIMARY);
     Zombie*                 FindSquashTarget();
+    Zombie*                 FindBombSquashTarget();
     void                    UpdateSquash();
+    void                    UpdateBombSquash();
+    void                    UpdateDoomnut();
+    void                    Plant::UpdatePlanternEffects(float healthMultiplier, int healAmount);
     /*inline*/ bool         NotOnGround();
     void                    DoSquashDamage();
     void                    BurnRow(int theRow);
+    void                    BurnColumn(int theCol);
     void                    IceZombies();
     void                    BlowAwayFliers(int theX, int theRow);
     void                    UpdateGraveBuster();
@@ -237,12 +280,15 @@ public:
     bool                    IsOnHighGround();
     void                    UpdateTorchwood();
     void                    LaunchStarFruit();
+    void 				    LaunchSourStarfruit();
     bool                    FindStarFruitTarget();
     void                    UpdateChomper();
+    void                    UpdateSuperChomper();
     void                    DoBlink();
     void                    UpdateBlink();
     void                    PlayBodyReanim(const char* theTrackName, ReanimLoopType theLoopType, int theBlendTime, float theAnimRate);
     void                    UpdateMagnetShroom();
+    void                    FireMagnet(Zombie* theTargetZombie);
     MagnetItem*             GetFreeMagnetItem();
     void                    DrawMagnetItems(Graphics* g);
     void                    UpdateDoomShroom();
@@ -263,6 +309,8 @@ public:
     void                    UpdateBlover();
     void                    UpdateCactus();
     void                    StarFruitFire();
+    void					FireSourStarfruit();
+    void        	        FireSourStarfruitSpecial();
     void                    UpdateTanglekelp();
     Reanimation*            AttachBlinkAnim(Reanimation* theReanimBody);
     void                    UpdateReanimColor();
@@ -277,6 +325,7 @@ public:
     void                    UpdateUmbrella();
     void                    EndBlink();
     void                    AnimateGarlic();
+    void                    AnimateCorrosionGarlic();
     Coin*                   FindGoldMagnetTarget();
     void                    SpikeweedAttack();
     void                    ImitaterMorph();
@@ -293,6 +342,8 @@ public:
     void                    GoldMagnetFindTargets();
     bool                    IsAGoldMagnetAboutToSuck();
     bool                    DrawMagnetItemsOnTop();
+    void                    TakeDamage(int theDamage, unsigned int theDamageFlags = 0);
+    void                    GetButterSplatOffset(int& theOffsetX, int& theOffsetY);
 };
 
 float                       PlantDrawHeightOffset(Board* theBoard, Plant* thePlant, SeedType theSeedType, int theCol, int theRow);
@@ -301,15 +352,16 @@ float                       PlantFlowerPotHeightOffset(SeedType theSeedType, flo
 class PlantDefinition
 {
 public:
-    SeedType                mSeedType;         // identifier of the plant, ex: SEED_PEASHOOTER  
-    Image**                 mPlantImage;       // leftover from beta builds, before reanims were added, for info look at beta lawn of the dead footage
-    ReanimationType         mReanimationType;  // reanimation type of the plant, used in mBodyReanimID
-    int                     mPacketIndex;      // unused, not much info about it, most likely used for the seed packet plant display before reanims
-    int                     mSeedCost;         // the sun cost
-    int                     mRefreshTime;      // time before you can plant it again !in frames!
-    PlantSubClass           mSubClass;         // for Shooter plants ex: peashooter, 2 variants SUBCLASS_NORMAL and SUBCLASS_SHOOTER
-    int                     mLaunchRate;       // how often the plant does its ability
-    const SexyChar*         mPlantName;        // plant name
+    SeedType                mSeedType;              // identifier of the plant, ex: SEED_PEASHOOTER  
+    Image**                 mPlantImage;            // leftover from beta builds, before reanims were added, for info look at beta lawn of the dead footage
+    ReanimationType         mReanimationType;       // reanimation type of the plant, used in mBodyReanimID
+    int                     mPacketIndex;           // unused, not much info about it, most likely used for the seed packet plant display before reanims
+    int                     mSeedCost;              // the sun cost
+    int                     mRefreshTime;           // time before you can plant it again !in frames!
+    PlantSubClass           mSubClass;              // for Shooter plants ex: peashooter, 2 variants SUBCLASS_NORMAL and SUBCLASS_SHOOTER
+    int                     mLaunchRate;            // how often the plant does its ability
+    const SexyChar*         mPlantName;             // plant name
+    int                     mProjectilesPerShot;    // how much the plant will shot the projectile
 };
 extern PlantDefinition gPlantDefs[SeedType::NUM_SEED_TYPES];
 

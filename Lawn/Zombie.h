@@ -60,6 +60,16 @@ enum ZombieParts
     PART_DIGGER
 };
 
+inline bool IsBalloonZombie(ZombieType theZombieType)
+{
+    return theZombieType == ZOMBIE_BALLOON || theZombieType == ZOMBIE_PURPLE_BALLOON || theZombieType == ZOMBIE_BLACK_BALLOON;
+}
+
+inline bool IsNewspaperZombie(ZombieType theZombieType)
+{
+    return theZombieType == ZOMBIE_NEWSPAPER || theZombieType == ZOMBIE_RED_NEWSPAPER || theZombieType == ZOMBIE_RED_EYE_NEWSPAPER;
+}
+
 class ZombieDrawPosition
 {
 public:
@@ -75,6 +85,7 @@ public:
 class Plant;
 class Reanimation;
 class TodParticleSystem;
+class Coin;
 class Zombie : public GameObject
 {
 public:
@@ -157,11 +168,35 @@ public:
     int                             mBossStompCounter;                          
     int                             mBossHeadCounter;                           
     ReanimationID                   mBossFireBallReanimID;                      
-    ReanimationID                   mSpecialHeadReanimID;                       
+    ReanimationID                   mSpecialHeadReanimID;             
+    ReanimationID                   mHeadReanimID2;
+    ReanimationID                   mHeadReanimID3;
     int                             mFireballRow;                               
     bool                            mIsFireBall;                                
     ReanimationID                   mMoweredReanimID;                           
-    int                             mLastPortalX;                               
+    int                             mLastPortalX;         
+    int                             mLastGraveX;
+    bool                            mIsBlackVariant;
+    int                             mChompedTorchwoodCooldown;
+    bool                            mIsRadioactive;
+    int                             mRadioactiveCountdown;
+    float                           mPushX;
+    int                             mPushbackCount;
+    bool                            mIsOrange;
+    int                             mOrangeEffectCountdown;
+    bool                            mIsMagnetized;
+    bool                            mIsPoisoned;
+    int                             mPoisonCountdown;
+    int                             mStunCounter;
+    bool                            mIsCorroded;
+    int                             mCorrosionCountdown;
+    CoinID                          mTargetedCoinID;
+    int                             mSunStolen;
+    int                             mShootingCounter;
+    int                             mHealCountdown;
+    ReanimationID                   mLightReanimID;
+    ZombieID                        mProtectingZombieID;
+    int                             mLaunchKernel;
 
 public:
     Zombie();
@@ -281,6 +316,8 @@ public:
     void                            UpdateBurn();
     bool                            ZombieNotWalking();
     Zombie*                         FindZombieTarget();
+    Zombie*                         FindHypnotizedZombieTarget();
+    Zombie*                         FindGargantuarTargetZombie();
     /*inline*/ void                 PlayZombieReanim(const char* theTrackName, ReanimLoopType theLoopType, int theBlendTime, float theAnimRate);
     void                            UpdateZombieBackupDancer();
     ZombiePhase                     GetDancerPhase();
@@ -294,6 +331,7 @@ public:
     void                            DrawButter(Graphics* g, const ZombieDrawPosition& theDrawPos);
     bool                            IsImmobilizied();
     void                            ApplyButter();
+    void                            ApplyPoison();
     float                           ZombieTargetLeadX(float theTime);
     void                            UpdateZombieImp();
     void                            SquishAllInSquare(int theX, int theY, ZombieAttackType theAttackType);
@@ -315,6 +353,8 @@ public:
     void                            DrawBungeeReanim(Graphics* g, const ZombieDrawPosition& theDrawPos);
     void                            DrawBungeeTarget(Graphics* g);
     void                            BungeeDie();
+    void                            DamagePlantInSquare(int theX, int theY, int theDamage);
+    void                            Stun(int theStunTime);
     void                            ZamboniDeath(unsigned int theDamageFlags);
     void                            CatapultDeath(unsigned int theDamageFlags);
     bool                            SetupDrawZombieWon(Graphics* g);
@@ -393,6 +433,29 @@ public:
     void                            SetupReanimForLostArm(unsigned int theDamageFlags);
     bool                            IsSquashTarget(Plant* theExcept);
     static /*inline*/ bool			IsZombotany(ZombieType theZombieType);
+    void                            ApplyCorrosion();
+
+    //zombotany
+    void                            UpdateZombieRepeaterHead();
+    void                            UpdateZombieSnowPeaHead();
+    void                            UpdateZombieSunflowerHead();
+    void                            UpdateZombieCherryHead();
+    void                            UpdateZombiePotatoHead();
+    void                            UpdateZombieChomperHead();
+    void                            UpdateZombieFumeshroomHead();
+    void                            UpdateZombieGravebusterHead();
+    void                            UpdateZombieHypnoshroomHead();
+    void                            UpdateZombieScaredyshroomHead();
+    void                            UpdateZombieIceshroomHead();
+    void                            UpdateZombieDoomshroomHead();
+    void                            UpdateZombieThreepeaterHead();
+    void                            UpdateZombiePlanternHead();
+    void                            UpdateZombieCactusHead();
+    void                            UpdateZombieBloverHead();
+    void                            UpdateZombieStarfruitHead();
+    void                            UpdateZombiePumpkinHead();
+    void                            UpdateZombieCabbagepultHead();
+    void                            UpdateZombieKernelpultHead();
 };
 
 class ZombieDefinition

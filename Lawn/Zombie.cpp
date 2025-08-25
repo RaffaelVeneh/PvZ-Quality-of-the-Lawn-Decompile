@@ -16,25 +16,37 @@
 #include "../Sexy.TodLib/Reanimator.h"
 #include "../Sexy.TodLib/Attachment.h"
 #include "../Sexy.TodLib/TodParticle.h"
+#include <algorithm>
 
 ZombieDefinition gZombieDefs[NUM_ZOMBIE_TYPES] = {  
+    // Zombie Type,             Animation,                Value,Start Lvl,First Wave, Pick Weight,  Name
     { ZOMBIE_NORMAL,            REANIM_ZOMBIE,              1,      1,      1,      4000,   _S("ZOMBIE")},
     { ZOMBIE_FLAG,              REANIM_ZOMBIE,              1,      1,      1,      0,      _S("FLAG_ZOMBIE")},
     { ZOMBIE_TRAFFIC_CONE,      REANIM_ZOMBIE,              2,      3,      1,      4000,   _S("CONEHEAD_ZOMBIE")},
     { ZOMBIE_POLEVAULTER,       REANIM_POLEVAULTER,         2,      6,      5,      2000,   _S("POLE_VAULTING_ZOMBIE")},
-    { ZOMBIE_PAIL,              REANIM_ZOMBIE,              4,      8,      1,      3000,   _S("BUCKETHEAD_ZOMBIE")},
-    { ZOMBIE_NEWSPAPER,         REANIM_ZOMBIE_NEWSPAPER,    2,      11,     1,      1000,   _S("NEWSPAPER_ZOMBIE")},
-    { ZOMBIE_DOOR,              REANIM_ZOMBIE,              4,      13,     5,      3500,   _S("SCREEN_DOOR_ZOMBIE")},
+    { ZOMBIE_PAIL,              REANIM_ZOMBIE,              3,      8,      1,      3500,   _S("BUCKETHEAD_ZOMBIE")},
+    { ZOMBIE_NEWSPAPER,         REANIM_ZOMBIE_NEWSPAPER,    2,      11,     1,      3000,   _S("NEWSPAPER_ZOMBIE")},
+    { ZOMBIE_RED_NEWSPAPER,     REANIM_ZOMBIE_NEWSPAPER,    2,      31,     5,      2000,   _S("RED_NEWSPAPER_ZOMBIE")},
+    { ZOMBIE_RED_EYE_NEWSPAPER, REANIM_ZOMBIE_NEWSPAPER,    3,      32,     5,      1500,   _S("RED_EYE_NEWSPAPER_ZOMBIE")},
+    { ZOMBIE_DOOR,              REANIM_ZOMBIE,              3,      13,     5,      4000,   _S("SCREEN_DOOR_ZOMBIE")},
+    { ZOMBIE_DOOR_CONEHEAD,     REANIM_ZOMBIE,              4,      14,     5,      3500,   _S("CONEHEAD_DOOR_ZOMBIE")},
+    { ZOMBIE_DOOR_BUCKETHEAD,   REANIM_ZOMBIE,              5,      15,     5,      3000,   _S("BUCKETHEAD_DOOR_ZOMBIE")},
+    { ZOMBIE_BLACK_CONEHEAD,    REANIM_ZOMBIE,              2,      9,      2,      4000,   _S("BLACK_CONEHEAD_ZOMBIE")},
+    { ZOMBIE_BLACK_BUCKETHEAD,  REANIM_ZOMBIE,              4,      22,     1,      4000,   _S("BLACK_BUCKET_ZOMBIE")},
+    { ZOMBIE_BLACK_DOOR,        REANIM_ZOMBIE,              3,      19,     5,      4000,   _S("BLACK_DOOR_ZOMBIE")},
     { ZOMBIE_FOOTBALL,          REANIM_ZOMBIE_FOOTBALL,     7,      16,     5,      2000,   _S("FOOTBALL_ZOMBIE")},
     { ZOMBIE_DANCER,            REANIM_DANCER,              5,      18,     5,      1000,   _S("DANCING_ZOMBIE")},
     { ZOMBIE_BACKUP_DANCER,     REANIM_BACKUP_DANCER,       1,      18,     1,      0,      _S("BACKUP_DANCER")},
     { ZOMBIE_DUCKY_TUBE,        REANIM_ZOMBIE,              1,      21,     5,      0,      _S("DUCKY_TUBE_ZOMBIE")},
-    { ZOMBIE_SNORKEL,           REANIM_SNORKEL,             3,      23,     10,     2000,   _S("SNORKEL_ZOMBIE")},
-    { ZOMBIE_ZAMBONI,           REANIM_ZOMBIE_ZAMBONI,      7,      26,     10,     2000,   _S("ZOMBONI")},
-    { ZOMBIE_BOBSLED,           REANIM_BOBSLED,             3,      26,     10,     2000,   _S("ZOMBIE_BOBSLED_TEAM")},
-    { ZOMBIE_DOLPHIN_RIDER,     REANIM_ZOMBIE_DOLPHINRIDER, 3,      28,     10,     1500,   _S("DOLPHIN_RIDER_ZOMBIE")},
-    { ZOMBIE_JACK_IN_THE_BOX,   REANIM_JACKINTHEBOX,        3,      31,     10,     1000,   _S("JACK_IN_THE_BOX_ZOMBIE")},
-    { ZOMBIE_BALLOON,           REANIM_BALLOON,             2,      33,     10,     2000,   _S("BALLOON_ZOMBIE")},
+    { ZOMBIE_SNORKEL,           REANIM_SNORKEL,             3,      23,     5,      4000,   _S("SNORKEL_ZOMBIE")},
+    { ZOMBIE_ZAMBONI,           REANIM_ZOMBIE_ZAMBONI,      5,      26,     10,     3000,   _S("ZOMBONI")},
+    { ZOMBIE_BOBSLED,           REANIM_BOBSLED,             3,      26,     10,     3000,   _S("ZOMBIE_BOBSLED_TEAM")},
+    { ZOMBIE_DOLPHIN_RIDER,     REANIM_ZOMBIE_DOLPHINRIDER, 3,      28,     10,     2500,   _S("DOLPHIN_RIDER_ZOMBIE")},
+    { ZOMBIE_JACK_IN_THE_BOX,   REANIM_JACKINTHEBOX,        3,      31,     10,     3000,   _S("JACK_IN_THE_BOX_ZOMBIE")},
+    { ZOMBIE_ENRAGED_JACK,      REANIM_JACKINTHEBOX,        4,      31,     10,     1500,   _S("ENRAGED_JACK_ZOMBIE")},
+    { ZOMBIE_BALLOON,           REANIM_BALLOON,             2,      33,     5,      3500,   _S("BALLOON_ZOMBIE")},
+    { ZOMBIE_PURPLE_BALLOON,    REANIM_BALLOON,             2,      33,     5,      2500,   _S("PURPLE_BALLOON_ZOMBIE")},
+    { ZOMBIE_BLACK_BALLOON,     REANIM_BALLOON,             2,      34,     6,      2000,   _S("BLACK_BALLOON_ZOMBIE")},
     { ZOMBIE_DIGGER,            REANIM_DIGGER,              4,      36,     10,     1000,   _S("DIGGER_ZOMBIE")},
     { ZOMBIE_POGO,              REANIM_POGO,                4,      38,     10,     1000,   _S("POGO_ZOMBIE")},
     { ZOMBIE_YETI,              REANIM_YETI,                4,      40,     1,      1,      _S("ZOMBIE_YETI")},
@@ -47,10 +59,33 @@ ZombieDefinition gZombieDefs[NUM_ZOMBIE_TYPES] = {
     { ZOMBIE_REDEYE_GARGANTUAR, REANIM_GARGANTUAR,          10,     48,     15,     6000,   _S("REDEYED_GARGANTUAR")},
     { ZOMBIE_PEA_HEAD,          REANIM_ZOMBIE,              1,      99,     1,      4000,   _S("PEASHOOTER_ZOMBIE")},
     { ZOMBIE_WALLNUT_HEAD,      REANIM_ZOMBIE,              4,      99,     1,      3000,   _S("WALLNUT_ZOMBIE")},
-    { ZOMBIE_JALAPENO_HEAD,     REANIM_ZOMBIE,              3,      99,     10,     1000,   _S("JALAPENO_ZOMBIE")},
-    { ZOMBIE_GATLING_HEAD,      REANIM_ZOMBIE,              3,      99,     10,     2000,   _S("GATLING_ZOMBIE")},
-    { ZOMBIE_SQUASH_HEAD,       REANIM_ZOMBIE,              3,      99,     10,     2000,   _S("SQUASH_ZOMBIE")},
-    { ZOMBIE_TALLNUT_HEAD,      REANIM_ZOMBIE,              4,      99,     10,     2000,   _S("TALLNUT_ZOMBIE")}
+    { ZOMBIE_JALAPENO_HEAD,     REANIM_ZOMBIE,              3,      99,     10,     2000,   _S("JALAPENO_ZOMBIE")},
+    { ZOMBIE_GATLING_HEAD,      REANIM_ZOMBIE,              3,      99,     10,     3000,   _S("GATLING_ZOMBIE")},
+    { ZOMBIE_SQUASH_HEAD,       REANIM_ZOMBIE,              3,      99,     10,     3000,   _S("SQUASH_ZOMBIE")},
+    { ZOMBIE_TALLNUT_HEAD,      REANIM_ZOMBIE,              4,      99,     10,     2000,   _S("TALLNUT_ZOMBIE")},
+    { ZOMBIE_REPEATER_HEAD,     REANIM_ZOMBIE,              3,      99,     1,      3000,   _S("REPEATER_ZOMBIE")},
+    { ZOMBIE_SNOW_HEAD,         REANIM_ZOMBIE,              3,      99,     1,      3000,   _S("SNOW_PEA_ZOMBIE")},
+    { ZOMBIE_SUNFLOWER_HEAD,    REANIM_ZOMBIE,              1,      99,     1,      4000,   _S("SUNFLOWER_ZOMBIE")},
+    { ZOMBIE_CHERRY_HEAD,       REANIM_ZOMBIE,              3,      99,     10,     3000,   _S("CHERRY_HEAD_ZOMBIE")},
+    { ZOMBIE_POTATO_HEAD,       REANIM_ZOMBIE,              3,      99,     1,      4000,   _S("POTATO_MINE_ZOMBIE")},
+    { ZOMBIE_CHOMPER_HEAD,      REANIM_ZOMBIE,              4,      99,     10,     4000,   _S("CHOMPER_ZOMBIE")},
+    { ZOMBIE_SUNSHROOM_HEAD,    REANIM_ZOMBIE,              1,      99,     1,      4000,   _S("SUNSHROOM_ZOMBIE")},
+    { ZOMBIE_FUMESHROOM_HEAD,   REANIM_ZOMBIE,              3,      99,     1,      4000,   _S("FUMESHROOM_ZOMBIE")},
+    { ZOMBIE_GRAVEBUSTER_HEAD,  REANIM_ZOMBIE,              3,      99,     1,      4000,   _S("GRAVEBUSTER_ZOMBIE")},
+    { ZOMBIE_HYPNOSHROOM_HEAD,  REANIM_ZOMBIE,              5,      99,     10,     4000,   _S("HYPNOSHROOM_ZOMBIE")},
+    { ZOMBIE_SCAREDYSHROOM_HEAD,REANIM_ZOMBIE,              1,      99,     1,      4000,   _S("SCAREDYSHROOM_ZOMBIE")},
+    { ZOMBIE_ICESHROOM_HEAD,    REANIM_ZOMBIE,              3,      99,     10,     2000,   _S("ICESHROOM_ZOMBIE")},
+    { ZOMBIE_DOOMSHROOM_HEAD,   REANIM_ZOMBIE,              10,     99,     10,     1000,   _S("DOOMSHROOM_ZOMBIE")},
+    { ZOMBIE_THREEPEATER_HEAD,  REANIM_ZOMBIE,              1,      99,     1,      4000,   _S("THREEPEATER_ZOMBIE")},
+    { ZOMBIE_PLANTERN_HEAD,     REANIM_ZOMBIE,              3,      99,     1,      4000,   _S("PLANTERN_ZOMBIE")},
+    { ZOMBIE_CACTUS_HEAD,       REANIM_ZOMBIE,              1,      99,     1,      4000,   _S("CACTUS_ZOMBIE")},
+    { ZOMBIE_BLOVER_HEAD,       REANIM_ZOMBIE,              4,      99,     10,     2000,   _S("BLOVER_ZOMBIE")},
+    { ZOMBIE_STARFRUIT_HEAD,    REANIM_ZOMBIE,              1,      99,     1,      4000,   _S("STARFRUIT_ZOMBIE")},
+    { ZOMBIE_PUMPKIN_HEAD,      REANIM_ZOMBIE,              3,      99,     1,      4000,   _S("PUMPKIN_ZOMBIE")},
+    { ZOMBIE_CABBAGEPULT_HEAD,  REANIM_ZOMBIE,              1,      99,     1,      4000,   _S("CABBAGEPULT_ZOMBIE")},
+    { ZOMBIE_KERNELPULT_HEAD,   REANIM_ZOMBIE,              1,      99,     1,      4000,   _S("KERNELPULT_ZOMBIE")},
+    { ZOMBIE_COFFEE_HEAD,       REANIM_ZOMBIE,              3,      99,     1,      4000,   _S("COFFEE_BEAN_ZOMBIE")},
+    { ZOMBIE_GARLIC_HEAD,       REANIM_ZOMBIE,              1,      99,     1,      4000,   _S("GARLIC_ZOMBIE")},
 };
 
 static ZombieType gBossZombieList[] = {  
@@ -153,6 +188,22 @@ void Zombie::ZombieInitialize(int theRow, ZombieType theType, bool theVariant, Z
     mIsFireBall = false;
     mMoweredReanimID = ReanimationID::REANIMATIONID_NULL;
     mLastPortalX = -1;
+    mIsBlackVariant = false;
+    mLastGraveX = -1;
+    mChompedTorchwoodCooldown = 0;
+    mIsRadioactive = false;
+    mPushX = 0.0f;
+    mPushbackCount = 0;
+    mRadioactiveCountdown = 0;
+    mIsOrange = false;
+    mOrangeEffectCountdown = 0;
+    mIsMagnetized = false;
+    mIsPoisoned = false;
+    mPoisonCountdown = 0;
+    mStunCounter = 0;
+    mIsCorroded = false;
+    mCorrosionCountdown = 0;
+    mTargetedCoinID = COINID_NULL;
     for (int i = 0; i < MAX_ZOMBIE_FOLLOWERS; i++)
     {
         mFollowerZombieID[i] = ZombieID::ZOMBIEID_NULL;
@@ -203,6 +254,68 @@ void Zombie::ZombieInitialize(int theRow, ZombieType theType, bool theVariant, Z
         mShieldHealth = 1100;
         LoadPlainZombieReanim();
         AttachShield();
+        break;
+
+    case ZombieType::ZOMBIE_DOOR_CONEHEAD:
+        mShieldType = ShieldType::SHIELDTYPE_DOOR;
+        mShieldHealth = 1100;
+
+        mHelmType = HelmType::HELMTYPE_TRAFFIC_CONE;
+        mHelmHealth = 370;
+
+        LoadPlainZombieReanim();
+        AttachShield();
+        ReanimShowPrefix("anim_cone", RENDER_GROUP_NORMAL);
+        ReanimShowPrefix("anim_hair", RENDER_GROUP_HIDDEN);
+        break;
+
+    case ZombieType::ZOMBIE_DOOR_BUCKETHEAD:
+        mShieldType = ShieldType::SHIELDTYPE_DOOR;
+        mShieldHealth = 1100;
+
+        mHelmType = HelmType::HELMTYPE_PAIL;
+        mHelmHealth = 1100;
+
+        LoadPlainZombieReanim();
+        AttachShield();
+        ReanimShowPrefix("anim_bucket", RENDER_GROUP_NORMAL);
+        ReanimShowPrefix("anim_hair", RENDER_GROUP_HIDDEN);
+        break;
+
+    case ZombieType::ZOMBIE_BLACK_CONEHEAD:
+        LoadPlainZombieReanim();
+        ReanimShowPrefix("anim_cone", RENDER_GROUP_NORMAL);
+        ReanimShowPrefix("anim_hair", RENDER_GROUP_HIDDEN);
+        mHelmType = HelmType::HELMTYPE_BLACK_CONE;
+        mHelmHealth = 740; // Double of 370
+        {
+            Reanimation* aBodyReanim = mApp->ReanimationGet(mBodyReanimID);
+            aBodyReanim->SetImageOverride("anim_cone", IMAGE_REANIM_ZOMBIE_BLACK_CONE1);
+        }
+        break;
+
+    case ZombieType::ZOMBIE_BLACK_BUCKETHEAD:
+        LoadPlainZombieReanim();
+        ReanimShowPrefix("anim_bucket", RENDER_GROUP_NORMAL);
+        ReanimShowPrefix("anim_hair", RENDER_GROUP_HIDDEN);
+        mHelmType = HelmType::HELMTYPE_BLACK_PAIL;
+        mHelmHealth = 2200; // Double of 1100
+
+        {
+            Reanimation* aBodyReanim = mApp->ReanimationGet(mBodyReanimID);
+            aBodyReanim->SetImageOverride("anim_bucket", IMAGE_REANIM_ZOMBIE_BLACK_BUCKET1);
+        }
+        break;
+
+    case ZombieType::ZOMBIE_BLACK_DOOR:
+        mShieldType = ShieldType::SHIELDTYPE_BLACK_DOOR;
+        mShieldHealth = 2200; // Double of 1100
+        LoadPlainZombieReanim();
+        AttachShield();
+        {
+            Reanimation* aBodyReanim = mApp->ReanimationGet(mBodyReanimID);
+            aBodyReanim->SetImageOverride("anim_screendoor", IMAGE_REANIM_ZOMBIE_BLACK_SCREENDOOR1);
+        }
         break;
 
     case ZombieType::ZOMBIE_YETI:  
@@ -269,7 +382,7 @@ void Zombie::ZombieInitialize(int theRow, ZombieType theType, bool theVariant, Z
         mZombieRect = Rect(50, 0, 57, 115);
         ReanimShowPrefix("anim_hair", RENDER_GROUP_HIDDEN);
         mHelmType = HelmType::HELMTYPE_FOOTBALL;
-        mHelmHealth = 1400;
+        mHelmHealth = 1800;
         mAnimTicksPerFrame = 6;
         mVariant = false;
         break;
@@ -445,6 +558,24 @@ void Zombie::ZombieInitialize(int theRow, ZombieType theType, bool theVariant, Z
         break;
     }
 
+    case ZombieType::ZOMBIE_ENRAGED_JACK:
+    {
+        mBodyHealth = 500;
+        mAnimTicksPerFrame = 6;
+        int aDistance = 250 + Rand(150); // Shorter fuse than normal
+        mPhaseCounter = (int)(aDistance / mVelX) * ZOMBIE_LIMP_SPEED_FACTOR;
+        mZombieAttackRect = Rect(20, 0, 50, 115);
+        if (IsOnBoard()) mZombiePhase = ZombiePhase::PHASE_JACK_IN_THE_BOX_RUNNING;
+
+        // Apply red filter for "enraged" look
+        Reanimation* aBodyReanim = mApp->ReanimationGet(mBodyReanimID);
+        if (aBodyReanim)
+        {
+            aBodyReanim->mColorOverride = Color(255, 128, 128);
+        }
+        break;
+    }
+
     case ZombieType::ZOMBIE_BOBSLED:  
     {
         aRenderOffset = 3;
@@ -507,6 +638,11 @@ void Zombie::ZombieInitialize(int theRow, ZombieType theType, bool theVariant, Z
 
     case ZombieType::ZOMBIE_FLAG:  
     {
+        if (IsOnBoard())
+        {
+            mBoard->mGravesMayRise = true;
+        }
+
         mHasObject = true;
         LoadPlainZombieReanim();
 
@@ -517,6 +653,31 @@ void Zombie::ZombieInitialize(int theRow, ZombieType theType, bool theVariant, Z
         ReanimatorTrackInstance* aTrackInstance = aBodyReanim->GetTrackInstanceByName("Zombie_flaghand");
         AttachReanim(aTrackInstance->mAttachmentID, aFlagReanim, 0.0f, 0.0f);
         aBodyReanim->mFrameBasePose = 0;
+
+        if (mBoard->mLevel >= 21)
+        {
+            mHelmHealth = 3000;
+            mShieldHealth = 3000;
+            mBodyHealth = 2000;
+            mHelmType = HelmType::HELMTYPE_BLACK_PAIL;
+            mShieldType = ShieldType::SHIELDTYPE_BLACK_DOOR;
+
+            aBodyReanim->SetImageOverride("anim_bucket", IMAGE_REANIM_ZOMBIE_BLACK_BUCKET1);
+            aBodyReanim->SetImageOverride("anim_screendoor", IMAGE_REANIM_ZOMBIE_BLACK_SCREENDOOR1);
+        }
+        else
+        {
+            mHelmHealth = 1500;
+            mShieldHealth = 1500;
+            mBodyHealth = 1000;
+        }
+
+        ReanimShowPrefix("anim_bucket", RENDER_GROUP_NORMAL);
+        ReanimShowPrefix("anim_hair", RENDER_GROUP_HIDDEN);
+        AttachShield();
+
+        mVelX = 0.8f;
+        UpdateAnimSpeed();
 
         mPosX = WIDE_BOARD_WIDTH;
         break;
@@ -537,9 +698,41 @@ void Zombie::ZombieInitialize(int theRow, ZombieType theType, bool theVariant, Z
         mZombieAttackRect = Rect(20, 0, 50, 115);
         mZombiePhase = ZombiePhase::PHASE_NEWSPAPER_READING;
         mShieldType = ShieldType::SHIELDTYPE_NEWSPAPER;
-        mShieldHealth = 150;
+        mBodyHealth = 400;
+        mShieldHealth = 200;
         mVariant = false;
         AttachShield();
+        break;
+
+    case ZombieType::ZOMBIE_RED_NEWSPAPER:
+        mZombieAttackRect = Rect(20, 0, 50, 115);
+        mZombiePhase = ZombiePhase::PHASE_NEWSPAPER_READING;
+        mShieldType = ShieldType::SHIELDTYPE_NEWSPAPER;
+        mBodyHealth = 500; // A bit tougher
+        mShieldHealth = 700; // A bit tougher
+        mVariant = false;
+        AttachShield();
+        {
+            Reanimation* aBodyReanim = mApp->ReanimationGet(mBodyReanimID);
+            aBodyReanim->SetImageOverride("Zombie_paper_paper", IMAGE_REANIM_ZOMBIE_RED_PAPER1);
+        }
+        break;
+
+    case ZombieType::ZOMBIE_RED_EYE_NEWSPAPER:
+        mZombieAttackRect = Rect(20, 0, 50, 115);
+        mZombiePhase = ZombiePhase::PHASE_NEWSPAPER_READING;
+        mShieldType = ShieldType::SHIELDTYPE_NEWSPAPER;
+        mBodyHealth = 800;
+        mShieldHealth = 350;
+        mVariant = false;
+        AttachShield();
+        PickRandomSpeed();
+        mVelX *= 2.4f;
+        AttachShield();
+        {
+            Reanimation* aBodyReanim = mApp->ReanimationGet(mBodyReanimID);
+            aBodyReanim->SetImageOverride("anim_head1", IMAGE_REANIM_ZOMBIE_RED_PAPER_HEAD_LOOK);
+        }
         break;
 
     case ZombieType::ZOMBIE_BALLOON:  
@@ -570,7 +763,58 @@ void Zombie::ZombieInitialize(int theRow, ZombieType theType, bool theVariant, Z
         mVariant = false;
         break;
     }
-
+    case ZombieType::ZOMBIE_PURPLE_BALLOON:
+    {
+        Reanimation* aBodyReanim = mApp->ReanimationGet(mBodyReanimID);
+        aBodyReanim->SetImageOverride("Zombie_balloon_top", IMAGE_REANIM_ZOMBIE_PURPLE_BALLOON_TOP);
+        aBodyReanim->SetTruncateDisappearingFrames(nullptr, false);
+        if (IsOnBoard())
+        {
+            mAltitude = 25.0f;
+            mZombiePhase = ZombiePhase::PHASE_BALLOON_FLYING;
+            PlayZombieReanim("anim_idle", ReanimLoopType::REANIM_LOOP, 0, aBodyReanim->mAnimRate);
+        }
+        else
+        {
+            float aAnimRate = RandRangeFloat(8.0f, 10.0f);
+            SetAnimRate(aAnimRate);
+        }
+        Reanimation* aPropellerReanim = mApp->AddReanimation(0.0f, 0.0f, 0, aZombieDef.mReanimationType);
+        aPropellerReanim->SetFramesForLayer("Propeller");
+        aPropellerReanim->mLoopType = ReanimLoopType::REANIM_LOOP_FULL_LAST_FRAME;
+        aPropellerReanim->AttachToAnotherReanimation(aBodyReanim, "hat");
+        mFlyingHealth = 100; // 5 normal spike hits
+        mZombieRect = Rect(36, 30, 42, 115);
+        mZombieAttackRect = Rect(20, 30, 50, 115);
+        mVariant = false;
+        break;
+    }
+    case ZombieType::ZOMBIE_BLACK_BALLOON:
+    {
+        Reanimation* aBodyReanim = mApp->ReanimationGet(mBodyReanimID);
+        aBodyReanim->SetImageOverride("Zombie_balloon_top", IMAGE_REANIM_ZOMBIE_BLACK_BALLOON_TOP);
+        aBodyReanim->SetTruncateDisappearingFrames(nullptr, false);
+        if (IsOnBoard())
+        {
+            mAltitude = 25.0f;
+            mZombiePhase = ZombiePhase::PHASE_BALLOON_FLYING;
+            PlayZombieReanim("anim_idle", ReanimLoopType::REANIM_LOOP, 0, aBodyReanim->mAnimRate);
+        }
+        else
+        {
+            float aAnimRate = RandRangeFloat(8.0f, 10.0f);
+            SetAnimRate(aAnimRate);
+        }
+        Reanimation* aPropellerReanim = mApp->AddReanimation(0.0f, 0.0f, 0, aZombieDef.mReanimationType);
+        aPropellerReanim->SetFramesForLayer("Propeller");
+        aPropellerReanim->mLoopType = ReanimLoopType::REANIM_LOOP_FULL_LAST_FRAME;
+        aPropellerReanim->AttachToAnotherReanimation(aBodyReanim, "hat");
+        mFlyingHealth = 200; // 10 normal spike hits
+        mZombieRect = Rect(36, 30, 42, 115);
+        mZombieAttackRect = Rect(20, 30, 50, 115);
+        mVariant = false;
+        break;
+    }
     case ZombieType::ZOMBIE_DANCER:  
         if (!IsOnBoard())
         {
@@ -671,7 +915,7 @@ void Zombie::ZombieInitialize(int theRow, ZombieType theType, bool theVariant, Z
         TodScaleRotateTransformMatrix(aAttachEffect->mOffset, 50.0f, 0.0f, 0.2f, -0.8f, 0.8f);
 
         mHelmType = HelmType::HELMTYPE_WALLNUT;
-        mHelmHealth = 1100;
+        mHelmHealth = 2200;
         mVariant = false;
         break;
     }
@@ -692,8 +936,8 @@ void Zombie::ZombieInitialize(int theRow, ZombieType theType, bool theVariant, Z
         aBodyReanim->mFrameBasePose = 0;
         TodScaleRotateTransformMatrix(aAttachEffect->mOffset, 37.0f, 0.0f, 0.2f, -0.8f, 0.8f);
 
-        mHelmType = HelmType::HELMTYPE_WALLNUT;
-        mHelmHealth = 2200;
+        mHelmType = HelmType::HELMTYPE_TALLNUT;
+        mHelmHealth = 4400;
         mVariant = false;
         mPosX += 30.0f;
         break;
@@ -750,6 +994,7 @@ void Zombie::ZombieInitialize(int theRow, ZombieType theType, bool theVariant, Z
 
     case ZombieType::ZOMBIE_SQUASH_HEAD:  
     {
+        mBodyHealth = 500;
         LoadPlainZombieReanim();
         ReanimShowPrefix("anim_hair", RENDER_GROUP_HIDDEN);
         ReanimShowPrefix("anim_head2", RENDER_GROUP_HIDDEN);
@@ -771,6 +1016,638 @@ void Zombie::ZombieInitialize(int theRow, ZombieType theType, bool theVariant, Z
 
         mZombiePhase = ZombiePhase::PHASE_SQUASH_PRE_LAUNCH;
         mVariant = false;
+        break;
+    }
+    case ZombieType::ZOMBIE_REPEATER_HEAD:
+    {
+        LoadPlainZombieReanim();
+        ReanimShowPrefix("anim_hair", RENDER_GROUP_HIDDEN);
+        ReanimShowPrefix("anim_head2", RENDER_GROUP_HIDDEN);
+
+        Reanimation* aBodyReanim = mApp->ReanimationGet(mBodyReanimID);
+        if (IsOnBoard())
+        {
+            aBodyReanim->SetFramesForLayer("anim_walk2");
+        }
+
+        ReanimatorTrackInstance* aTrackInstance = aBodyReanim->GetTrackInstanceByName("anim_head1");
+        aTrackInstance->mImageOverride = IMAGE_BLANK;
+        Reanimation* aHeadReanim = mApp->AddReanimation(0.0f, 0.0f, 0, ReanimationType::REANIM_REPEATER);
+        aHeadReanim->PlayReanim("anim_head_idle", ReanimLoopType::REANIM_LOOP, 0, 15.0f);
+        mSpecialHeadReanimID = mApp->ReanimationGetID(aHeadReanim);
+        AttachEffect* aAttachEffect = AttachReanim(aTrackInstance->mAttachmentID, aHeadReanim, 0.0f, 0.0f);
+        aBodyReanim->mFrameBasePose = 0;
+        TodScaleRotateTransformMatrix(aAttachEffect->mOffset, 65.0f, -5.0f, 0.2f, -1.0f, 1.0f);
+
+        mPhaseCounter = 150;
+        mVariant = false;
+        break;
+    }
+    case ZombieType::ZOMBIE_SNOW_HEAD:
+    {
+        LoadPlainZombieReanim();
+        ReanimShowPrefix("anim_hair", RENDER_GROUP_HIDDEN);
+        ReanimShowPrefix("anim_head2", RENDER_GROUP_HIDDEN);
+
+        Reanimation* aBodyReanim = mApp->ReanimationGet(mBodyReanimID);
+        if (IsOnBoard())
+        {
+            aBodyReanim->SetFramesForLayer("anim_walk2");
+        }
+
+        ReanimatorTrackInstance* aTrackInstance = aBodyReanim->GetTrackInstanceByName("anim_head1");
+        aTrackInstance->mImageOverride = IMAGE_BLANK;
+        Reanimation* aHeadReanim = mApp->AddReanimation(0.0f, 0.0f, 0, ReanimationType::REANIM_SNOWPEA);
+        aHeadReanim->PlayReanim("anim_head_idle", ReanimLoopType::REANIM_LOOP, 0, 15.0f);
+        mSpecialHeadReanimID = mApp->ReanimationGetID(aHeadReanim);
+        AttachEffect* aAttachEffect = AttachReanim(aTrackInstance->mAttachmentID, aHeadReanim, 0.0f, 0.0f);
+        aBodyReanim->mFrameBasePose = 0;
+        TodScaleRotateTransformMatrix(aAttachEffect->mOffset, 65.0f, -5.0f, 0.2f, -1.0f, 1.0f);
+
+        mPhaseCounter = 150;
+        mVariant = false;
+        break;
+    }
+
+    case ZombieType::ZOMBIE_SUNFLOWER_HEAD:
+    {
+        mBodyHealth = 350;
+        LoadPlainZombieReanim();
+        ReanimShowPrefix("anim_hair", RENDER_GROUP_HIDDEN);
+        ReanimShowPrefix("anim_head2", RENDER_GROUP_HIDDEN);
+
+        Reanimation* aBodyReanim = mApp->ReanimationGet(mBodyReanimID);
+        if (IsOnBoard())
+        {
+            aBodyReanim->SetFramesForLayer("anim_walk2");
+        }
+
+        ReanimatorTrackInstance* aTrackInstance = aBodyReanim->GetTrackInstanceByName("anim_head1");
+        aTrackInstance->mImageOverride = IMAGE_BLANK;
+        Reanimation* aHeadReanim = mApp->AddReanimation(0.0f, 0.0f, 0, ReanimationType::REANIM_SUNFLOWER);
+        aHeadReanim->PlayReanim("anim_head_idle", ReanimLoopType::REANIM_LOOP, 0, 15.0f);
+        mSpecialHeadReanimID = mApp->ReanimationGetID(aHeadReanim);
+        AttachEffect* aAttachEffect = AttachReanim(aTrackInstance->mAttachmentID, aHeadReanim, 0.0f, 0.0f);
+        aBodyReanim->mFrameBasePose = 0;
+        TodScaleRotateTransformMatrix(aAttachEffect->mOffset, 65.0f, -5.0f, 0.2f, -1.0f, 1.0f);
+
+        mVariant = false;
+        mTargetedCoinID = COINID_NULL;
+        mZombiePhase = PHASE_SUNFLOWER_WALKING;
+        mSummonCounter = 300;
+        mSunStolen = 0;
+        break;
+    }
+    case ZombieType::ZOMBIE_CHERRY_HEAD:
+    {
+        mBodyHealth = 500;
+        LoadPlainZombieReanim();
+        ReanimShowPrefix("anim_hair", RENDER_GROUP_HIDDEN);
+        ReanimShowPrefix("anim_head2", RENDER_GROUP_HIDDEN);
+
+        Reanimation* aBodyReanim = mApp->ReanimationGet(mBodyReanimID);
+        if (IsOnBoard())
+        {
+            aBodyReanim->SetFramesForLayer("anim_walk2");
+        }
+
+        ReanimatorTrackInstance* aTrackInstance = aBodyReanim->GetTrackInstanceByName("anim_head1");
+        aTrackInstance->mImageOverride = IMAGE_BLANK;
+        Reanimation* aHeadReanim = mApp->AddReanimation(0.0f, 0.0f, 0, ReanimationType::REANIM_CHERRYBOMB);
+        aHeadReanim->PlayReanim("anim_idle", ReanimLoopType::REANIM_LOOP, 0, 15.0f);
+        mSpecialHeadReanimID = mApp->ReanimationGetID(aHeadReanim);
+        AttachEffect* aAttachEffect = AttachReanim(aTrackInstance->mAttachmentID, aHeadReanim, 0.0f, 0.0f);
+        aBodyReanim->mFrameBasePose = 0;
+        TodScaleRotateTransformMatrix(aAttachEffect->mOffset, 70.0f, -15.0f, 0.2f, -1.0f, 1.0f);
+        mVariant = false;
+        break;
+    }
+    case ZombieType::ZOMBIE_POTATO_HEAD:
+    {
+        mBodyHealth = 270; // Standard health
+        LoadPlainZombieReanim();
+        ReanimShowPrefix("anim_hair", RENDER_GROUP_HIDDEN);
+        ReanimShowPrefix("anim_head2", RENDER_GROUP_HIDDEN);
+
+        Reanimation* aBodyReanim = mApp->ReanimationGet(mBodyReanimID);
+        if (IsOnBoard())
+        {
+            aBodyReanim->SetFramesForLayer("anim_walk2");
+        }
+
+        ReanimatorTrackInstance* aTrackInstance = aBodyReanim->GetTrackInstanceByName("anim_head1");
+        aTrackInstance->mImageOverride = IMAGE_BLANK;
+        Reanimation* aHeadReanim = mApp->AddReanimation(0.0f, 0.0f, 0, ReanimationType::REANIM_POTATOMINE);
+        aHeadReanim->SetFramesForLayer("anim_armed"); // Start in the armed state
+        aHeadReanim->mLoopType = ReanimLoopType::REANIM_LOOP;
+        aHeadReanim->mAnimRate = 15.0f;
+        mSpecialHeadReanimID = mApp->ReanimationGetID(aHeadReanim);
+        AttachEffect* aAttachEffect = AttachReanim(aTrackInstance->mAttachmentID, aHeadReanim, 0.0f, 0.0f);
+        aBodyReanim->mFrameBasePose = 0;
+        TodScaleRotateTransformMatrix(aAttachEffect->mOffset, 50.0f, -5.0f, 0.2f, -0.6f, 0.6f);
+        mVariant = false;
+        break;
+    }
+    case ZombieType::ZOMBIE_CHOMPER_HEAD:
+    {
+        mBodyHealth = 700; // Give it some decent health
+        LoadPlainZombieReanim();
+        ReanimShowPrefix("anim_hair", RENDER_GROUP_HIDDEN);
+        ReanimShowPrefix("anim_head2", RENDER_GROUP_HIDDEN);
+
+        Reanimation* aBodyReanim = mApp->ReanimationGet(mBodyReanimID);
+        if (IsOnBoard())
+        {
+            aBodyReanim->SetFramesForLayer("anim_walk2");
+        }
+
+        ReanimatorTrackInstance* aTrackInstance = aBodyReanim->GetTrackInstanceByName("anim_head1");
+        aTrackInstance->mImageOverride = IMAGE_BLANK;
+        Reanimation* aHeadReanim = mApp->AddReanimation(0.0f, 0.0f, 0, ReanimationType::REANIM_CHOMPER);
+        aHeadReanim->PlayReanim("anim_idle", ReanimLoopType::REANIM_LOOP, 0, 15.0f);
+        mSpecialHeadReanimID = mApp->ReanimationGetID(aHeadReanim);
+        AttachEffect* aAttachEffect = AttachReanim(aTrackInstance->mAttachmentID, aHeadReanim, 0.0f, 0.0f);
+        aBodyReanim->mFrameBasePose = 0;
+        TodScaleRotateTransformMatrix(aAttachEffect->mOffset, 65.0f, -5.0f, 0.2f, -1.0f, 1.0f);
+        mVariant = false;
+        break;
+    }
+    case ZombieType::ZOMBIE_SUNSHROOM_HEAD:
+    {
+        mBodyHealth = 350; // A bit tougher than a basic zombie
+        LoadPlainZombieReanim();
+        ReanimShowPrefix("anim_hair", RENDER_GROUP_HIDDEN);
+        ReanimShowPrefix("anim_head2", RENDER_GROUP_HIDDEN);
+
+        Reanimation* aBodyReanim = mApp->ReanimationGet(mBodyReanimID);
+        if (IsOnBoard())
+        {
+            aBodyReanim->SetFramesForLayer("anim_walk2");
+        }
+
+        ReanimatorTrackInstance* aTrackInstance = aBodyReanim->GetTrackInstanceByName("anim_head1");
+        aTrackInstance->mImageOverride = IMAGE_BLANK;
+        Reanimation* aHeadReanim = mApp->AddReanimation(0.0f, 0.0f, 0, ReanimationType::REANIM_SUNSHROOM);
+        aHeadReanim->PlayReanim("anim_bigidle", ReanimLoopType::REANIM_LOOP, 0, 15.0f); // Use the big idle animation
+        mSpecialHeadReanimID = mApp->ReanimationGetID(aHeadReanim);
+        AttachEffect* aAttachEffect = AttachReanim(aTrackInstance->mAttachmentID, aHeadReanim, 0.0f, 0.0f);
+        aBodyReanim->mFrameBasePose = 0;
+        TodScaleRotateTransformMatrix(aAttachEffect->mOffset, 65.0f, -25.0f, 0.2f, -1.0f, 1.0f);
+        mVariant = false;
+        break;
+    }
+    case ZombieType::ZOMBIE_FUMESHROOM_HEAD:
+    {
+        mBodyHealth = 300; // Moderately tough
+        LoadPlainZombieReanim();
+        ReanimShowPrefix("anim_hair", RENDER_GROUP_HIDDEN);
+        ReanimShowPrefix("anim_head2", RENDER_GROUP_HIDDEN);
+
+        Reanimation* aBodyReanim = mApp->ReanimationGet(mBodyReanimID);
+        if (IsOnBoard())
+        {
+            aBodyReanim->SetFramesForLayer("anim_walk2");
+        }
+
+        ReanimatorTrackInstance* aTrackInstance = aBodyReanim->GetTrackInstanceByName("anim_head1");
+        aTrackInstance->mImageOverride = IMAGE_BLANK;
+        Reanimation* aHeadReanim = mApp->AddReanimation(0.0f, 0.0f, 0, ReanimationType::REANIM_FUMESHROOM);
+        aHeadReanim->PlayReanim("anim_idle", ReanimLoopType::REANIM_LOOP, 0, 15.0f);
+        mSpecialHeadReanimID = mApp->ReanimationGetID(aHeadReanim);
+        AttachEffect* aAttachEffect = AttachReanim(aTrackInstance->mAttachmentID, aHeadReanim, 0.0f, 0.0f);
+        aBodyReanim->mFrameBasePose = 0;
+        TodScaleRotateTransformMatrix(aAttachEffect->mOffset, 55.0f, -15.0f, 0.2f, -0.8f, 0.8f);
+        mVariant = false;
+
+        mZombiePhase = PHASE_ZOMBIE_NORMAL; // Ensure it starts in the default walking state.
+        mPhaseCounter = 150;
+        break;
+    }
+    case ZombieType::ZOMBIE_GRAVEBUSTER_HEAD:
+    {
+        mBodyHealth = 450;
+        LoadPlainZombieReanim();
+        ReanimShowPrefix("anim_hair", RENDER_GROUP_HIDDEN);
+        ReanimShowPrefix("anim_head2", RENDER_GROUP_HIDDEN);
+
+        Reanimation* aBodyReanim = mApp->ReanimationGet(mBodyReanimID);
+        if (IsOnBoard())
+        {
+            aBodyReanim->SetFramesForLayer("anim_walk2");
+        }
+
+        ReanimatorTrackInstance* aTrackInstance = aBodyReanim->GetTrackInstanceByName("anim_head1");
+        aTrackInstance->mImageOverride = IMAGE_BLANK;
+        Reanimation* aHeadReanim = mApp->AddReanimation(0.0f, 0.0f, 0, ReanimationType::REANIM_GRAVE_BUSTER);
+        aHeadReanim->PlayReanim("anim_idle", REANIM_LOOP, 0, 15.0f);
+        mSpecialHeadReanimID = mApp->ReanimationGetID(aHeadReanim);
+        AttachEffect* aAttachEffect = AttachReanim(aTrackInstance->mAttachmentID, aHeadReanim, 0.0f, 0.0f);
+        aBodyReanim->mFrameBasePose = 0;
+        TodScaleRotateTransformMatrix(aAttachEffect->mOffset, 60.0f, -15.0f, 0.2f, -0.8f, 0.8f);
+        mVariant = false;
+        break;
+    }
+    case ZombieType::ZOMBIE_HYPNOSHROOM_HEAD:
+    {
+        LoadPlainZombieReanim();
+        ReanimShowPrefix("anim_hair", RENDER_GROUP_HIDDEN);
+        ReanimShowPrefix("anim_head2", RENDER_GROUP_HIDDEN);
+
+        Reanimation* aBodyReanim = mApp->ReanimationGet(mBodyReanimID);
+        if (IsOnBoard())
+        {
+            aBodyReanim->SetFramesForLayer("anim_walk2");
+        }
+
+        ReanimatorTrackInstance* aTrackInstance = aBodyReanim->GetTrackInstanceByName("anim_head1");
+        aTrackInstance->mImageOverride = IMAGE_BLANK;
+        Reanimation* aHeadReanim = mApp->AddReanimation(0.0f, 0.0f, 0, ReanimationType::REANIM_HYPNOSHROOM);
+        aHeadReanim->PlayReanim("anim_idle", REANIM_LOOP, 0, 15.0f);
+        mSpecialHeadReanimID = mApp->ReanimationGetID(aHeadReanim);
+        AttachEffect* aAttachEffect = AttachReanim(aTrackInstance->mAttachmentID, aHeadReanim, 0.0f, 0.0f);
+        aBodyReanim->mFrameBasePose = 0;
+        TodScaleRotateTransformMatrix(aAttachEffect->mOffset, 55.0f, -15.0f, 0.2f, -0.8f, 0.8f);
+        mVariant = false;
+        break;
+    }
+    case ZombieType::ZOMBIE_SCAREDYSHROOM_HEAD:
+    {
+        LoadPlainZombieReanim();
+        ReanimShowPrefix("anim_hair", RENDER_GROUP_HIDDEN);
+        ReanimShowPrefix("anim_head2", RENDER_GROUP_HIDDEN);
+
+        Reanimation* aBodyReanim = mApp->ReanimationGet(mBodyReanimID);
+        if (IsOnBoard())
+        {
+            aBodyReanim->SetFramesForLayer("anim_walk2");
+        }
+
+        ReanimatorTrackInstance* aTrackInstance = aBodyReanim->GetTrackInstanceByName("anim_head1");
+        aTrackInstance->mImageOverride = IMAGE_BLANK;
+        Reanimation* aHeadReanim = mApp->AddReanimation(0.0f, 0.0f, 0, ReanimationType::REANIM_SCRAREYSHROOM);
+        aHeadReanim->PlayReanim("anim_idle", REANIM_LOOP, 0, 15.0f);
+        mSpecialHeadReanimID = mApp->ReanimationGetID(aHeadReanim);
+        AttachEffect* aAttachEffect = AttachReanim(aTrackInstance->mAttachmentID, aHeadReanim, 0.0f, 0.0f);
+        aBodyReanim->mFrameBasePose = 0;
+        TodScaleRotateTransformMatrix(aAttachEffect->mOffset, 62.0f, -35.0f, 0.2f, -1.0f, 1.0f);
+
+        mPhaseCounter = 150; // Initial shooting cooldown
+        mVariant = false; // Using mVariant to track if it's scared or not
+        break;
+    }
+    case ZombieType::ZOMBIE_ICESHROOM_HEAD:
+    {
+        LoadPlainZombieReanim();
+        ReanimShowPrefix("anim_hair", RENDER_GROUP_HIDDEN);
+        ReanimShowPrefix("anim_head2", RENDER_GROUP_HIDDEN);
+
+        Reanimation* aBodyReanim = mApp->ReanimationGet(mBodyReanimID);
+        if (IsOnBoard())
+        {
+            aBodyReanim->SetFramesForLayer("anim_walk2");
+        }
+
+        ReanimatorTrackInstance* aTrackInstance = aBodyReanim->GetTrackInstanceByName("anim_head1");
+        aTrackInstance->mImageOverride = IMAGE_BLANK;
+        Reanimation* aHeadReanim = mApp->AddReanimation(0.0f, 0.0f, 0, ReanimationType::REANIM_ICESHROOM);
+        aHeadReanim->PlayReanim("anim_idle", REANIM_LOOP, 0, 15.0f);
+        mSpecialHeadReanimID = mApp->ReanimationGetID(aHeadReanim);
+        AttachEffect* aAttachEffect = AttachReanim(aTrackInstance->mAttachmentID, aHeadReanim, 0.0f, 0.0f);
+        aBodyReanim->mFrameBasePose = 0;
+        TodScaleRotateTransformMatrix(aAttachEffect->mOffset, 55.0f, -15.0f, 0.2f, -0.8f, 0.8f);
+
+        int aDistance = 315 + Rand(225);
+        mPhaseCounter = (int)(aDistance / mVelX) * ZOMBIE_LIMP_SPEED_FACTOR;
+        mVariant = false;
+        break;
+    }
+    case ZombieType::ZOMBIE_DOOMSHROOM_HEAD:
+    {
+        LoadPlainZombieReanim();
+        ReanimShowPrefix("anim_hair", RENDER_GROUP_HIDDEN);
+        ReanimShowPrefix("anim_head2", RENDER_GROUP_HIDDEN);
+
+        Reanimation* aBodyReanim = mApp->ReanimationGet(mBodyReanimID);
+        if (IsOnBoard())
+        {
+            aBodyReanim->SetFramesForLayer("anim_walk2");
+        }
+
+        ReanimatorTrackInstance* aTrackInstance = aBodyReanim->GetTrackInstanceByName("anim_head1");
+        aTrackInstance->mImageOverride = IMAGE_BLANK;
+        Reanimation* aHeadReanim = mApp->AddReanimation(0.0f, 0.0f, 0, ReanimationType::REANIM_DOOMSHROOM);
+        aHeadReanim->PlayReanim("anim_idle", REANIM_LOOP, 0, 15.0f);
+        mSpecialHeadReanimID = mApp->ReanimationGetID(aHeadReanim);
+        AttachEffect* aAttachEffect = AttachReanim(aTrackInstance->mAttachmentID, aHeadReanim, 0.0f, 0.0f);
+        aBodyReanim->mFrameBasePose = 0;
+        TodScaleRotateTransformMatrix(aAttachEffect->mOffset, 55.0f, -15.0f, 0.2f, -0.8f, 0.8f);
+
+        int aDistance = 425 + Rand(475);
+        mPhaseCounter = (int)(aDistance / mVelX) * ZOMBIE_LIMP_SPEED_FACTOR;
+        mVariant = false;
+        break;
+    }
+    case ZombieType::ZOMBIE_THREEPEATER_HEAD:
+    {
+        LoadPlainZombieReanim();
+        ReanimShowPrefix("anim_hair", RENDER_GROUP_HIDDEN);
+        ReanimShowPrefix("anim_head2", RENDER_GROUP_HIDDEN);
+
+        Reanimation* aBodyReanim = mApp->ReanimationGet(mBodyReanimID);
+        if (IsOnBoard())
+        {
+            aBodyReanim->SetFramesForLayer("anim_walk2");
+        }
+
+        ReanimatorTrackInstance* aTrackInstance = aBodyReanim->GetTrackInstanceByName("anim_head1");
+        aTrackInstance->mImageOverride = IMAGE_BLANK;
+
+        // Head 1 (Bottom)
+        Reanimation* aHeadReanim1 = mApp->AddReanimation(0.0f, 0.0f, 0, ReanimationType::REANIM_THREEPEATER);
+        aHeadReanim1->PlayReanim("anim_head_idle1", REANIM_LOOP, 0, 15.0f);
+        mSpecialHeadReanimID = mApp->ReanimationGetID(aHeadReanim1);
+        AttachEffect* aAttachEffect1 = AttachReanim(aTrackInstance->mAttachmentID, aHeadReanim1, 0.0f, 0.0f);
+        TodScaleRotateTransformMatrix(aAttachEffect1->mOffset, 75.0f, -5.0f, 0.2f, -1.0f, 1.0f); // Flipped and positioned
+
+        // Head 2 (Middle)
+        Reanimation* aHeadReanim2 = mApp->AddReanimation(0.0f, 0.0f, 0, ReanimationType::REANIM_THREEPEATER);
+        aHeadReanim2->PlayReanim("anim_head_idle2", REANIM_LOOP, 0, 15.0f);
+        mHeadReanimID2 = mApp->ReanimationGetID(aHeadReanim2);
+        AttachEffect* aAttachEffect2 = AttachReanim(aTrackInstance->mAttachmentID, aHeadReanim2, 0.0f, 0.0f);
+        TodScaleRotateTransformMatrix(aAttachEffect2->mOffset, 68.0f, 2.0f, 0.2f, -1.0f, 1.0f); // Flipped and positioned
+
+        // Head 3 (Top)
+        Reanimation* aHeadReanim3 = mApp->AddReanimation(0.0f, 0.0f, 0, ReanimationType::REANIM_THREEPEATER);
+        aHeadReanim3->PlayReanim("anim_head_idle3", REANIM_LOOP, 0, 15.0f);
+        mHeadReanimID3 = mApp->ReanimationGetID(aHeadReanim3);
+        AttachEffect* aAttachEffect3 = AttachReanim(aTrackInstance->mAttachmentID, aHeadReanim3, 0.0f, 0.0f);
+        TodScaleRotateTransformMatrix(aAttachEffect3->mOffset, 63.0f, 8.0f, 0.2f, -1.0f, 1.0f); // Flipped and positioned
+
+        aBodyReanim->mFrameBasePose = 0;
+        mPhaseCounter = 150;
+        mVariant = false;
+        break;
+    }
+    case ZombieType::ZOMBIE_PLANTERN_HEAD:
+    {
+        mBodyHealth = 500;
+        LoadPlainZombieReanim();
+        ReanimShowPrefix("anim_hair", RENDER_GROUP_HIDDEN);
+        ReanimShowPrefix("anim_head2", RENDER_GROUP_HIDDEN);
+        ReanimShowPrefix("Zombie_tie", RENDER_GROUP_HIDDEN);
+
+        Reanimation* aBodyReanim = mApp->ReanimationGet(mBodyReanimID);
+        if (IsOnBoard())
+        {
+            aBodyReanim->SetFramesForLayer("anim_walk2");
+        }
+
+        ReanimatorTrackInstance* aTrackInstance = aBodyReanim->GetTrackInstanceByName("Zombie_body");
+        aBodyReanim->SetImageOverride("anim_head1", IMAGE_BLANK);
+
+        Reanimation* aHeadReanim = mApp->AddReanimation(0.0f, 0.0f, 0, ReanimationType::REANIM_PLANTERN);
+        aHeadReanim->PlayReanim("anim_idle", REANIM_LOOP, 0, 15.0f);
+        mSpecialHeadReanimID = mApp->ReanimationGetID(aHeadReanim);
+
+        // Attach the head to the body track.
+        AttachEffect* aAttachEffect = AttachReanim(aTrackInstance->mAttachmentID, aHeadReanim, 0.0f, 0.0f);
+        aBodyReanim->mFrameBasePose = 0;
+        TodScaleRotateTransformMatrix(aAttachEffect->mOffset, 65.0f, -15.0f, 0.2f, -1.0f, 1.0f);
+
+        mHealCountdown = 100; // Initial heal cooldown
+        mVariant = false;
+        break;
+    }
+    case ZombieType::ZOMBIE_CACTUS_HEAD:
+    {
+        LoadPlainZombieReanim();
+        ReanimShowPrefix("anim_hair", RENDER_GROUP_HIDDEN);
+        ReanimShowPrefix("anim_head2", RENDER_GROUP_HIDDEN);
+
+        Reanimation* aBodyReanim = mApp->ReanimationGet(mBodyReanimID);
+        if (IsOnBoard())
+        {
+            aBodyReanim->SetFramesForLayer("anim_walk2");
+        }
+
+        ReanimatorTrackInstance* aTrackInstance = aBodyReanim->GetTrackInstanceByName("anim_head1");
+        aTrackInstance->mImageOverride = IMAGE_BLANK;
+
+        Reanimation* aHeadReanim = mApp->AddReanimation(0.0f, 0.0f, 0, ReanimationType::REANIM_CACTUS);
+        aHeadReanim->PlayReanim("anim_idle", REANIM_LOOP, 0, 15.0f);
+        mSpecialHeadReanimID = mApp->ReanimationGetID(aHeadReanim);
+
+        AttachEffect* aAttachEffect = AttachReanim(aTrackInstance->mAttachmentID, aHeadReanim, 0.0f, 0.0f);
+        aBodyReanim->mFrameBasePose = 0;
+
+        TodScaleRotateTransformMatrix(aAttachEffect->mOffset, 55.0f, -15.0f, 0.2f, -0.8f, 0.8f);
+
+        mPhaseCounter = 150; // Initial shooting cooldown
+        mVariant = false;
+        break;
+    }
+    case ZombieType::ZOMBIE_BLOVER_HEAD:
+    {
+        LoadPlainZombieReanim();
+        ReanimShowPrefix("anim_hair", RENDER_GROUP_HIDDEN);
+        ReanimShowPrefix("anim_head2", RENDER_GROUP_HIDDEN);
+
+        Reanimation* aBodyReanim = mApp->ReanimationGet(mBodyReanimID);
+        if (IsOnBoard())
+        {
+            aBodyReanim->SetFramesForLayer("anim_walk2");
+        }
+
+        ReanimatorTrackInstance* aTrackInstance = aBodyReanim->GetTrackInstanceByName("anim_head1");
+        aTrackInstance->mImageOverride = IMAGE_BLANK;
+
+        Reanimation* aHeadReanim = mApp->AddReanimation(0.0f, 0.0f, 0, ReanimationType::REANIM_BLOVER);
+        aHeadReanim->PlayReanim("anim_idle", REANIM_LOOP, 0, 15.0f);
+        mSpecialHeadReanimID = mApp->ReanimationGetID(aHeadReanim);
+
+        AttachEffect* aAttachEffect = AttachReanim(aTrackInstance->mAttachmentID, aHeadReanim, 0.0f, 0.0f);
+        aBodyReanim->mFrameBasePose = 0;
+
+        TodScaleRotateTransformMatrix(aAttachEffect->mOffset, 65.0f, -5.0f, 0.2f, -1.0f, 1.0f);
+
+        mVariant = false;
+        break;
+    }
+    case ZombieType::ZOMBIE_STARFRUIT_HEAD:
+    {
+        LoadPlainZombieReanim();
+        ReanimShowPrefix("anim_hair", RENDER_GROUP_HIDDEN);
+        ReanimShowPrefix("anim_head2", RENDER_GROUP_HIDDEN);
+        ReanimShowPrefix("Zombie_tie", RENDER_GROUP_HIDDEN);
+
+        Reanimation* aBodyReanim = mApp->ReanimationGet(mBodyReanimID);
+        if (IsOnBoard())
+        {
+            aBodyReanim->SetFramesForLayer("anim_walk2");
+        }
+
+        ReanimatorTrackInstance* aTrackInstance = aBodyReanim->GetTrackInstanceByName("Zombie_body");
+        aBodyReanim->SetImageOverride("anim_head1", IMAGE_BLANK);
+
+        Reanimation* aHeadReanim = mApp->AddReanimation(0.0f, 0.0f, 0, ReanimationType::REANIM_STARFRUIT);
+        aHeadReanim->PlayReanim("anim_idle", REANIM_LOOP, 0, 15.0f);
+        mSpecialHeadReanimID = mApp->ReanimationGetID(aHeadReanim);
+
+        AttachEffect* aAttachEffect = AttachReanim(aTrackInstance->mAttachmentID, aHeadReanim, 0.0f, 0.0f);
+        aBodyReanim->mFrameBasePose = 0;
+
+        TodScaleRotateTransformMatrix(aAttachEffect->mOffset, 65.0f, -5.0f, 0.2f, -1.0f, 1.0f);
+
+        mPhaseCounter = 300; // Initial shooting cooldown
+        mVariant = false;
+        break;
+    }
+
+    case ZombieType::ZOMBIE_PUMPKIN_HEAD:
+    {
+        LoadPlainZombieReanim();
+        ReanimShowPrefix("anim_hair", RENDER_GROUP_HIDDEN);
+        ReanimShowPrefix("anim_head", RENDER_GROUP_HIDDEN);
+        ReanimShowPrefix("Zombie_tie", RENDER_GROUP_HIDDEN);
+
+        Reanimation* aBodyReanim = mApp->ReanimationGet(mBodyReanimID);
+        ReanimatorTrackInstance* aTrackInstance = aBodyReanim->GetTrackInstanceByName("Zombie_body");
+
+        Reanimation* aHeadReanim = mApp->AddReanimation(0.0f, 0.0f, 0, ReanimationType::REANIM_PUMPKIN);
+        aHeadReanim->PlayReanim("anim_idle", REANIM_LOOP, 0, 15.0f);
+        mSpecialHeadReanimID = mApp->ReanimationGetID(aHeadReanim);
+
+        AttachEffect* aAttachEffect = AttachReanim(aTrackInstance->mAttachmentID, aHeadReanim, 0.0f, 0.0f);
+        aBodyReanim->mFrameBasePose = 0;
+        TodScaleRotateTransformMatrix(aAttachEffect->mOffset, 65.0f, -15.0f, 0.2f, -1.0f, 1.0f);
+
+        mHelmType = HELMTYPE_PUMPKIN;
+        mHelmHealth = 2200;
+        mVariant = false;
+        mProtectingZombieID = ZOMBIEID_NULL;
+        break;
+    }
+    case ZombieType::ZOMBIE_CABBAGEPULT_HEAD:
+    {
+        LoadPlainZombieReanim();
+        ReanimShowPrefix("anim_hair", RENDER_GROUP_HIDDEN);
+        ReanimShowPrefix("anim_head2", RENDER_GROUP_HIDDEN);
+        ReanimShowPrefix("Zombie_tie", RENDER_GROUP_HIDDEN);
+
+        Reanimation* aBodyReanim = mApp->ReanimationGet(mBodyReanimID);
+        if (IsOnBoard())
+        {
+            aBodyReanim->SetFramesForLayer("anim_walk2");
+        }
+
+        ReanimatorTrackInstance* aTrackInstance = aBodyReanim->GetTrackInstanceByName("Zombie_body");
+        aBodyReanim->SetImageOverride("anim_head1", IMAGE_BLANK);
+
+        Reanimation* aHeadReanim = mApp->AddReanimation(0.0f, 0.0f, 0, ReanimationType::REANIM_CABBAGEPULT);
+        aHeadReanim->PlayReanim("anim_idle", REANIM_LOOP, 0, 15.0f);
+        mSpecialHeadReanimID = mApp->ReanimationGetID(aHeadReanim);
+
+        AttachEffect* aAttachEffect = AttachReanim(aTrackInstance->mAttachmentID, aHeadReanim, 0.0f, 0.0f);
+        aBodyReanim->mFrameBasePose = 0;
+
+        TodScaleRotateTransformMatrix(aAttachEffect->mOffset, 65.0f, -25.0f, 0.2f, -1.0f, 1.0f);
+
+        mPhaseCounter = 300; // Initial shooting cooldown
+        mVariant = false;
+        break;
+    }
+    case ZombieType::ZOMBIE_KERNELPULT_HEAD:
+    {
+        LoadPlainZombieReanim();
+        ReanimShowPrefix("anim_hair", RENDER_GROUP_HIDDEN);
+        ReanimShowPrefix("anim_head2", RENDER_GROUP_HIDDEN);
+        ReanimShowPrefix("Zombie_tie", RENDER_GROUP_HIDDEN);
+
+        Reanimation* aBodyReanim = mApp->ReanimationGet(mBodyReanimID);
+        if (IsOnBoard())
+        {
+            aBodyReanim->SetFramesForLayer("anim_walk2");
+        }
+
+        ReanimatorTrackInstance* aTrackInstance = aBodyReanim->GetTrackInstanceByName("Zombie_body");
+        aBodyReanim->SetImageOverride("anim_head1", IMAGE_BLANK);
+
+        Reanimation* aHeadReanim = mApp->AddReanimation(0.0f, 0.0f, 0, ReanimationType::REANIM_KERNELPULT);
+        aHeadReanim->PlayReanim("anim_idle", REANIM_LOOP, 0, 15.0f);
+        mSpecialHeadReanimID = mApp->ReanimationGetID(aHeadReanim);
+
+        aHeadReanim->AssignRenderGroupToPrefix("Cornpult_butter", RENDER_GROUP_HIDDEN);
+        aHeadReanim->AssignRenderGroupToPrefix("Cornpult_kernal", RENDER_GROUP_NORMAL);
+
+        AttachEffect* aAttachEffect = AttachReanim(aTrackInstance->mAttachmentID, aHeadReanim, 0.0f, 0.0f);
+        aBodyReanim->mFrameBasePose = 0;
+
+        TodScaleRotateTransformMatrix(aAttachEffect->mOffset, 65.0f, -25.0f, 0.2f, -1.0f, 1.0f);
+
+        mPhaseCounter = 300; // Initial shooting cooldown
+        mVariant = false;
+        mLaunchKernel = 0;
+        break;
+    }
+    case ZombieType::ZOMBIE_COFFEE_HEAD:
+    {
+        mBodyHealth = 500;
+        LoadPlainZombieReanim();
+        ReanimShowPrefix("anim_hair", RENDER_GROUP_HIDDEN);
+        ReanimShowPrefix("anim_head2", RENDER_GROUP_HIDDEN);
+        ReanimShowPrefix("Zombie_tie", RENDER_GROUP_HIDDEN);
+
+        Reanimation* aBodyReanim = mApp->ReanimationGet(mBodyReanimID);
+        if (IsOnBoard())
+        {
+            aBodyReanim->SetFramesForLayer("anim_walk2");
+        }
+
+        ReanimatorTrackInstance* aTrackInstance = aBodyReanim->GetTrackInstanceByName("Zombie_body");
+        aBodyReanim->SetImageOverride("anim_head1", IMAGE_BLANK);
+
+        Reanimation* aHeadReanim = mApp->AddReanimation(0.0f, 0.0f, 0, ReanimationType::REANIM_COFFEEBEAN);
+        aHeadReanim->PlayReanim("anim_idle", REANIM_LOOP, 0, 15.0f);
+        mSpecialHeadReanimID = mApp->ReanimationGetID(aHeadReanim);
+
+        AttachEffect* aAttachEffect = AttachReanim(aTrackInstance->mAttachmentID, aHeadReanim, 0.0f, 0.0f);
+        aBodyReanim->mFrameBasePose = 0;
+        TodScaleRotateTransformMatrix(aAttachEffect->mOffset, 65.0f, -15.0f, 0.2f, -1.0f, 1.0f);
+
+        mVelX = 1.5f; // Set super speed (normal is ~0.3, football is ~0.7)
+        UpdateAnimSpeed(); // Make the animation match the speed
+        mVariant = false;
+        break;
+    }
+
+    case ZombieType::ZOMBIE_GARLIC_HEAD:
+    {
+        mBodyHealth = 500; // Moderately tough
+        LoadPlainZombieReanim();
+        ReanimShowPrefix("anim_hair", RENDER_GROUP_HIDDEN);
+        ReanimShowPrefix("anim_head2", RENDER_GROUP_HIDDEN);
+        ReanimShowPrefix("Zombie_tie", RENDER_GROUP_HIDDEN);
+
+        Reanimation* aBodyReanim = mApp->ReanimationGet(mBodyReanimID);
+        if (IsOnBoard())
+        {
+            aBodyReanim->SetFramesForLayer("anim_walk2");
+        }
+
+        ReanimatorTrackInstance* aTrackInstance = aBodyReanim->GetTrackInstanceByName("Zombie_body");
+        aBodyReanim->SetImageOverride("anim_head1", IMAGE_BLANK);
+
+        Reanimation* aHeadReanim = mApp->AddReanimation(0.0f, 0.0f, 0, ReanimationType::REANIM_GARLIC);
+        aHeadReanim->PlayReanim("anim_idle", REANIM_LOOP, 0, 15.0f);
+        mSpecialHeadReanimID = mApp->ReanimationGetID(aHeadReanim);
+
+        AttachEffect* aAttachEffect = AttachReanim(aTrackInstance->mAttachmentID, aHeadReanim, 0.0f, 0.0f);
+        aBodyReanim->mFrameBasePose = 0;
+        TodScaleRotateTransformMatrix(aAttachEffect->mOffset, 55.0f, -15.0f, 0.2f, -0.8f, 0.8f);
+
+        mYuckyFace = true; // This will be our flag for lane-switching behavior
+        mYuckyFaceCounter = 100; // Initialize the timer for the first lane change
+        mVariant = false; // We'll use mVariant to store the vertical direction (0=down, 1=up)
         break;
     }
     }
@@ -864,7 +1741,7 @@ void Zombie::SetupReanimLayers(Reanimation* aReanim, ZombieType theZombieType)
         aReanim->AssignRenderGroupToPrefix("anim_bucket", RENDER_GROUP_NORMAL);
         aReanim->AssignRenderGroupToPrefix("anim_hair", RENDER_GROUP_HIDDEN);
     }
-    else if (theZombieType == ZombieType::ZOMBIE_DOOR)
+    else if (theZombieType == ZombieType::ZOMBIE_DOOR || theZombieType == ZombieType::ZOMBIE_BLACK_DOOR)
     {
         SetupDoorArms(aReanim, true);
     }
@@ -1127,10 +2004,22 @@ void Zombie::PickRandomSpeed()
     {
         mVelX = RandRangeFloat(0.79f, 0.81f);
     }
-    else if (mZombiePhase == ZombiePhase::PHASE_NEWSPAPER_MAD || mZombiePhase == ZombiePhase::PHASE_DOLPHIN_WALKING || 
+    else if (mZombieType == ZombieType::ZOMBIE_CHERRY_HEAD || mZombieType == ZombieType::ZOMBIE_GRAVEBUSTER_HEAD || mZombieType == ZombieType::ZOMBIE_HYPNOSHROOM_HEAD)
+    {
+        mVelX = 0.81f;
+    }
+    else if (mZombiePhase == ZombiePhase::PHASE_DOLPHIN_WALKING || 
         mZombiePhase == ZombiePhase::PHASE_DOLPHIN_WALKING_WITHOUT_DOLPHIN)
     {
         mVelX = RandRangeFloat(0.89f, 0.91f);
+    }
+    else if (mZombieType == ZombieType::ZOMBIE_POTATO_HEAD)
+    {
+        mVelX = 1.6f;
+    }
+    else if (mZombiePhase == ZombiePhase::PHASE_NEWSPAPER_MAD)
+    {
+        mVelX = (mZombieType == ZOMBIE_RED_EYE_NEWSPAPER) ? 2.4f : 1.2f;
     }
     else
     {
@@ -1315,6 +2204,9 @@ void Zombie::UpdateZombieBungee()
 
 void Zombie::PogoBreak(unsigned int theDamageFlags)
 {
+    if (IsDeadOrDying())
+        return;
+
     if (!mHasObject)
         return;
 
@@ -1563,6 +2455,18 @@ void Zombie::LandFlyer(unsigned int theDamageFlags)
     {
         mApp->PlaySample(SOUND_BALLOON_POP);
         mZombiePhase = ZombiePhase::PHASE_BALLOON_POPPING;
+        Reanimation* aBodyReanim = mApp->ReanimationGet(mBodyReanimID);
+        if (mZombieType == ZOMBIE_PURPLE_BALLOON)
+        {
+            aBodyReanim->SetImageOverride("Zombie_balloon_pop1", IMAGE_REANIM_ZOMBIE_PURPLE_BALLOON_POP1);
+            aBodyReanim->SetImageOverride("Zombie_balloon_pop2", IMAGE_REANIM_ZOMBIE_PURPLE_BALLOON_POP2);
+        }
+        else if (mZombieType == ZOMBIE_BLACK_BALLOON)
+        {
+            aBodyReanim->SetImageOverride("Zombie_balloon_pop1", IMAGE_REANIM_ZOMBIE_BLACK_BALLOON_POP1);
+            aBodyReanim->SetImageOverride("Zombie_balloon_pop2", IMAGE_REANIM_ZOMBIE_BLACK_BALLOON_POP2);
+        }
+
         PlayZombieReanim("anim_pop", ReanimLoopType::REANIM_PLAY_ONCE_AND_HOLD, 20, 24.0f);
     }
 
@@ -1617,7 +2521,10 @@ void Zombie::UpdateZombieNewspaper()
             }
 
             StartWalkAnim(20);
-            aBodyReanim->SetImageOverride("anim_head1", IMAGE_REANIM_ZOMBIE_PAPER_MADHEAD);
+            if (mZombieType == ZOMBIE_RED_EYE_NEWSPAPER)
+                aBodyReanim->SetImageOverride("anim_head1", IMAGE_REANIM_ZOMBIE_RED_PAPER_MADHEAD);
+            else
+                aBodyReanim->SetImageOverride("anim_head1", IMAGE_REANIM_ZOMBIE_PAPER_MADHEAD);
         }
     }
 }
@@ -1949,6 +2856,17 @@ void Zombie::UpdateZombieSnorkel()
 
 void Zombie::UpdateZombieJackInTheBox()
 {
+    if (mZombieType == ZOMBIE_ENRAGED_JACK && mHasHead && !IsImmobilizied() && mZombiePhase == ZombiePhase::PHASE_JACK_IN_THE_BOX_RUNNING)
+    {
+        // Check if there is a plant in range to be eaten
+        Plant* aPlant = FindPlantTarget(ZombieAttackType::ATTACKTYPE_CHEW);
+        if (aPlant != nullptr)
+        {
+            // Immediately trigger the explosion sequence
+            mPhaseCounter = 1;
+        }
+    }
+
     if (mZombiePhase == ZombiePhase::PHASE_JACK_IN_THE_BOX_RUNNING)
     {
         if (mPhaseCounter <= 0 && mHasHead)
@@ -1981,7 +2899,7 @@ void Zombie::UpdateZombieJackInTheBox()
             else
             {
                 mBoard->KillAllZombiesInRadius(mRow, aPosX, aPosY, JackInTheBoxZombieRadius, 1, true, 255);
-                mBoard->KillAllPlantsInRadius(aPosX, aPosY, JackInTheBoxPlantRadius);
+                mBoard->DamageAllPlantsInRadius(aPosX, aPosY, JackInTheBoxPlantRadius, 4000);
             }
 
             mApp->AddTodParticle(aPosX, aPosY, Board::MakeRenderOrder(RenderLayer::RENDER_LAYER_TOP, 0, 0), ParticleEffect::PARTICLE_JACKEXPLODE);
@@ -2005,10 +2923,10 @@ void Zombie::UpdateZombieGargantuar()
         {
             if (mMindControlled)  
             {
-                Zombie* aZombie = FindZombieTarget();
+                Zombie* aZombie = FindGargantuarTargetZombie();
                 if (aZombie)
                 {
-                    int aDamage = mZombieType == ZombieType::ZOMBIE_REDEYE_GARGANTUAR ? 1000 : 500;
+                    int aDamage = mZombieType == ZombieType::ZOMBIE_REDEYE_GARGANTUAR ? 2000 : 2000;
                     aZombie->TakeDamage(aDamage, 0U);
                 }
             }
@@ -2026,9 +2944,13 @@ void Zombie::UpdateZombieGargantuar()
                             SquishAllInSquare(aPlant->mPlantCol, aPlant->mRow, ZombieAttackType::ATTACKTYPE_CHEW);
                         }
                     }
+                    else if (aPlant->mSeedType == SeedType::SEED_PUMPKINSHELL)
+                    {
+                        TakeDamage(8000, 0U); // Deal enough damage to destroy it
+                    }
                     else
                     {
-                        SquishAllInSquare(aPlant->mPlantCol, aPlant->mRow, ZombieAttackType::ATTACKTYPE_CHEW);
+                        DamagePlantInSquare(aPlant->mPlantCol, aPlant->mRow, 8000);
                     }
                 }
 
@@ -2144,6 +3066,14 @@ void Zombie::UpdateZombieGargantuar()
 
     bool doSmash = false;
     if (FindPlantTarget(ZombieAttackType::ATTACKTYPE_CHEW))
+    {
+        doSmash = true;
+    }
+    else if (FindHypnotizedZombieTarget())
+    {
+        doSmash = true;
+    }
+    else if (FindGargantuarTargetZombie())
     {
         doSmash = true;
     }
@@ -2285,16 +3215,7 @@ void Zombie::UpdateZombieJalapenoHead()
         }
         else
         {
-            Plant* aPlant = nullptr;
-            while (mBoard->IteratePlants(aPlant))
-            {
-                //Rect aPlantRect = aPlant->GetPlantRect();
-                if (aPlant->mRow == mRow && !aPlant->NotOnGround())
-                {
-                    mBoard->mPlantsEaten++;
-                    aPlant->Die();
-                }
-            }
+            mBoard->DamageRow(mRow, 2000);
         }
         DieNoLoot();
 
@@ -2437,7 +3358,9 @@ void Zombie::UpdateZombieSquashHead()
             }
             else
             {
-                SquishAllInSquare(mBoard->PixelToGridXKeepOnBoard(mX, mY), mRow, ZombieAttackType::ATTACKTYPE_CHEW);
+                int aPosX = mX + mWidth / 2;
+                int aPosY = mY + mHeight / 2;
+                mBoard->DamageAllPlantsInRadius(aPosX, aPosY, 70, 4000);
             }
         }
 
@@ -2458,6 +3381,1153 @@ void Zombie::UpdateZombieSquashHead()
         mSpecialHeadReanimID = ReanimationID::REANIMATIONID_NULL;
 
         TakeDamage(1800, 9U);
+    }
+}
+
+void Zombie::UpdateZombieRepeaterHead()
+{
+    if (!mHasHead)
+        return;
+
+    // First shot
+    if (mPhaseCounter == 135)
+    {
+        Reanimation* aHeadReanim = mApp->ReanimationGet(mSpecialHeadReanimID);
+        aHeadReanim->PlayReanim("anim_shooting", ReanimLoopType::REANIM_PLAY_ONCE_AND_HOLD, 20, 35.0f);
+    }
+    // Second shot
+    else if (mPhaseCounter == 110) // 25 ticks after the first shot
+    {
+        Reanimation* aHeadReanim = mApp->ReanimationGet(mSpecialHeadReanimID);
+        aHeadReanim->PlayReanim("anim_shooting", ReanimLoopType::REANIM_PLAY_ONCE_AND_HOLD, 20, 35.0f);
+    }
+    else if (mPhaseCounter == 0)
+    {
+        Reanimation* aHeadReanim = mApp->ReanimationGet(mSpecialHeadReanimID);
+        aHeadReanim->PlayReanim("anim_head_idle", ReanimLoopType::REANIM_PLAY_ONCE_AND_HOLD, 20, 15.0f);
+        mPhaseCounter = 150; // Reset the firing cooldown
+    }
+
+    // Firing projectiles
+    if (mPhaseCounter == 111 || mPhaseCounter == 86) // Fire on the frame after the animation starts
+    {
+        mApp->PlayFoley(FoleyType::FOLEY_THROW);
+
+        Reanimation* aBodyReanim = mApp->ReanimationGet(mBodyReanimID);
+        int aTrackIndex = aBodyReanim->FindTrackIndex("anim_head1");
+        ReanimatorTransform aTransform;
+        aBodyReanim->GetCurrentTransform(aTrackIndex, &aTransform);
+
+        float aOriginX = mPosX + aTransform.mTransX - 9.0f;
+        float aOriginY = mPosY + aTransform.mTransY + 6.0f - mAltitude;
+        if (mMindControlled)
+        {
+            aOriginX += 90.0f * mScaleZombie;
+            Projectile* aProjectile = mBoard->AddProjectile(aOriginX, aOriginY, mRenderOrder, mRow, ProjectileType::PROJECTILE_PEA);
+            aProjectile->mDamageRangeFlags = 1;
+        }
+        else
+        {
+            Projectile* aProjectile = mBoard->AddProjectile(aOriginX, aOriginY, mRenderOrder, mRow, ProjectileType::PROJECTILE_ZOMBIE_PEA);
+            aProjectile->mMotionType = ProjectileMotion::MOTION_BACKWARDS;
+        }
+    }
+}
+
+void Zombie::UpdateZombieSnowPeaHead()
+{
+    if (!mHasHead)
+        return;
+
+    if (mPhaseCounter == 35)
+    {
+        Reanimation* aHeadReanim = mApp->ReanimationGet(mSpecialHeadReanimID);
+        aHeadReanim->PlayReanim("anim_shooting", ReanimLoopType::REANIM_PLAY_ONCE_AND_HOLD, 20, 35.0f);
+    }
+    else if (mPhaseCounter == 0)
+    {
+        Reanimation* aHeadReanim = mApp->ReanimationGet(mSpecialHeadReanimID);
+        aHeadReanim->PlayReanim("anim_head_idle", ReanimLoopType::REANIM_PLAY_ONCE_AND_HOLD, 20, 15.0f);
+        mApp->PlayFoley(FoleyType::FOLEY_THROW);
+        mApp->PlayFoley(FoleyType::FOLEY_SNOW_PEA_SPARKLES);
+
+        Reanimation* aBodyReanim = mApp->ReanimationGet(mBodyReanimID);
+        int aTrackIndex = aBodyReanim->FindTrackIndex("anim_head1");
+        ReanimatorTransform aTransform;
+        aBodyReanim->GetCurrentTransform(aTrackIndex, &aTransform);
+
+        float aOriginX = mPosX + aTransform.mTransX - 9.0f;
+        float aOriginY = mPosY + aTransform.mTransY + 6.0f - mAltitude;
+        if (mMindControlled)
+        {
+            aOriginX += 90.0f * mScaleZombie;
+            Projectile* aProjectile = mBoard->AddProjectile(aOriginX, aOriginY, mRenderOrder, mRow, ProjectileType::PROJECTILE_SNOWPEA);
+            aProjectile->mDamageRangeFlags = 1;
+        }
+        else
+        {
+            Projectile* aProjectile = mBoard->AddProjectile(aOriginX, aOriginY, mRenderOrder, mRow, ProjectileType::PROJECTILE_ZOMBIE_SNOWPEA);
+            aProjectile->mMotionType = ProjectileMotion::MOTION_BACKWARDS;
+        }
+
+        mPhaseCounter = 150;
+    }
+}
+
+void Zombie::UpdateZombieSunflowerHead()
+{
+    if (!mHasHead || IsImmobilizied())
+        return;
+
+    // DEAR FUTURE ME, if you want to add head animation, you should not rely on current code, and create another madness so it can handle new head animation.
+
+    switch (mZombiePhase)
+    {
+        case PHASE_SUNFLOWER_WALKING:
+        {
+            if (mSummonCounter > 0) mSummonCounter--;
+
+            if (mSummonCounter == 0)
+            {
+                Coin* aClosestSun = nullptr;
+                float aClosestDist = -1.0f;
+                Coin* aCoin = nullptr;
+                while (mBoard->IterateCoins(aCoin))
+                {
+                    if (aCoin->IsSun() && !aCoin->mIsBeingStolen && !aCoin->mIsBeingCollected)
+                    {
+                        float aDist = Distance2D(mPosX, mPosY, aCoin->mPosX, aCoin->mPosY);
+                        if (aClosestSun == nullptr || aDist < aClosestDist)
+                        {
+                            aClosestDist = aDist;
+                            aClosestSun = aCoin;
+                        }
+                    }
+                }
+
+                if (aClosestSun != nullptr)
+                {
+                    mTargetedCoinID = (CoinID)mBoard->mCoins.DataArrayGetID(aClosestSun);
+                    aClosestSun->mIsBeingStolen = true;
+                    aClosestSun->mTargetZombieID = mBoard->ZombieGetID(this);
+
+                    mZombiePhase = PHASE_SUNFLOWER_STEALING;
+                    mPhaseCounter = 50;
+                    PlayZombieReanim("anim_eat", REANIM_LOOP, 20, 0.0f);
+                }
+                else
+                {
+                    mSummonCounter = 100;
+                }
+            }
+            break;
+        }
+
+        case PHASE_SUNFLOWER_STEALING:
+        {
+            if (mPhaseCounter > 0) mPhaseCounter--;
+
+            Coin* aCoin = mBoard->mCoins.DataArrayTryToGet((unsigned int)mTargetedCoinID);
+            if (aCoin == nullptr || !aCoin->mIsBeingStolen)
+            {
+                mTargetedCoinID = COINID_NULL;
+                mZombiePhase = PHASE_SUNFLOWER_WALKING;
+                mSummonCounter = 300;
+                StartWalkAnim(20);
+            }
+            else if (mPhaseCounter == 0)
+            {
+                float aTargetX, aTargetY;
+                GetTrackPosition("anim_head1", aTargetX, aTargetY);
+                if (Distance2D(aCoin->mPosX, aCoin->mPosY, aTargetX, aTargetY) < 15.0f)
+                {
+                    mSunStolen += aCoin->GetSunValue();
+                    aCoin->Die();
+                    mTargetedCoinID = COINID_NULL;
+
+                    mZombiePhase = PHASE_SUNFLOWER_WALKING;
+                    mSummonCounter = 300;
+                    StartWalkAnim(20);
+                }
+            }
+            break;
+        }
+        case PHASE_SUNFLOWER_SPAWNING:
+        {
+            if (mPhaseCounter > 0) mPhaseCounter--;
+
+            if (mPhaseCounter == 0)
+            {
+                //Go back to walking and looking for more sun
+                mZombiePhase = PHASE_SUNFLOWER_WALKING;
+                mSummonCounter = 300; // Reset main timer
+                StartWalkAnim(20);
+            }
+            break;
+        }
+    }
+}
+
+void Zombie::UpdateZombieCherryHead()
+{
+    Reanimation* aHeadReanim = mApp->ReanimationTryToGet(mSpecialHeadReanimID);
+    if (aHeadReanim == nullptr)
+    {
+        if (mZombiePhase == PHASE_CHERRY_HEAD_EXPLODING) DieNoLoot(); // If head is gone, die.
+        return;
+    }
+
+    if (mZombiePhase == PHASE_CHERRY_HEAD_EXPLODING)
+    {
+        // Check if the head's explosion animation has finished.
+        if (aHeadReanim->mLoopCount > 0)
+        {
+            DieNoLoot();
+        }
+        return; // Don't do anything else while exploding.
+    }
+
+    // Check if the zombie is close enough to a plant to explode.
+    Plant* aPlant = FindPlantTarget(ATTACKTYPE_CHEW);
+    if (aPlant != nullptr && aPlant->mSeedType != SEED_SPROUT)
+    {
+        mZombiePhase = PHASE_CHERRY_HEAD_EXPLODING;
+
+        // Stop the main body's animation and movement.
+        Reanimation* aBodyReanim = mApp->ReanimationGet(mBodyReanimID);
+        aBodyReanim->mAnimRate = 0.0f;
+        StopEating();
+
+        // Tell the attached head to play its explosion animation.
+        aHeadReanim->PlayReanim("anim_explode", REANIM_PLAY_ONCE_AND_HOLD, 0, 24.0f);
+        mApp->PlayFoley(FOLEY_REVERSE_EXPLOSION);
+
+        // Schedule the explosion damage to happen mid-animation.
+        mPhaseCounter = 100; // This will now be used as a timer for the damage.
+    }
+}
+
+void Zombie::UpdateZombiePotatoHead()
+{
+    if (mZombiePhase == PHASE_POTATO_HEAD_EXPLODING)
+    {
+        if (mPhaseCounter > 0) mPhaseCounter--;
+        if (mPhaseCounter == 0) DieNoLoot();
+        return;
+    }
+
+    Plant* aPlant = FindPlantTarget(ATTACKTYPE_CHEW);
+    if (aPlant != nullptr && aPlant->mSeedType != SEED_SPROUT)
+    {
+        mZombiePhase = PHASE_POTATO_HEAD_EXPLODING;
+        mPhaseCounter = 50; // Short delay before disappearing
+
+        int aPosX = mX + mWidth / 2;
+        int aPosY = mY + mHeight / 2;
+
+        mApp->PlaySample(SOUND_POTATO_MINE);
+        mBoard->ShakeBoard(3, -4);
+
+        // Deal massive damage to the single plant
+        aPlant->mPlantHealth -= 3000;
+        if (aPlant->mPlantHealth <= 0)
+        {
+            mBoard->mPlantsEaten++;
+            aPlant->Die();
+        }
+
+        // Add explosion particle
+        mApp->AddTodParticle(aPosX, aPosY, (int)RenderLayer::RENDER_LAYER_TOP, ParticleEffect::PARTICLE_POTATO_MINE);
+
+        // Zombie dies after exploding
+        DieNoLoot();
+    }
+}
+
+void Zombie::UpdateZombieChomperHead()
+{
+    if (!mHasHead || IsImmobilizied())
+        return;
+
+    Reanimation* aHeadReanim = mApp->ReanimationGet(mSpecialHeadReanimID);
+
+    // If the zombie is digesting, just count down and do nothing else.
+    if (mZombiePhase == PHASE_CHOMPER_HEAD_DIGESTING)
+    {
+        if (mPhaseCounter > 0) mPhaseCounter--;
+        if (mPhaseCounter == 0)
+        {
+            // [FIX-START]
+            // Digestion is finished, go back to walking.
+            mZombiePhase = PHASE_ZOMBIE_NORMAL;
+            StartWalkAnim(20);
+            if (aHeadReanim)
+            {
+                aHeadReanim->PlayReanim("anim_idle", REANIM_LOOP, 20, 15.0f);
+            }
+            // [FIX-END]
+        }
+        return;
+    }
+
+    // [FIX-START]
+    // Define the 2-tile (160 pixels) attack range starting from the front of the zombie.
+    Rect aAttackRect(mX - 40, mY, 160, mHeight);
+    // [FIX-END]
+    Plant* aTargetPlant = nullptr;
+
+    // Find the closest plant within the attack range
+    Plant* aPlant = nullptr;
+    while (mBoard->IteratePlants(aPlant))
+    {
+        if (aPlant->mRow == mRow && !aPlant->NotOnGround())
+        {
+            SeedType aSeedType = aPlant->mSeedType;
+            if (aSeedType == SEED_CHERRYBOMB || aSeedType == SEED_JALAPENO ||
+                aSeedType == SEED_DOOMSHROOM || aSeedType == SEED_ICESHROOM ||
+                aSeedType == SEED_POTATOMINE || aSeedType == SEED_SQUASH ||
+                aSeedType == SEED_TANGLEKELP || aSeedType == SEED_SPIKEWEED ||
+                aSeedType == SEED_SPIKEROCK || aSeedType == SEED_SPIKEWEED ||
+                aSeedType == SEED_BOMBSQUASH || aSeedType == STATE_DOOM_NUT_PRE_LAUNCH ||
+                aSeedType == STATE_DOOM_NUT_RISING || aSeedType == STATE_DOOM_NUT_FALLING ||
+                aSeedType == SEED_BLOVER)
+            {
+                continue; // Skip this plant and check the next one
+            }
+
+            Rect aPlantRect = aPlant->GetPlantRect();
+            if (GetRectOverlap(aAttackRect, aPlantRect) > 0)
+            {
+                aTargetPlant = aPlant;
+                break;
+            }
+        }
+    }
+
+    // If a target is found
+    if (aTargetPlant != nullptr)
+    {
+        // If not already in an attack animation, start one
+        if (mZombiePhase != PHASE_CHOMPER_HEAD_BITING)
+        {
+            mZombiePhase = PHASE_CHOMPER_HEAD_BITING;
+            PlayZombieReanim("anim_eat", REANIM_LOOP, 20, 0.0f);
+            mPhaseCounter = 100; // Timer for bite cooldown
+        }
+    }
+    else // No target in range
+    {
+        // If the zombie was attacking, stop and go back to walking.
+        if (mZombiePhase == PHASE_CHOMPER_HEAD_BITING)
+        {
+            mZombiePhase = PHASE_ZOMBIE_NORMAL;
+            StartWalkAnim(20);
+        }
+        return; // No target, nothing else to do.
+    }
+
+    // Handle the biting/devouring logic
+    if (mPhaseCounter > 0) mPhaseCounter--;
+    if (mPhaseCounter == 0)
+    {
+        if (aHeadReanim == nullptr) return; // Safety check if head is gone
+
+        if (aTargetPlant->mPlantHealth <= 500)
+        {
+            // DEVOUR the plant
+            aHeadReanim->PlayReanim("anim_bite", REANIM_PLAY_ONCE_AND_HOLD, 10, 24.0f);
+            mApp->PlayFoley(FOLEY_BIGCHOMP);
+            aTargetPlant->Die();
+            mBoard->mPlantsEaten++;
+            mZombiePhase = PHASE_CHOMPER_HEAD_DIGESTING;
+            mPhaseCounter = 4000; // 40-second cooldown
+        }
+        else
+        {
+            // BITE the plant
+            aHeadReanim->PlayReanim("anim_bite", REANIM_PLAY_ONCE_AND_HOLD, 10, 48.0f);
+            mApp->PlayFoley(FOLEY_CHOMP);
+            aTargetPlant->TakeDamage(100, 0);
+            mPhaseCounter = 100; // 1-second cooldown between bites
+        }
+    }
+}
+
+void Zombie::UpdateZombieFumeshroomHead()
+{
+    if (!mHasHead || IsImmobilizied())
+        return;
+
+    // Use mPhaseCounter as a simple cooldown timer for shooting.
+    if (mPhaseCounter > 0)
+    {
+        mPhaseCounter--;
+    }
+
+    // Define the 5-tile attack range (400 pixels) in front of the zombie.
+    Rect aAttackRect(mX - 320, mY, 320, mHeight);
+    Plant* aTargetPlant = nullptr;
+
+    // Find if there's any plant within range to trigger an attack.
+    Plant* aPlant = nullptr;
+    while (mBoard->IteratePlants(aPlant))
+    {
+        if (aPlant->mRow == mRow && !aPlant->NotOnGround())
+        {
+            Rect aPlantRect = aPlant->GetPlantRect();
+            if (GetRectOverlap(aAttackRect, aPlantRect) > 0)
+            {
+                aTargetPlant = aPlant;
+                break;
+            }
+        }
+    }
+
+    Reanimation* aHeadReanim = mApp->ReanimationGet(mSpecialHeadReanimID);
+
+    // If a target is in range and cooldown is over, start the attack animation.
+    if (aTargetPlant != nullptr && mPhaseCounter == 0 && aHeadReanim->IsAnimPlaying("anim_idle"))
+    {
+        aHeadReanim->PlayReanim("anim_shooting", REANIM_PLAY_ONCE_AND_HOLD, 10, 36.0f); // Speed up animation
+        mPhaseCounter = 300; // Reset cooldown
+    }
+
+    // Check if the head is in the shooting animation.
+    if (aHeadReanim->IsAnimPlaying("anim_shooting"))
+    {
+        // Use ShouldTriggerTimedEvent to fire the particle at the perfect moment.
+        if (aHeadReanim->ShouldTriggerTimedEvent(0.4f)) // Trigger at 40% into the animation
+        {
+            mApp->PlayFoley(FOLEY_FUME);
+
+            // Create the fume cloud particle with the corrected offset.
+            TodParticleSystem* aFumeParticle = AddAttachedParticle(-40, 31, PARTICLE_FUMECLOUD_LEFT);
+
+            // Deal piercing damage to all plants in the row.
+            Plant* aPlantToDamage = nullptr;
+            while (mBoard->IteratePlants(aPlantToDamage))
+            {
+                if (aPlantToDamage->mRow == mRow && !aPlantToDamage->NotOnGround())
+                {
+                    Rect aPlantRect = aPlantToDamage->GetPlantRect();
+                    if (GetRectOverlap(aAttackRect, aPlantRect) > 0)
+                    {
+                        aPlantToDamage->TakeDamage(20, 1U << DAMAGE_BYPASSES_SHIELD);
+                    }
+                }
+            }
+        }
+
+        // When the shooting animation is done, go back to idle.
+        if (aHeadReanim->mLoopCount > 0)
+        {
+            aHeadReanim->PlayReanim("anim_idle", REANIM_LOOP, 10, 15.0f);
+        }
+    }
+}
+
+void Zombie::UpdateZombieGravebusterHead()
+{
+    if (!mHasHead || IsImmobilizied() || mIsEating)
+        return;
+
+    // Only try to eat if the zombie is in its normal walking phase
+    if (mZombiePhase != PHASE_ZOMBIE_NORMAL)
+        return;
+
+    Plant* aTargetPlant = FindPlantTarget(ATTACKTYPE_CHEW);
+    if (aTargetPlant != nullptr)
+    {
+        // If the plant is weak enough, turn it into a grave instantly
+        if (aTargetPlant->mPlantHealth < 1000)
+        {
+            mBoard->AddAGraveStone(aTargetPlant->mPlantCol, aTargetPlant->mRow);
+            aTargetPlant->Die();
+            mApp->PlayFoley(FOLEY_GRAVEBUSTERCHOMP);
+
+            Reanimation* aHeadReanim = mApp->ReanimationTryToGet(mSpecialHeadReanimID);
+            if (aHeadReanim)
+            {
+                aHeadReanim->ReanimationDie();
+                mSpecialHeadReanimID = ReanimationID::REANIMATIONID_NULL;
+            }
+
+            // Mark head as gone and play the body's death animation
+            mHasHead = false;
+            SetupReanimForLostHead();
+            PlayDeathAnim(0U);
+        }
+        else
+        {
+            // If the plant is too healthy, just eat it normally
+            StartEating();
+        }
+    }
+}
+
+void Zombie::UpdateZombieHypnoshroomHead()
+{
+    if (!mHasHead || IsImmobilizied() || mIsEating)
+        return;
+
+    if (mZombiePhase != PHASE_ZOMBIE_NORMAL)
+        return;
+
+    mApp->PlaySample(SOUND_MINDCONTROLLED);
+
+    Plant* aTargetPlant = FindPlantTarget(ATTACKTYPE_CHEW);
+    if (aTargetPlant != nullptr)
+    {
+        // Determine which Zombotany to spawn
+        ZombieType aNewZombieType = ZOMBIE_TALLNUT_HEAD; // Default
+        switch (aTargetPlant->mSeedType)
+        {
+        case SEED_PEASHOOTER:   aNewZombieType = ZOMBIE_PEA_HEAD; break;
+        case SEED_SUNFLOWER:    aNewZombieType = ZOMBIE_SUNFLOWER_HEAD; break;
+        case SEED_CHERRYBOMB:   aNewZombieType = ZOMBIE_CHERRY_HEAD; break;
+        case SEED_WALLNUT:      aNewZombieType = ZOMBIE_WALLNUT_HEAD; break;
+        case SEED_POTATOMINE:   aNewZombieType = ZOMBIE_POTATO_HEAD; break;
+        case SEED_SNOWPEA:      aNewZombieType = ZOMBIE_SNOW_HEAD; break;
+        case SEED_CHOMPER:      aNewZombieType = ZOMBIE_CHOMPER_HEAD; break;
+        case SEED_REPEATER:     aNewZombieType = ZOMBIE_REPEATER_HEAD; break;
+        case SEED_SUNSHROOM:    aNewZombieType = ZOMBIE_SUNSHROOM_HEAD; break;
+        case SEED_GRAVEBUSTER:  aNewZombieType = ZOMBIE_GRAVEBUSTER_HEAD; break;
+        case SEED_HYPNOSHROOM:  aNewZombieType = ZOMBIE_HYPNOSHROOM_HEAD; break;
+        case SEED_TALLNUT:      aNewZombieType = ZOMBIE_TALLNUT_HEAD; break;
+        case SEED_GATLINGPEA:   aNewZombieType = ZOMBIE_GATLING_HEAD; break;
+        case SEED_SQUASH:       aNewZombieType = ZOMBIE_SQUASH_HEAD; break;
+        case SEED_JALAPENO:     aNewZombieType = ZOMBIE_JALAPENO_HEAD; break;
+        case SEED_FUMESHROOM:   aNewZombieType = ZOMBIE_FUMESHROOM_HEAD; break;
+        default: break; // Keep the default Tallnut Head
+        }
+
+        int aGridX = aTargetPlant->mPlantCol;
+        int aGridY = aTargetPlant->mRow;
+        float aPosX = aTargetPlant->mX;
+        float aPosY = aTargetPlant->mY;
+
+        mApp->AddTodParticle(mPosX + 60.0f, mPosY + 40.0f, mRenderOrder + 1, ParticleEffect::PARTICLE_MIND_CONTROL);
+        // Kill the original plant and this zombie
+        aTargetPlant->Die();
+        this->DieNoLoot();
+
+        // Spawn the new Zombotany
+        Zombie* aNewZombie = mBoard->AddZombieInRow(aNewZombieType, aGridY, mFromWave);
+        if (aNewZombie)
+        {
+            // Instantly place the new zombie at the plant's position
+            aNewZombie->mPosX = aPosX;
+            aNewZombie->mPosY = aNewZombie->GetPosYBasedOnRow(aGridY);
+            aNewZombie->mAltitude = 0.0f;
+            aNewZombie->mZombiePhase = PHASE_ZOMBIE_NORMAL;
+            aNewZombie->mZombieHeight = HEIGHT_ZOMBIE_NORMAL;
+            aNewZombie->StartWalkAnim(0);
+        }
+    }
+}
+
+void Zombie::UpdateZombieScaredyshroomHead()
+{
+    if (!mHasHead || IsImmobilizied())
+        return;
+
+    // Only check for the scared trigger if the zombie is not already scared.
+    if (!mVariant)
+    {
+        // Check for nearby plants within a 1.5 tile radius (120px)
+        bool aPlantIsNear = false;
+        Rect aScaredRect(mX - 40, mY, 120, mHeight);
+        Plant* aPlant = nullptr;
+        while (mBoard->IteratePlants(aPlant))
+        {
+            if (aPlant->mRow != mRow)
+                continue;
+
+            if (GetRectOverlap(aScaredRect, aPlant->GetPlantRect()) > 0 && !aPlant->NotOnGround())
+            {
+                aPlantIsNear = true;
+                break;
+            }
+        }
+
+        Reanimation* aHeadReanim = mApp->ReanimationGet(mSpecialHeadReanimID);
+
+        // If a plant is near, trigger the permanent scared state.
+        if (aPlantIsNear)
+        {
+            mVariant = true; // Set scared state to true permanently.
+            mBodyHealth += 2000;
+            mBodyMaxHealth += 2000;
+            aHeadReanim->PlayReanim("anim_scared", REANIM_PLAY_ONCE_AND_HOLD, 10, 10.0f);
+            StopEating(); // Make sure it stops eating when scared.
+        }
+    }
+
+    // If the zombie is NOT scared, let it shoot.
+    if (!mVariant)
+    {
+        if (mPhaseCounter > 0) mPhaseCounter--;
+
+        Reanimation* aHeadReanim = mApp->ReanimationGet(mSpecialHeadReanimID);
+
+        // If cooldown is over and it's not already in a shooting animation, start one.
+        if (mPhaseCounter == 0 && aHeadReanim->IsAnimPlaying("anim_idle"))
+        {
+            aHeadReanim->PlayReanim("anim_shooting", REANIM_PLAY_ONCE_AND_HOLD, 10, 24.0f);
+        }
+
+        // If the head is in the shooting animation, fire the projectile at the right time.
+        if (aHeadReanim->IsAnimPlaying("anim_shooting"))
+        {
+            if (aHeadReanim->ShouldTriggerTimedEvent(0.5f)) // Fire at 50% of the animation
+            {
+                mApp->PlayFoley(FOLEY_PUFF);
+
+                int aOriginX = mX + 29;
+                int aOriginY = mY + 21;
+                Projectile* aProjectile = mBoard->AddProjectile(aOriginX, aOriginY, mRenderOrder - 1, mRow, PROJECTILE_ZOMBIE_PUFF);
+                aProjectile->mMotionType = MOTION_STRAIGHT;
+
+                // This tells the projectile it's allowed to hit plants on the ground.
+                aProjectile->mDamageRangeFlags = (1 << DAMAGES_GROUND);
+            }
+
+            // After the shooting animation is done, return to idle and reset cooldown.
+            if (aHeadReanim->mLoopCount > 0)
+            {
+                aHeadReanim->PlayReanim("anim_idle", REANIM_LOOP, 10, 15.0f);
+                mPhaseCounter = 150; // Reset shooting cooldown
+            }
+        }
+    }
+    // If the zombie IS scared and the scared animation has finished, play the scared idle loop.
+    else
+    {
+        Reanimation* aHeadReanim = mApp->ReanimationGet(mSpecialHeadReanimID);
+        if (aHeadReanim->IsAnimPlaying("anim_scared") && aHeadReanim->mLoopCount > 0)
+        {
+            aHeadReanim->PlayReanim("anim_scaredidle", REANIM_LOOP, 10, 12.0f);
+        }
+    }
+}
+
+void Zombie::UpdateZombieIceshroomHead()
+{
+    if (!mHasHead || IsImmobilizied())
+        return;
+
+    // mPhaseCounter is used as the explosion timer
+    if (mPhaseCounter > 0)
+    {
+        mPhaseCounter--;
+    }
+
+    // When the timer hits zero, explode!
+    if (mPhaseCounter == 0)
+    {
+        mApp->PlayFoley(FOLEY_FROZEN);
+        mBoard->ShakeBoard(1, -2);
+        mApp->AddTodParticle(mPosX + 40, mPosY + 40, mRenderOrder + 1, ParticleEffect::PARTICLE_ICE_TRAP);
+
+        // Freeze all vulnerable plants on the screen
+        Plant* aPlant = nullptr;
+        while (mBoard->IteratePlants(aPlant))
+        {
+            // Immune plants
+            if (aPlant->mSeedType == SEED_SNOWPEA || aPlant->mSeedType == SEED_WINTERMELON ||
+                aPlant->mSeedType == SEED_TORCHWOOD || aPlant->mSeedType == SEED_JALAPENO ||
+                aPlant->mSeedType == SEED_ICESHROOM || aPlant->mSeedType == SEED_ICEPEA ||
+                aPlant->mSeedType == SEED_BLUE_TORCHWOOD || aPlant->mSeedType == SEED_ICE_PLANTERN)
+            {
+                continue;
+            }
+
+            aPlant->mFrozenCounter = 500; // Freeze for 5 seconds
+        }
+
+        this->DieNoLoot(); // The zombie is consumed in the blast
+    }
+}
+
+void Zombie::UpdateZombieDoomshroomHead()
+{
+    if (!mHasHead || IsImmobilizied())
+        return;
+
+    if (mPhaseCounter > 0)
+    {
+        mPhaseCounter--;
+    }
+
+    if (mPhaseCounter == 0)
+    {
+        mApp->PlaySample(SOUND_DOOMSHROOM);
+        mBoard->ShakeBoard(15, -15);
+
+        int aPosX = mX + mWidth / 2;
+        int aPosY = mY + mHeight / 2;
+
+        // Damage plants in a 5x5 radius (theRadius of 250 covers about 2.5 tiles each way)
+        mBoard->DamageAllPlantsInRadius(aPosX, aPosY, 250, 3000);
+
+        // Create the visual explosion effect
+        mApp->AddTodParticle(aPosX, aPosY, (int)RenderLayer::RENDER_LAYER_TOP, ParticleEffect::PARTICLE_DOOM);
+
+        // Leave a crater
+        int gridX = mBoard->PixelToGridXKeepOnBoard(mX, mY);
+        mBoard->AddACrater(gridX, mRow)->mGridItemCounter = 18000;
+
+        this->DieNoLoot();
+    }
+}
+
+void Zombie::UpdateZombieThreepeaterHead()
+{
+    if (!mHasHead || IsImmobilizied())
+        return;
+
+    if (mPhaseCounter > 0)
+    {
+        mPhaseCounter--;
+    }
+
+    Reanimation* aHeadReanim1 = mApp->ReanimationTryToGet(mSpecialHeadReanimID);
+    Reanimation* aHeadReanim2 = mApp->ReanimationTryToGet(mHeadReanimID2);
+    Reanimation* aHeadReanim3 = mApp->ReanimationTryToGet(mHeadReanimID3);
+    if (aHeadReanim1 == nullptr || aHeadReanim2 == nullptr || aHeadReanim3 == nullptr) return;
+
+    // If cooldown is over and it's not already in a shooting animation, start one.
+    if (mPhaseCounter == 0 && aHeadReanim1->IsAnimPlaying("anim_head_idle1"))
+    {
+        aHeadReanim1->PlayReanim("anim_shooting1", REANIM_PLAY_ONCE_AND_HOLD, 10, 24.0f);
+        aHeadReanim2->PlayReanim("anim_shooting2", REANIM_PLAY_ONCE_AND_HOLD, 10, 24.0f);
+        aHeadReanim3->PlayReanim("anim_shooting3", REANIM_PLAY_ONCE_AND_HOLD, 10, 24.0f);
+    }
+
+    // If the heads are in the shooting animation, fire the projectiles.
+    if (aHeadReanim1->IsAnimPlaying("anim_shooting1"))
+    {
+        if (aHeadReanim1->ShouldTriggerTimedEvent(0.5f))
+        {
+            mApp->PlayFoley(FOLEY_THROW);
+            float aOriginX, aOriginY;
+
+            // Get the base position from the zombie's main head attachment point
+            GetTrackPosition("anim_head1", aOriginX, aOriginY);
+            aOriginX -= 40.0f; // Adjust to be closer to the mouth
+
+            // Fire a pea in the current row and the rows above/below
+            mBoard->AddProjectile(aOriginX, aOriginY - 100, mRenderOrder - 1, mRow - 1, PROJECTILE_ZOMBIE_PEA)->mMotionType = MOTION_BACKWARDS;
+            mBoard->AddProjectile(aOriginX, aOriginY, mRenderOrder - 1, mRow, PROJECTILE_ZOMBIE_PEA)->mMotionType = MOTION_BACKWARDS;
+            mBoard->AddProjectile(aOriginX, aOriginY + 100, mRenderOrder - 1, mRow + 1, PROJECTILE_ZOMBIE_PEA)->mMotionType = MOTION_BACKWARDS;
+        }
+
+        // After the shooting animation is done, return to idle and reset cooldown.
+        if (aHeadReanim1->mLoopCount > 0)
+        {
+            aHeadReanim1->PlayReanim("anim_head_idle1", REANIM_LOOP, 10, 15.0f);
+            aHeadReanim2->PlayReanim("anim_head_idle2", REANIM_LOOP, 10, 15.0f);
+            aHeadReanim3->PlayReanim("anim_head_idle3", REANIM_LOOP, 10, 15.0f);
+            mPhaseCounter = 150;
+        }
+    }
+}
+
+void Zombie::UpdateZombiePlanternHead()
+{
+    if (!mHasHead || IsImmobilizied() || IsDeadOrDying())
+        return;
+
+    // Make sure the light reanimation exists and follows the zombie
+    Reanimation* aLightReanim = mApp->ReanimationTryToGet(mLightReanimID);
+    if (aLightReanim)
+    {
+        aLightReanim->SetPosition(mPosX + 40, mPosY + 60);
+        aLightReanim->Update();
+    }
+
+    // Countdown to the next heal pulse
+    if (mHealCountdown > 0)
+    {
+        mHealCountdown--;
+    }
+
+    if (mHealCountdown == 0)
+    {
+        mHealCountdown = 100; // Heal every 1 second (100 ticks)
+
+        // Create a visual particle effect for the heal
+        mApp->AddTodParticle(mPosX + 40, mPosY + 40, mRenderOrder + 1, ParticleEffect::PARTICLE_STARBURST)->OverrideColor(nullptr, Color(143, 255, 143));
+
+        // Find and heal all zombies in a 3x3 area
+        Zombie* aZombieToHeal = nullptr;
+        while (mBoard->IterateZombies(aZombieToHeal))
+        {
+            if (!aZombieToHeal->IsDeadOrDying() && abs(aZombieToHeal->mRow - mRow) <= 1)
+            {
+                Rect aZombieRect = aZombieToHeal->GetZombieRect();
+                if (aZombieRect.mX >= mX - 40 && aZombieRect.mX <= mX + 120)
+                {
+                    aZombieToHeal->mBodyHealth = (std::min)(aZombieToHeal->mBodyMaxHealth, aZombieToHeal->mBodyHealth + 30);
+                }
+            }
+        }
+    }
+}
+
+void Zombie::UpdateZombieCactusHead()
+{
+    if (!mHasHead || IsImmobilizied())
+        return;
+
+    if (mPhaseCounter > 0)
+    {
+        mPhaseCounter--;
+    }
+
+    Reanimation* aHeadReanim = mApp->ReanimationTryToGet(mSpecialHeadReanimID);
+    if (aHeadReanim == nullptr) return;
+
+    if (mPhaseCounter == 0 && aHeadReanim->IsAnimPlaying("anim_idle"))
+    {
+        aHeadReanim->PlayReanim("anim_shooting", REANIM_PLAY_ONCE_AND_HOLD, 10, 35.0f);
+    }
+
+    if (aHeadReanim->IsAnimPlaying("anim_shooting"))
+    {
+        if (aHeadReanim->ShouldTriggerTimedEvent(0.5f))
+        {
+            mApp->PlayFoley(FOLEY_THROW);
+
+            int aOriginX = mX + 60;
+            int aOriginY = mY + 23;
+            Projectile* aProjectile = mBoard->AddProjectile(aOriginX, aOriginY, mRenderOrder - 1, mRow, PROJECTILE_ZOMBIE_SPIKE);
+            aProjectile->mMotionType = MOTION_STRAIGHT;
+        }
+
+        if (aHeadReanim->mLoopCount > 0)
+        {
+            aHeadReanim->PlayReanim("anim_idle", REANIM_LOOP, 10, 15.0f);
+            mPhaseCounter = 150;
+        }
+    }
+}
+
+void Zombie::UpdateZombieBloverHead()
+{
+    if (!mHasHead || IsImmobilizied() || mIsEating)
+        return;
+
+    if (mZombiePhase != PHASE_ZOMBIE_NORMAL)
+        return;
+
+    Plant* aTargetPlant = FindPlantTarget(ATTACKTYPE_CHEW);
+    if (aTargetPlant != nullptr)
+    {
+        mApp->PlaySample(SOUND_BLOVER);
+        mBoard->PushPlantsInRow(mRow);
+
+        // The zombie sacrifices itself after pushing
+        this->DieNoLoot();
+    }
+}
+
+void Zombie::UpdateZombieStarfruitHead()
+{
+    if (!mHasHead || IsImmobilizied())
+        return;
+
+    if (mPhaseCounter > 0)
+    {
+        mPhaseCounter--;
+    }
+
+    Reanimation* aHeadReanim = mApp->ReanimationTryToGet(mSpecialHeadReanimID);
+    if (aHeadReanim == nullptr) return;
+
+    if (mPhaseCounter == 0 && aHeadReanim->IsAnimPlaying("anim_idle"))
+    {
+        aHeadReanim->PlayReanim("anim_shoot", REANIM_PLAY_ONCE_AND_HOLD, 10, 28.0f);
+    }
+
+    if (aHeadReanim->IsAnimPlaying("anim_shoot"))
+    {
+        if (aHeadReanim->ShouldTriggerTimedEvent(0.5f))
+        {
+            mApp->PlayFoley(FOLEY_THROW);
+
+            float aOriginX, aOriginY;
+            GetTrackPosition("anim_head1", aOriginX, aOriginY);
+
+            float aProjectileSpeed = 3.33f;
+
+            for (int i = 0; i < 5; i++)
+            {
+                Projectile* aProjectile = mBoard->AddProjectile(aOriginX, aOriginY, mRenderOrder - 1, mRow, PROJECTILE_ZOMBIE_STAR);
+                aProjectile->mDamageRangeFlags = (1 << DAMAGES_GROUND);
+                aProjectile->mMotionType = MOTION_STAR;
+
+                float aShootAngleX = cos(DEG_TO_RAD(30.0f)) * aProjectileSpeed;
+                float aShootAngleY = sin(DEG_TO_RAD(30.0f)) * aProjectileSpeed;
+
+                switch (i)
+                {
+                case 0: aProjectile->mVelX = 3.33f;             aProjectile->mVelY = 0.0f;              break; // Right
+                case 1: aProjectile->mVelX = 0.0f;              aProjectile->mVelY = 3.33f;             break; // Down
+                case 2: aProjectile->mVelX = 0.0f;              aProjectile->mVelY = -3.33f;            break; // Up
+                case 3: aProjectile->mVelX = -aShootAngleX;     aProjectile->mVelY = aShootAngleY;      break; // Down-Left
+                case 4: aProjectile->mVelX = -aShootAngleX;     aProjectile->mVelY = -aShootAngleY;     break; // Up-Left
+                }
+            }
+        }
+
+        if (aHeadReanim->mLoopCount > 0)
+        {
+            aHeadReanim->PlayReanim("anim_idle", REANIM_LOOP, 10, 15.0f);
+            mPhaseCounter = 150;
+        }
+    }
+}
+
+void Zombie::UpdateZombiePumpkinHead()
+{
+    if (!mHasHead || IsImmobilizied() || IsDeadOrDying())
+        return;
+
+    // --- Always find the best target ---
+    Zombie* aBestTarget = nullptr;
+    int aHighestX = -1;
+
+    Zombie* aZombie = nullptr;
+    while (mBoard->IterateZombies(aZombie))
+    {
+        // Check if the zombie is a valid target and is in front of the Pumpkin
+        if (aZombie != this && aZombie->mRow == mRow && aZombie->mPosX <= mPosX && !aZombie->IsDeadOrDying())
+        {
+            if (aZombie->mZombieType == ZOMBIE_NORMAL || aZombie->mZombieType == ZOMBIE_TRAFFIC_CONE ||
+                aZombie->mZombieType == ZOMBIE_NEWSPAPER)
+            {
+                // If this zombie is further back than the current best target, it becomes the new best target
+                if (aBestTarget == nullptr || aZombie->mPosX > aHighestX)
+                {
+                    aBestTarget = aZombie;
+                    aHighestX = aZombie->mPosX;
+                }
+            }
+        }
+    }
+
+    mProtectingZombieID = (aBestTarget != nullptr) ? mBoard->ZombieGetID(aBestTarget) : ZOMBIEID_NULL;
+
+    // --- Update behavior based on the target ---
+    Zombie* aProtectedZombie = mBoard->ZombieTryToGet(mProtectingZombieID);
+    if (aProtectedZombie != nullptr)
+    {
+        mIsEating = false; // Stop eating when in protect mode.
+
+        float aTargetX = aProtectedZombie->mPosX - 80.0f;
+
+        if (mPosX > aTargetX)
+        {
+            mVelX = 2.4f; // sextuple speed
+        }
+        // If we are in the protection zone, match its speed.
+        else
+        {
+            mVelX = aProtectedZombie->mVelX;
+        }
+    }
+    else // No target, so behave like a normal zombie.
+    {
+        PickRandomSpeed();
+    }
+    UpdateAnimSpeed();
+}
+
+void Zombie::UpdateZombieCabbagepultHead()
+{
+    if (!mHasHead || IsImmobilizied())
+        return;
+
+    if (mPhaseCounter > 0)
+    {
+        mPhaseCounter--;
+    }
+
+    Reanimation* aHeadReanim = mApp->ReanimationTryToGet(mSpecialHeadReanimID);
+    if (aHeadReanim == nullptr) return;
+
+    Plant* aTargetPlant = nullptr;
+
+    if (mPhaseCounter == 0 && aHeadReanim->IsAnimPlaying("anim_idle"))
+    {
+        // Find the furthest valid plant in the lane to target
+        int aMinX = 10000;
+        Plant* aPlant = nullptr;
+        while (mBoard->IteratePlants(aPlant))
+        {
+            if (aPlant->mRow == mRow && !aPlant->NotOnGround() && aPlant->mX < aMinX)
+            {
+                aTargetPlant = aPlant;
+                aMinX = aPlant->mX;
+            }
+        }
+
+        if (aTargetPlant)
+        {
+            aHeadReanim->PlayReanim("anim_shooting", REANIM_PLAY_ONCE_AND_HOLD, 10, 24.0f);
+        }
+        else
+        {
+            mPhaseCounter = 100;
+        }
+    }
+
+    if (aHeadReanim->IsAnimPlaying("anim_shooting"))
+    {
+        if (aHeadReanim->ShouldTriggerTimedEvent(0.3f))
+        {
+            // Find the target again right before firing
+            aTargetPlant = nullptr;
+            int aMinX = 10000;
+            Plant* aPlant = nullptr;
+            while (mBoard->IteratePlants(aPlant))
+            {
+                if (aPlant->mRow == mRow && !aPlant->NotOnGround() && aPlant->mX < aMinX)
+                {
+                    aTargetPlant = aPlant;
+                    aMinX = aPlant->mX;
+                }
+            }
+
+            if (aTargetPlant)
+            {
+                mApp->PlayFoley(FOLEY_THROW);
+
+                float aOriginX, aOriginY;
+                GetTrackPosition("anim_head1", aOriginX, aOriginY);
+                aOriginX -= 35.0f;
+                aOriginY -= 70.0f;
+
+                Projectile* aProjectile = mBoard->AddProjectile(aOriginX, aOriginY, mRenderOrder - 1, mRow, PROJECTILE_ZOMBIE_CABBAGE);
+
+                float aRangeX = aOriginX - aTargetPlant->mX - 20.0f;
+                float aRangeY = aTargetPlant->mY - aOriginY;
+                if (aRangeX < 40.0f) aRangeX = 40.0f;
+
+                aProjectile->mMotionType = MOTION_LOBBED;
+                aProjectile->mVelX = -aRangeX / 120.0f;
+                aProjectile->mVelY = 0.0f;
+                aProjectile->mVelZ = aRangeY / 120.0f - 7.0f;
+                aProjectile->mAccZ = 0.115f;
+            }
+        }
+
+        if (aHeadReanim->mLoopCount > 0)
+        {
+            aHeadReanim->PlayReanim("anim_idle", REANIM_LOOP, 10, 15.0f);
+            mPhaseCounter = 300;
+        }
+    }
+}
+
+void Zombie::UpdateZombieKernelpultHead()
+{
+    if (!mHasHead || IsImmobilizied())
+        return;
+
+    if (mPhaseCounter > 0)
+    {
+        mPhaseCounter--;
+    }
+
+    Reanimation* aHeadReanim = mApp->ReanimationTryToGet(mSpecialHeadReanimID);
+    if (aHeadReanim == nullptr) return;
+
+    if (mPhaseCounter == 0 && aHeadReanim->IsAnimPlaying("anim_idle"))
+    {
+        Plant* aTargetPlant = nullptr;
+        int aMinX = 10000;
+
+        Plant* aPlant = nullptr;
+        while (mBoard->IteratePlants(aPlant))
+        {
+            if (aPlant->mRow == mRow && !aPlant->NotOnGround() && aPlant->mX < aMinX)
+            {
+                aTargetPlant = aPlant;
+                aMinX = aPlant->mX;
+            }
+        }
+
+        if (aTargetPlant)
+        {
+            mLaunchKernel = (Rand(4) == 0) ? 2 : 1; // 2 = butter, 1 = kernel
+
+            if (mLaunchKernel == 2) // It's butter
+            {
+                aHeadReanim->AssignRenderGroupToPrefix("Cornpult_butter", RENDER_GROUP_NORMAL);
+                aHeadReanim->AssignRenderGroupToPrefix("Cornpult_kernal", RENDER_GROUP_HIDDEN);
+            }
+            else // It's a kernel
+            {
+                aHeadReanim->AssignRenderGroupToPrefix("Cornpult_butter", RENDER_GROUP_HIDDEN);
+                aHeadReanim->AssignRenderGroupToPrefix("Cornpult_kernal", RENDER_GROUP_NORMAL);
+            }
+            aHeadReanim->PlayReanim("anim_shooting", REANIM_PLAY_ONCE_AND_HOLD, 10, 24.0f);
+        }
+        else
+        {
+            mPhaseCounter = 100;
+        }
+    }
+
+    if (aHeadReanim->IsAnimPlaying("anim_shooting"))
+    {
+        if (aHeadReanim->ShouldTriggerTimedEvent(0.3f))
+        {
+            Plant* aTargetPlant = nullptr;
+            int aMinX = 10000;
+            Plant* aPlant = nullptr;
+            while (mBoard->IteratePlants(aPlant))
+            {
+                if (aPlant->mRow == mRow && !aPlant->NotOnGround() && aPlant->mX < aMinX)
+                {
+                    aTargetPlant = aPlant;
+                    aMinX = aPlant->mX;
+                }
+            }
+
+            if (aTargetPlant)
+            {
+                mApp->PlayFoley(FOLEY_THROW);
+
+                float aOriginX, aOriginY;
+                GetTrackPosition("anim_head1", aOriginX, aOriginY);
+                aOriginX -= 35.0f;
+                aOriginY -= 70.0f;
+
+                ProjectileType aProjectileType = (mLaunchKernel == 2) ? PROJECTILE_ZOMBIE_BUTTER : PROJECTILE_ZOMBIE_KERNEL;
+                Projectile* aProjectile = mBoard->AddProjectile(aOriginX, aOriginY, mRenderOrder - 1, mRow, aProjectileType);
+
+                float aRangeX = aOriginX - aTargetPlant->mX - 20.0f;
+                float aRangeY = aTargetPlant->mY - aOriginY;
+                if (aRangeX < 40.0f) aRangeX = 40.0f;
+
+                aProjectile->mMotionType = MOTION_LOBBED;
+                aProjectile->mVelX = -aRangeX / 120.0f;
+                aProjectile->mVelY = 0.0f;
+                aProjectile->mVelZ = aRangeY / 120.0f - 7.0f;
+                aProjectile->mAccZ = 0.115f;
+            }
+        }
+
+        if (aHeadReanim->mLoopCount > 0)
+        {
+            aHeadReanim->AssignRenderGroupToPrefix("Cornpult_butter", RENDER_GROUP_HIDDEN);
+            aHeadReanim->AssignRenderGroupToPrefix("Cornpult_kernal", RENDER_GROUP_NORMAL);
+            aHeadReanim->PlayReanim("anim_idle", REANIM_LOOP, 10, 15.0f);
+            mPhaseCounter = 300;
+        }
     }
 }
 
@@ -3322,7 +5392,7 @@ void Zombie::DropHead(unsigned int theDamageFlags)
         ReanimShowPrefix("Zombie_backup_stash", RENDER_GROUP_HIDDEN);
         ReanimShowPrefix("Zombie_disco_chops", RENDER_GROUP_HIDDEN);
     }
-    else if (mZombieType == ZombieType::ZOMBIE_NEWSPAPER)
+    else if (IsNewspaperZombie(mZombieType))
     {
         aEffect = ParticleEffect::PARTICLE_ZOMBIE_NEWSPAPER_HEAD;
     }
@@ -3869,8 +5939,22 @@ void Zombie::UpdateLadder()
 
 void Zombie::UpdateZombieWalking()
 {
+    if (mZombieType == ZombiePhase::PHASE_SUNFLOWER_STEALING ||
+        mZombieType == ZombiePhase::PHASE_CHERRY_HEAD_EXPLODING)
+        return;
+
     if (ZombieNotWalking())
         return;
+
+    if (mMindControlled)
+    {
+        Plant* aSpikeweed = IsStandingOnSpikeweed();
+        if (aSpikeweed != nullptr)
+        {
+            // The zombie is on a spikeweed, so stop its movement but let it continue animating.
+            return;
+        }
+    }
 
     Reanimation* aBodyReanim = mApp->ReanimationTryToGet(mBodyReanimID);
     if (aBodyReanim)
@@ -4015,6 +6099,15 @@ void Zombie::CheckForZombieStep()
 
 void Zombie::UpdateZombiePosition()
 {
+    if (mPushbackCount > 0)
+    {
+        mPushbackCount--;
+        mPosX += mPushX;
+
+        // Cap their position at the edge of the lawn to prevent them going off-screen
+        mPosX = min(mPosX, 800.0f);
+    }
+
     if (mZombieType == ZombieType::ZOMBIE_BUNGEE || mZombieType == ZombieType::ZOMBIE_BOSS || 
         mZombiePhase == ZombiePhase::PHASE_RISING_FROM_GRAVE || mZombieHeight == ZombieHeight::HEIGHT_ZOMBIQUARIUM)
         return;
@@ -4064,6 +6157,11 @@ void Zombie::UpdateBurn()
     {
         DieWithLoot();
     }
+}
+
+void Zombie::Stun(int theStunTime)
+{
+    mStunCounter = theStunTime;
 }
 
 void Zombie::Update()
@@ -4233,11 +6331,11 @@ void Zombie::UpdateActions()
     {
         UpdateZombieSnorkel();
     }
-    if (mZombieType == ZombieType::ZOMBIE_BALLOON)
+    if (IsBalloonZombie(mZombieType))
     {
         UpdateZombieFlyer();
     }
-    if (mZombieType == ZombieType::ZOMBIE_NEWSPAPER)
+    if (IsNewspaperZombie(mZombieType))
     {
         UpdateZombieNewspaper();
     }
@@ -4297,6 +6395,86 @@ void Zombie::UpdateActions()
     {
         UpdateZombieSquashHead();
     }
+    if (mZombieType == ZombieType::ZOMBIE_REPEATER_HEAD)
+    {
+        UpdateZombieRepeaterHead();
+    }
+    if (mZombieType == ZombieType::ZOMBIE_SNOW_HEAD) 
+    {
+        UpdateZombieSnowPeaHead();
+    }
+    if (mZombieType == ZombieType::ZOMBIE_SUNFLOWER_HEAD)
+    {
+        UpdateZombieSunflowerHead();
+    }
+    if (mZombieType == ZombieType::ZOMBIE_CHERRY_HEAD)
+    {
+        UpdateZombieCherryHead();
+    }
+    if (mZombieType == ZombieType::ZOMBIE_POTATO_HEAD)
+    {
+        UpdateZombiePotatoHead();
+    }
+    if (mZombieType == ZombieType::ZOMBIE_CHOMPER_HEAD)
+    {
+        UpdateZombieChomperHead();
+    }
+    if (mZombieType == ZOMBIE_FUMESHROOM_HEAD)
+    {
+        UpdateZombieFumeshroomHead();
+    }
+    if (mZombieType == ZOMBIE_GRAVEBUSTER_HEAD)
+    {
+        UpdateZombieGravebusterHead();
+    }
+    if (mZombieType == ZOMBIE_HYPNOSHROOM_HEAD)
+    {
+        UpdateZombieHypnoshroomHead();
+    }
+    if (mZombieType == ZOMBIE_SCAREDYSHROOM_HEAD)
+    {
+        UpdateZombieScaredyshroomHead();
+    }
+    if (mZombieType == ZOMBIE_ICESHROOM_HEAD)
+    {
+        UpdateZombieIceshroomHead();
+    }
+    if (mZombieType == ZOMBIE_DOOMSHROOM_HEAD)
+    {
+        UpdateZombieDoomshroomHead();
+    }
+    if (mZombieType == ZOMBIE_THREEPEATER_HEAD)
+    {
+        UpdateZombieThreepeaterHead();
+    }
+    if (mZombieType == ZOMBIE_PLANTERN_HEAD)
+    {
+        UpdateZombiePlanternHead();
+    }
+    if (mZombieType == ZOMBIE_CACTUS_HEAD)
+    {
+        UpdateZombieCactusHead();
+    }
+    if (mZombieType == ZOMBIE_BLOVER_HEAD)
+    {
+        UpdateZombieBloverHead();
+    }
+    if (mZombieType == ZOMBIE_STARFRUIT_HEAD)
+    {
+        UpdateZombieStarfruitHead();
+    }
+    if (mZombieType == ZOMBIE_PUMPKIN_HEAD)
+    {
+        UpdateZombiePumpkinHead();
+    }
+    if (mZombieType == ZOMBIE_CABBAGEPULT_HEAD)
+    {
+        UpdateZombieCabbagepultHead();
+    }
+    if (mZombieType == ZOMBIE_KERNELPULT_HEAD)
+    {
+        UpdateZombieKernelpultHead();
+    }
 }
 
 void Zombie::CheckForBoardEdge()
@@ -4340,6 +6518,96 @@ void Zombie::CheckForBoardEdge()
 
 void Zombie::UpdatePlaying()
 {
+    if (mIsCorroded)
+    {
+        mCorrosionCountdown--;
+        if (mCorrosionCountdown == 0)
+        {
+            mCorrosionCountdown = 100; // Reset timer for the next second
+
+            bool armorExists = false;
+            if (mHelmHealth > 0)
+            {
+                int helmDamage = mHelmMaxHealth / 4; // 25% damage
+                TakeHelmDamage(helmDamage, 1U << DAMAGE_BYPASSES_SHIELD);
+                armorExists = true;
+            }
+            if (mShieldHealth > 0)
+            {
+                int shieldDamage = mShieldMaxHealth / 4; // 25% damage
+                TakeShieldDamage(shieldDamage, 1U << DAMAGE_BYPASSES_SHIELD);
+                armorExists = true;
+            }
+
+            // If all armor is gone, remove the effect
+            if (!armorExists)
+            {
+                mIsCorroded = false;
+            }
+        }
+    }
+
+    if (mIsPoisoned)
+    {
+        mPoisonCountdown--;
+        if (mPoisonCountdown % 100 == 0) // Every 100 ticks (1 second)
+        {
+            TakeBodyDamage(25, 1U << DAMAGE_BYPASSES_SHIELD); // Deal 25 damage, ignoring armor
+            if (IsDeadOrDying())
+            {
+                return; // Exit the function immediately if the poison was fatal
+            } 
+        }
+
+        if (mPoisonCountdown <= 0)
+        {
+            mIsPoisoned = false;
+        }
+    }
+
+    if (mIsRadioactive)
+    {
+        mRadioactiveCountdown--;
+        if (mRadioactiveCountdown == 0)
+        {
+            mRadioactiveCountdown = 100; // Reset the timer for the next second
+
+            int aDamage = 150; // Damage value
+            mBodyHealth -= aDamage;
+            mJustGotShotCounter = 25; // A stronger flash for a bigger damage tick
+
+            if (mBodyHealth <= 0)
+            {
+                mBodyHealth = 0;
+                PlayDeathAnim(0U);
+                DropLoot();
+                return; // Zombie is dead, no need to continue
+            }
+            else
+            {
+                UpdateDamageStates(0U);
+            }
+        }
+    }
+
+    if (mOrangeEffectCountdown > 0)
+    {
+        mOrangeEffectCountdown--;
+        if (mOrangeEffectCountdown == 0)
+        {
+            mIsOrange = false;
+        }
+    }
+
+    if (mChompedTorchwoodCooldown > 0)
+    {
+        mChompedTorchwoodCooldown--;
+        if (mChompedTorchwoodCooldown == 0)
+        {
+            TakeDamage(20, 1U << (int)DamageFlags::DAMAGE_FIRE);
+        }
+    }
+
     TOD_ASSERT(mBodyHealth > 0 || mZombiePhase == ZombiePhase::PHASE_BOBSLED_CRASHING);
 
     mGroanCounter--;
@@ -4370,6 +6638,23 @@ void Zombie::UpdatePlaying()
         }
 
         mGroanCounter = Rand(1000) + 500;
+    }
+
+    if (mZombieType == ZOMBIE_CHERRY_HEAD && mZombiePhase == PHASE_CHERRY_HEAD_EXPLODING && mPhaseCounter > 0)
+    {
+        mPhaseCounter--;
+        if (mPhaseCounter == 40) // Trigger damage at this point in the countdown
+        {
+            int aPosX = mX + mWidth / 2;
+            int aPosY = mY + mHeight / 2;
+
+            mApp->PlayFoley(FOLEY_CHERRYBOMB);
+            mApp->PlayFoley(FOLEY_JUICY);
+            mApp->AddTodParticle(aPosX, aPosY, (int)RenderLayer::RENDER_LAYER_TOP, ParticleEffect::PARTICLE_POWIE);
+
+            mBoard->DamageAllPlantsInRadius(aPosX, aPosY, 115, 900);
+            mBoard->ShakeBoard(3, -4);
+        }
     }
 
     if (mIceTrapCounter > 0)
@@ -4448,6 +6733,24 @@ void Zombie::UpdatePlaying()
             }
         }
     }
+
+    if (mZombieType == ZOMBIE_FLAG && IsOnBoard() && !mMindControlled)
+    {
+        // Get the zombie's current grid column
+        int aGridX = mBoard->PixelToGridX(mPosX, mPosY);
+
+        // Check if the zombie has moved to a new column since the last check
+        if (aGridX >= 0 && aGridX != mLastGraveX)
+        {
+            // Check if it's possible to place a gravestone on this tile
+            if (mBoard->CanAddGraveStoneAt(aGridX, mRow))
+            {
+                mBoard->AddAGraveStone(aGridX, mRow);
+            }
+            // Remember this column so we don't spawn another one on the same tile
+            mLastGraveX = aGridX;
+        }
+    }
 }
 
 bool Zombie::HasYuckyFaceImage()
@@ -4498,89 +6801,110 @@ void Zombie::ShowYuckyFace(bool theShow)
 
 void Zombie::UpdateYuckyFace()
 {
-    mYuckyFaceCounter++;
-    if (mYuckyFaceCounter > 20 && mYuckyFaceCounter < 170 && !HasYuckyFaceImage())
+    // If it's a regular zombie, use the original yucky logic
+    if (mZombieType != ZOMBIE_GARLIC_HEAD)
     {
-        StopEating();
-        mYuckyFaceCounter = 170;
-        if (mBoard->CountZombiesOnScreen() <= 5 && mHasHead)
+        mYuckyFaceCounter++;
+        if (mYuckyFaceCounter > 20 && mYuckyFaceCounter < 170 && !HasYuckyFaceImage())
         {
-            mApp->PlayFoley(FoleyType::FOLEY_YUCK);
+            StopEating();
+            mYuckyFaceCounter = 170;
+            if (mBoard->CountZombiesOnScreen() <= 5 && mHasHead) { mApp->PlayFoley(FoleyType::FOLEY_YUCK); }
+            else if (mBoard->CountZombiesOnScreen() <= 10 && mHasHead && Rand(2) == 0) { mApp->PlayFoley(FoleyType::FOLEY_YUCK); }
         }
-        else if (mBoard->CountZombiesOnScreen() <= 10 && mHasHead && Rand(2) == 0)
-        {
-            mApp->PlayFoley(FoleyType::FOLEY_YUCK);
-        }
-    }
 
-    if (mYuckyFaceCounter > 270)
-    {
-        ShowYuckyFace(false);
-        mYuckyFace = false;
-        mYuckyFaceCounter = 0;
+        if (mYuckyFaceCounter > 270)
+        {
+            ShowYuckyFace(false);
+            mYuckyFace = false;
+            mYuckyFaceCounter = 0;
+            return;
+        }
+
+        if (mYuckyFaceCounter == 70)
+        {
+            StopEating();
+            ShowYuckyFace(true);
+            if (mBoard->CountZombiesOnScreen() <= 5 && mHasHead) { mApp->PlayFoley(FoleyType::FOLEY_YUCK); }
+            else if (mBoard->CountZombiesOnScreen() <= 10 && mHasHead && Rand(2) == 0) { mApp->PlayFoley(FoleyType::FOLEY_YUCK); }
+        }
+        if (mYuckyFaceCounter == 170)
+        {
+            StartWalkAnim(20);
+
+            bool aCanGoUp = true;
+            bool aCanGoDown = true;
+            bool aIsPool = mBoard->mPlantRow[mRow] == PlantRowType::PLANTROW_POOL;
+            if (!mBoard->RowCanHaveZombies(mRow - 1)) aCanGoUp = false;
+            else if (mBoard->mPlantRow[mRow - 1] == PlantRowType::PLANTROW_POOL && !aIsPool) aCanGoUp = false;
+            else if (mBoard->mPlantRow[mRow - 1] != PlantRowType::PLANTROW_POOL && aIsPool) aCanGoUp = false;
+            if (!mBoard->RowCanHaveZombies(mRow + 1)) aCanGoDown = false;
+            else if (mBoard->mPlantRow[mRow + 1] == PlantRowType::PLANTROW_POOL && !aIsPool) aCanGoDown = false;
+            else if (mBoard->mPlantRow[mRow + 1] != PlantRowType::PLANTROW_POOL && aIsPool) aCanGoDown = false;
+
+            if (aCanGoDown && !aCanGoUp) SetRow(mRow + 1);
+            else if (!aCanGoDown && aCanGoUp) SetRow(mRow - 1);
+            else if (aCanGoDown && aCanGoUp) SetRow((Rand(2) == 0) ? (mRow + 1) : (mRow - 1));
+            else TOD_ASSERT();
+        }
         return;
     }
 
-    if (mYuckyFaceCounter == 70)
+    // New logic for Garlic Head Zombie
+    if (!IsOnBoard()) return;
+
+    mYuckyFaceCounter--;
+
+    if (mIsEating)
     {
-        StopEating();
-        ShowYuckyFace(true);
-        if (mBoard->CountZombiesOnScreen() <= 5 && mHasHead)
-        {
-            mApp->PlayFoley(FoleyType::FOLEY_YUCK);
-        }
-        else if (mBoard->CountZombiesOnScreen() <= 10 && mHasHead && Rand(2) == 0)
-        {
-            mApp->PlayFoley(FoleyType::FOLEY_YUCK);
-        }
+        StopEating(); // This zombie never eats
     }
-    if (mYuckyFaceCounter == 170)
+
+    // Only start zigzagging when the zombie is on the screen
+    if (mX < BOARD_WIDTH)
     {
-        StartWalkAnim(20);
+        float aHorizontalSpeed = mVelX;
+        if (IsMovingAtChilledSpeed())
+        {
+            aHorizontalSpeed *= CHILLED_SPEED_FACTOR;
+        }
+        mPosX -= aHorizontalSpeed; // Move from right to left
 
-        bool aCanGoUp = true;
-        bool aCanGoDown = true;
-        bool aIsPool = mBoard->mPlantRow[mRow] == PlantRowType::PLANTROW_POOL;
-        if (!mBoard->RowCanHaveZombies(mRow - 1))
+        // Determine vertical velocity for zigzag
+        float aVerticalSpeed = 0.4f;
+        if (mVariant) // mVariant is used for direction: true = up, false = down
         {
-            aCanGoUp = false;
-        }
-        else if (mBoard->mPlantRow[mRow - 1] == PlantRowType::PLANTROW_POOL && !aIsPool)
-        {
-            aCanGoUp = false;
-        }
-        else if (mBoard->mPlantRow[mRow - 1] != PlantRowType::PLANTROW_POOL && aIsPool)
-        {
-            aCanGoUp = false;
-        }
-        if (!mBoard->RowCanHaveZombies(mRow + 1))
-        {
-            aCanGoDown = false;
-        }
-        else if (mBoard->mPlantRow[mRow + 1] == PlantRowType::PLANTROW_POOL && !aIsPool)
-        {
-            aCanGoDown = false;
-        }
-        else if (mBoard->mPlantRow[mRow + 1] != PlantRowType::PLANTROW_POOL && aIsPool)
-        {
-            aCanGoDown = false;
-        }
-
-        if (aCanGoDown && !aCanGoUp)
-        {
-            SetRow(mRow + 1);
-        }
-        else if (!aCanGoDown && aCanGoUp)
-        {
-            SetRow(mRow - 1);
-        }
-        else if (aCanGoDown && aCanGoUp)
-        {
-            SetRow((Rand(2) == 0) ? (mRow + 1) : (mRow - 1));
+            mVelZ = -aVerticalSpeed; // Move up
         }
         else
         {
-            TOD_ASSERT();
+            mVelZ = aVerticalSpeed; // Move down
+        }
+        mPosY += mVelZ;
+
+        // Check if it's time to change direction and play the sound
+        if (mYuckyFaceCounter <= 0)
+        {
+            mYuckyFaceCounter = 150 + Rand(100); // Reset timer for next change
+            mVariant = !mVariant; // Flip direction
+            mApp->PlayFoley(FoleyType::FOLEY_YUCK);
+        }
+
+        // Boundary checks to keep it on the lawn
+        int aGridY = mBoard->PixelToGridY(mX, mY);
+        if (aGridY != mRow)
+        {
+            // If it has moved to a new row, update its internal row property
+            if (aGridY != -1)
+            {
+                mRow = aGridY;
+            }
+
+            // If it hits the top or bottom of the valid area, reverse direction
+            if ((mRow == 0 && mVariant) || (mRow == 4 && !mVariant))
+            {
+                mVariant = !mVariant;
+            }
         }
     }
 }
@@ -4611,10 +6935,44 @@ void Zombie::AnimateChewSound()
                 mApp->GetAchievement(AchievementType::ACHIEVEMENT_DISCO_IS_UNDEAD);
             }
         }
+        else if (aPlant->mSeedType == SeedType::SEED_HYPNOGIGA && !aPlant->mIsAsleep)
+        {
+            // Store the old zombie's properties before it's removed
+            int aRow = mRow;
+            float aPosX = mPosX;
+
+            // The plant gets eaten and the original zombie is removed
+            mApp->PlayFoley(FoleyType::FOLEY_FLOOP);
+            mApp->AddTodParticle(mPosX + 60.0f, mPosY + 40.0f, mRenderOrder + 1, ParticleEffect::PARTICLE_MIND_CONTROL);
+            aPlant->Die();
+            this->DieNoLoot();
+
+            // Spawn a new hypnotized Gargantuar in its place
+            Zombie* aNewGargantuar = mBoard->AddZombieInRow(ZOMBIE_GARGANTUAR, aRow, mFromWave);
+            if (aNewGargantuar)
+            {
+                aNewGargantuar->mPosX = aPosX;
+                aNewGargantuar->StartMindControlled();
+            }
+
+            return; // Stop further processing for the original zombie
+        }
         else if (aPlant->mSeedType == SeedType::SEED_GARLIC)
         {
             if (!mYuckyFace)
             {
+                mYuckyFace = true;
+                mYuckyFaceCounter = 0;
+                UpdateAnimSpeed();
+                mApp->PlayFoley(FoleyType::FOLEY_CHOMP);
+            }
+        }
+        else if (aPlant->mSeedType == SeedType::SEED_CORROSION_GARLIC)
+        {
+            if (!mYuckyFace)
+            {
+                ApplyCorrosion();
+
                 mYuckyFace = true;
                 mYuckyFaceCounter = 0;
                 UpdateAnimSpeed();
@@ -4799,6 +7157,7 @@ void Zombie::DrawZombie(Graphics* g, const ZombieDrawPosition& theDrawPos)
     case ZombieType::ZOMBIE_PAIL:
     case ZombieType::ZOMBIE_NEWSPAPER:
     case ZombieType::ZOMBIE_DOOR:
+    case ZombieType::ZOMBIE_BLACK_DOOR:
     case ZombieType::ZOMBIE_FOOTBALL:
     case ZombieType::ZOMBIE_DOLPHIN_RIDER:
     case ZombieType::ZOMBIE_LADDER:
@@ -5437,6 +7796,15 @@ void Zombie::DrawReanim(Graphics* g, const ZombieDrawPosition& theDrawPos, int t
     }
 
     Color aColorOverride(255, 255, 255, aFadeAlpha);
+    if (mZombieType == ZOMBIE_ENRAGED_JACK)
+    {
+        aColorOverride = Color(255, 128, 128, aFadeAlpha);
+    }
+    else if (mIsRadioactive)
+    {
+        aColorOverride = Color(150, 255, 150, aFadeAlpha); // A sickly green tint
+    }
+
     Color aExtraAdditiveColor = Color::Black;
     bool aEnableExtraAdditiveDraw = false;
     if (mZombiePhase == ZombiePhase::PHASE_ZOMBIE_BURNED)
@@ -5461,6 +7829,12 @@ void Zombie::DrawReanim(Graphics* g, const ZombieDrawPosition& theDrawPos, int t
         aExtraAdditiveColor = Color::Black;
         aEnableExtraAdditiveDraw = false;
     }
+    else if (mIsCorroded)
+    {
+        aColorOverride = Color(139, 69, 19, aFadeAlpha); // A brown color
+        aExtraAdditiveColor = Color(139, 69, 19, 100);   // A subtle brown glow
+        aEnableExtraAdditiveDraw = true;
+    }
     else if (mMindControlled)
     {
         aColorOverride = ZOMBIE_MINDCONTROLLED_COLOR;
@@ -5472,6 +7846,18 @@ void Zombie::DrawReanim(Graphics* g, const ZombieDrawPosition& theDrawPos, int t
     {
         aColorOverride = Color(75, 75, 255, aFadeAlpha);
         aExtraAdditiveColor = aColorOverride;
+        aEnableExtraAdditiveDraw = true;
+    }
+    else if (mIsPoisoned)
+    {
+        aColorOverride = Color(128, 0, 128, aFadeAlpha); // Purple tint
+        aExtraAdditiveColor = Color(128, 0, 128, 100);   // Purple glow
+        aEnableExtraAdditiveDraw = true;
+    }
+    else if (mIsOrange)
+    {
+        aColorOverride = Color(255, 165, 0, aFadeAlpha);
+        aExtraAdditiveColor = Color(255, 165, 0, 100);
         aEnableExtraAdditiveDraw = true;
     }
     else if (mZombieHeight == ZombieHeight::HEIGHT_ZOMBIQUARIUM && mBodyHealth < 100)
@@ -6222,6 +8608,61 @@ Zombie* Zombie::FindZombieTarget()
     return nullptr;
 }
 
+Zombie* Zombie::FindHypnotizedZombieTarget()
+{
+    Rect aAttackRect = GetZombieAttackRect();
+    Zombie* aBestZombie = nullptr;
+    int aMinX = 0;
+
+    Zombie* aZombie = nullptr;
+    while (mBoard->IterateZombies(aZombie))
+    {
+        // Find a zombie that IS mind-controlled, is in the same row, and isn't dead
+        if (aZombie->mMindControlled && aZombie != this && aZombie->mRow == mRow && !aZombie->IsDeadOrDying())
+        {
+            Rect aZombieRect = aZombie->GetZombieRect();
+            if (GetRectOverlap(aAttackRect, aZombieRect) > 0)
+            {
+                if (aBestZombie == nullptr || aZombie->mX < aMinX)
+                {
+                    aBestZombie = aZombie;
+                    aMinX = aZombie->mX;
+                }
+            }
+        }
+    }
+    return aBestZombie;
+}
+
+Zombie* Zombie::FindGargantuarTargetZombie()
+{
+    Rect aAttackRect = GetZombieAttackRect();
+    aAttackRect.mWidth = 170;
+    aAttackRect.mY += 40;
+    aAttackRect.mHeight = 80;
+
+    Zombie* aBestZombie = nullptr;
+    int aMinX = 0;
+
+    Zombie* aZombie = nullptr;
+    while (mBoard->IterateZombies(aZombie))
+    {
+        if (!aZombie->mMindControlled && aZombie != this && aZombie->mRow == mRow && !aZombie->IsDeadOrDying())
+        {
+            Rect aZombieRect = aZombie->GetZombieRect();
+            if (GetRectOverlap(aAttackRect, aZombieRect) > 0)
+            {
+                if (aBestZombie == nullptr || aZombie->mX < aMinX)
+                {
+                    aBestZombie = aZombie;
+                    aMinX = aZombie->mX;
+                }
+            }
+        }
+    }
+    return aBestZombie;
+}
+
 void Zombie::SquishAllInSquare(int theX, int theY, ZombieAttackType theAttackType)
 {
     Plant* aPlant = nullptr;
@@ -6238,6 +8679,27 @@ void Zombie::SquishAllInSquare(int theX, int theY, ZombieAttackType theAttackTyp
             {
                 mBoard->mPlantsEaten++;
                 aPlant->Squish();
+            }
+        }
+    }
+}
+
+void Zombie::DamagePlantInSquare(int theX, int theY, int theDamage)
+{
+    Plant* aPlant = nullptr;
+    while (mBoard->IteratePlants(aPlant))
+    {
+        if (aPlant->mRow == theY && aPlant->mPlantCol == theX)
+        {
+            if (aPlant->mSeedType != SeedType::SEED_SPIKEROCK)
+            {
+                aPlant->mPlantHealth -= theDamage;
+                aPlant->mEatenFlashCountdown = 25; // Make the plant flash white
+                if (aPlant->mPlantHealth <= 0)
+                {
+                    mBoard->mPlantsEaten++;
+                    aPlant->Die();
+                }
             }
         }
     }
@@ -6409,7 +8871,19 @@ void Zombie::UpdateAnimSpeed()
 
     if (mIsEating)
     {
-        if (mZombieType == ZombieType::ZOMBIE_POLEVAULTER || mZombieType == ZombieType::ZOMBIE_BALLOON || mZombieType == ZombieType::ZOMBIE_IMP || 
+        if (mZombieType == ZOMBIE_FLAG)
+        {
+            ApplyAnimRate(72.0f); // Default is 36.0f
+        }
+        else if (mZombieType == ZOMBIE_NEWSPAPER)
+        {
+            ApplyAnimRate(72.0f); // Doubles the animation speed from the default of 36.0f
+        }
+        else if (mZombieType == ZOMBIE_RED_EYE_NEWSPAPER)
+        {
+            ApplyAnimRate(144.0f); // Doubles the animation speed from the default of 36.0f
+        }
+        else if (mZombieType == ZombieType::ZOMBIE_POLEVAULTER || mZombieType == ZombieType::ZOMBIE_BALLOON || mZombieType == ZombieType::ZOMBIE_IMP || 
             mZombieType == ZombieType::ZOMBIE_DIGGER || mZombieType == ZombieType::ZOMBIE_JACK_IN_THE_BOX || mZombieType == ZombieType::ZOMBIE_SNORKEL || 
             mZombieType == ZombieType::ZOMBIE_YETI)
         {
@@ -6571,12 +9045,26 @@ void Zombie::StopEating()
 
 void Zombie::CheckIfPreyCaught()
 {
+    if (mZombieType == ZOMBIE_PUMPKIN_HEAD && mProtectingZombieID != ZOMBIEID_NULL)
+    {
+        StopEating();
+        return;
+    }
+
+    if (mZombieType == ZOMBIE_GARLIC_HEAD)
+    {
+        return;
+    }
+
     if (mZombieType == ZombieType::ZOMBIE_BUNGEE ||
         mZombieType == ZombieType::ZOMBIE_GARGANTUAR ||
         mZombieType == ZombieType::ZOMBIE_REDEYE_GARGANTUAR ||
         mZombieType == ZombieType::ZOMBIE_ZAMBONI ||
         mZombieType == ZombieType::ZOMBIE_CATAPULT ||
         mZombieType == ZombieType::ZOMBIE_BOSS || 
+        mZombieType == ZombieType::ZOMBIE_CHERRY_HEAD ||
+        mZombieType == ZombieType::ZOMBIE_POTATO_HEAD ||
+        mZombieType == ZombieType::ZOMBIE_CHOMPER_HEAD ||
         IsBouncingPogo() || 
         IsBobsledTeamWithSled() ||
         mZombiePhase == ZombiePhase::PHASE_POLEVAULTER_IN_VAULT ||
@@ -6600,7 +9088,8 @@ void Zombie::CheckIfPreyCaught()
         mZombiePhase == ZombiePhase::PHASE_DOLPHIN_IN_JUMP || 
         mZombiePhase == ZombiePhase::PHASE_SNORKEL_INTO_POOL || 
         mZombiePhase == ZombiePhase::PHASE_SNORKEL_WALKING || 
-        mZombiePhase == ZombiePhase::PHASE_LADDER_PLACING || 
+        mZombiePhase == ZombiePhase::PHASE_LADDER_PLACING ||
+        mZombiePhase == ZombiePhase::PHASE_SUNFLOWER_STEALING ||
         mZombieHeight == ZombieHeight::HEIGHT_GETTING_BUNGEE_DROPPED || 
         mZombieHeight == ZombieHeight::HEIGHT_UP_LADDER || 
         mZombieHeight == ZombieHeight::HEIGHT_IN_TO_POOL || 
@@ -6615,6 +9104,28 @@ void Zombie::CheckIfPreyCaught()
     if (mChilledCounter > 0)
     {
         aTicksBetweenEats *= 2;
+    }
+    if (mZombieType == ZOMBIE_COFFEE_HEAD)
+    {
+        aTicksBetweenEats = 1; // Eats 4x faster than a normal zombie
+    }
+    if (mZombieType == ZOMBIE_FLAG)
+    {
+        aTicksBetweenEats /= 2; // Now 2 ticks between eats
+    }
+    else if (mZombieType == ZOMBIE_NEWSPAPER || mZombieType == ZOMBIE_RED_NEWSPAPER || mZombieType == ZOMBIE_RED_EYE_NEWSPAPER)
+    {
+        if (mZombiePhase == PHASE_NEWSPAPER_MAD) // Only speed up when mad
+        {
+            if (mZombieType == ZOMBIE_RED_EYE_NEWSPAPER)
+            {
+                aTicksBetweenEats = 1; // Double eat speed for Red Eye
+            }
+            else
+            {
+                aTicksBetweenEats /= 2; // Normal eat speed for other newspaper zombies
+            }
+        }
     }
     if (mZombieAge % aTicksBetweenEats != 0)
     {
@@ -6738,6 +9249,9 @@ void Zombie::CheckForHighGround()
 
 void Zombie::StartMindControlled()
 {
+    if (mZombieType == ZOMBIE_FLAG)
+        return;
+
     mApp->PlaySample(SOUND_MINDCONTROLLED);
     mMindControlled = true;
     mLastPortalX = -1;
@@ -6780,6 +9294,29 @@ void Zombie::StartMindControlled()
 
 void Zombie::EatPlant(Plant* thePlant)
 {
+    if (thePlant->mSeedType == SeedType::SEED_RED_POTATO_MINE)
+    {
+        return;
+    }
+
+    if (thePlant->mSeedType == SeedType::SEED_TORCHWOOD)
+    {
+        if (mChompedTorchwoodCooldown == 0)
+        {
+            mChompedTorchwoodCooldown = 100;
+        }
+
+        Reanimation* aFireEffect = mApp->AddReanimation(mPosX + 38.0f, mPosY + 10.0f, mRenderOrder + 1, ReanimationType::REANIM_JALAPENO_FIRE);
+        if (aFireEffect)
+        {
+            aFireEffect->mAnimTime = 0.25f;
+            aFireEffect->mLoopType = REANIM_PLAY_ONCE_AND_HOLD;
+            aFireEffect->mAnimRate = 24.0f;
+            aFireEffect->OverrideScale(0.3f, 0.3f);
+            aFireEffect->mIsAttachment = true;
+        }
+    }
+
     if (mZombiePhase == ZombiePhase::PHASE_DANCER_DANCING_IN)
     {
         mPhaseCounter = 1;
@@ -6851,13 +9388,51 @@ void Zombie::EatPlant(Plant* thePlant)
         }
     }
 
-    thePlant->mPlantHealth -= DAMAGE_PER_EAT;
+    int aDamage = DAMAGE_PER_EAT; // Default damage is 4
+    if (mZombieType == ZOMBIE_FLAG)
+    {
+        aDamage = 20; // Set a higher damage value for Flag Zombies
+    }
+
+    else if ((mZombieType == ZOMBIE_NEWSPAPER || mZombieType == ZOMBIE_RED_NEWSPAPER) && mZombiePhase == PHASE_NEWSPAPER_MAD)
+    {
+        aDamage = 10;
+    }
+    else if ((mZombieType == ZOMBIE_RED_EYE_NEWSPAPER) && mZombiePhase == PHASE_NEWSPAPER_MAD)
+    {
+        aDamage = 20;
+    }
+
+    thePlant->mPlantHealth -= aDamage;
     thePlant->mRecentlyEatenCountdown = 50;
     if (mApp->IsIZombieLevel() && mJustGotShotCounter < -500)
     {
         if (thePlant->mSeedType == SeedType::SEED_WALLNUT || thePlant->mSeedType == SeedType::SEED_TALLNUT || thePlant->mSeedType == SeedType::SEED_PUMPKINSHELL)
         {
             thePlant->mPlantHealth -= DAMAGE_PER_EAT;
+        }
+    }
+
+    if (mZombieType == ZOMBIE_GRAVEBUSTER_HEAD)
+    {
+        if (thePlant->mPlantHealth < 1000)
+        {
+            mBoard->AddAGraveStone(thePlant->mPlantCol, thePlant->mRow);
+            thePlant->Die();
+            mApp->PlayFoley(FOLEY_GRAVEBUSTERCHOMP);
+            StopEating();
+
+            Reanimation* aHeadReanim = mApp->ReanimationTryToGet(mSpecialHeadReanimID);
+            if (aHeadReanim)
+            {
+                aHeadReanim->ReanimationDie();
+                mSpecialHeadReanimID = ReanimationID::REANIMATIONID_NULL;
+            }
+
+            mHasHead = false;
+            SetupReanimForLostHead();
+            PlayDeathAnim(0U);
+            return;
         }
     }
 
@@ -7040,6 +9615,65 @@ void Zombie::DropLoot()
     if (!IsOnBoard())
         return;
 
+    if (mZombieType == ZOMBIE_SUNFLOWER_HEAD)
+    {
+        if (!mDroppedLoot) // A safety check to ensure this only runs once
+        {
+            mDroppedLoot = true;
+
+            ZombieType aZombieToSpawn = ZOMBIE_INVALID;
+            CoinType aCoinToDrop = COIN_NONE;
+            int aNumLargeSuns = 0;
+
+            if (mSunStolen >= 300)
+            {
+                aZombieToSpawn = ZOMBIE_GARGANTUAR;
+                aNumLargeSuns = 2;
+            }
+            else if (mSunStolen >= 200)
+            {
+                ZombieType aZombiePool[] = { ZOMBIE_PAIL, ZOMBIE_BLACK_CONEHEAD, ZOMBIE_WALLNUT_HEAD };
+                aZombieToSpawn = (ZombieType)TodPickFromArray((int*)aZombiePool, 3);
+                aCoinToDrop = COIN_LARGESUN;
+            }
+            else if (mSunStolen >= 100)
+            {
+                ZombieType aZombiePool[] = { ZOMBIE_TRAFFIC_CONE, ZOMBIE_PEA_HEAD, ZOMBIE_NEWSPAPER };
+                aZombieToSpawn = (ZombieType)TodPickFromArray((int*)aZombiePool, 3);
+                aCoinToDrop = COIN_SUN;
+            }
+            else
+            {
+                aZombieToSpawn = ZOMBIE_NORMAL;
+                aCoinToDrop = COIN_SMALLSUN;
+            }
+
+            // Spawn the new zombie and make it rise from the ground
+            if (aZombieToSpawn != ZOMBIE_INVALID)
+            {
+                Zombie* aNewZombie = mBoard->AddZombieInRow(aZombieToSpawn, mRow, mFromWave);
+                if (aNewZombie)
+                {
+                    // Get the grid position of the dying sunflower zombie
+                    int aGridX = mBoard->PixelToGridX(mPosX, mPosY);
+                    int aGridY = mRow;
+                    // Trigger the rise from grave animation at that spot
+                    aNewZombie->RiseFromGrave(aGridX, aGridY);
+                }
+            }
+
+            // Drop the sun at the death position
+            if (aCoinToDrop != COIN_NONE)
+            {
+                mBoard->AddCoin(mX, mY, aCoinToDrop, COIN_MOTION_COIN);
+            }
+            for (int i = 0; i < aNumLargeSuns; i++)
+            {
+                mBoard->AddCoin(mX + (i * 10), mY, COIN_LARGESUN, COIN_MOTION_COIN);
+            }
+        }
+    }
+
     AlmanacPlayerDefeatedZombie(mZombieType);
     if (mZombieType == ZombieType::ZOMBIE_YETI)
     {
@@ -7180,11 +9814,37 @@ void Zombie::BungeeDie()
 
 void Zombie::DieNoLoot()
 {
+    if (mZombieType == ZOMBIE_SUNSHROOM_HEAD && IsOnBoard())
+    {
+        int aGridX = mBoard->PixelToGridX(mPosX, mPosY);
+        int aGridY = mRow;
+
+        if (aGridX >= 0 && aGridX < MAX_GRID_SIZE_X)
+        {
+            // Check if a gravestone already exists
+            if (mBoard->GetGraveStoneAt(aGridX, aGridY) == nullptr)
+            {
+                // Check for a plant on the tile and kill it
+                Plant* aPlant = mBoard->GetTopPlantAt(aGridX, aGridY, TOPPLANT_ANY);
+                if (aPlant != nullptr)
+                {
+                    aPlant->Die();
+                }
+
+                // Add the new gravestone
+                mBoard->AddAGraveStone(aGridX, aGridY);
+            }
+        }
+    }
+
     StopZombieSound();
     AttachmentDie(mAttachmentID);
     mApp->RemoveReanimation(mBodyReanimID);
     mApp->RemoveReanimation(mMoweredReanimID);
     mApp->RemoveReanimation(mSpecialHeadReanimID);
+    mApp->RemoveReanimation(mHeadReanimID2);
+    mApp->RemoveReanimation(mHeadReanimID3);
+    mApp->RemoveReanimation(mLightReanimID);
 
     mDead = true;
     TrySpawnLevelAward();
@@ -7265,7 +9925,9 @@ void Zombie::StopZombieSound()
     {
         mPlayingSong = false;
 
-        if (mZombieType == ZombieType::ZOMBIE_JACK_IN_THE_BOX)
+        if (mZombieType == ZombieType::ZOMBIE_JACK_IN_THE_BOX ||
+            mZombieType == ZombieType::ZOMBIE_ENRAGED_JACK
+            )
         {
             mApp->mSoundSystem->StopFoley(FoleyType::FOLEY_JACKINTHEBOX);
         }
@@ -7327,6 +9989,18 @@ void Zombie::DropShield(unsigned int theDamageFlags)
         mZombiePhase = ZombiePhase::PHASE_NEWSPAPER_MADDENING;
         PlayZombieReanim("anim_gasp", ReanimLoopType::REANIM_PLAY_ONCE_AND_HOLD, 10, 8.0f);
         DetachShield();
+
+        if (mZombieType == ZOMBIE_RED_NEWSPAPER)
+        {
+            int aPosX = mX + mWidth / 2;
+            int aPosY = mY + mHeight / 2;
+
+            mBoard->DamageAllPlantsInRadius(aPosX, aPosY, JackInTheBoxPlantRadius, 4000);
+
+            mApp->PlayFoley(FoleyType::FOLEY_CHERRYBOMB);
+            mApp->AddTodParticle(aPosX, aPosY, (int)RenderLayer::RENDER_LAYER_TOP, ParticleEffect::PARTICLE_POWIE);
+            mBoard->ShakeBoard(3, -4);
+        }
 
         if (!TestBit(theDamageFlags, (int)DamageFlags::DAMAGE_DOESNT_LEAVE_BODY))
         {
@@ -7403,8 +10077,10 @@ int Zombie::TakeShieldDamage(int theDamage, unsigned int theDamageFlags)
         }
         else if (mShieldType == ShieldType::SHIELDTYPE_NEWSPAPER && aDamageIndexAfterDamage == 1)
         {
-            TOD_ASSERT(aBodyReanim);
-            aBodyReanim->SetImageOverride("Zombie_paper_paper", IMAGE_REANIM_ZOMBIE_PAPER_PAPER2);
+            if (mZombieType == ZOMBIE_RED_NEWSPAPER)
+                aBodyReanim->SetImageOverride("Zombie_paper_paper", IMAGE_REANIM_ZOMBIE_RED_PAPER2);
+            else
+                aBodyReanim->SetImageOverride("Zombie_paper_paper", IMAGE_REANIM_ZOMBIE_PAPER_PAPER2);
         }
         else if (mShieldType == ShieldType::SHIELDTYPE_NEWSPAPER && aDamageIndexAfterDamage == 2)
         {
@@ -7413,8 +10089,10 @@ int Zombie::TakeShieldDamage(int theDamage, unsigned int theDamageFlags)
         }
         else if (mShieldType == ShieldType::SHIELDTYPE_LADDER && aDamageIndexAfterDamage == 1)
         {
-            TOD_ASSERT(aBodyReanim);
-            aBodyReanim->SetImageOverride("Zombie_ladder_1", IMAGE_REANIM_ZOMBIE_LADDER_1_DAMAGE1);
+            if (mZombieType == ZOMBIE_RED_NEWSPAPER)
+                aBodyReanim->SetImageOverride("Zombie_paper_paper", IMAGE_REANIM_ZOMBIE_RED_PAPER3);
+            else
+                aBodyReanim->SetImageOverride("Zombie_paper_paper", IMAGE_REANIM_ZOMBIE_PAPER_PAPER3);
         }
         else if (mShieldType == ShieldType::SHIELDTYPE_LADDER && aDamageIndexAfterDamage == 2)
         {
@@ -7510,6 +10188,16 @@ int Zombie::TakeHelmDamage(int theDamage, unsigned int theDamageFlags)
         {
             aBodyReanim->SetImageOverride("anim_cone", IMAGE_REANIM_ZOMBIE_CONE3);
         }
+        else if (mHelmType == HelmType::HELMTYPE_BLACK_CONE && aDamageIndexAfterDamage == 1)
+        {
+            TOD_ASSERT(aBodyReanim);
+            aBodyReanim->SetImageOverride("anim_cone", IMAGE_REANIM_ZOMBIE_BLACK_CONE2);
+        }
+        else if (mHelmType == HelmType::HELMTYPE_BLACK_CONE && aDamageIndexAfterDamage == 2)
+        {
+            TOD_ASSERT(aBodyReanim);
+            aBodyReanim->SetImageOverride("anim_cone", IMAGE_REANIM_ZOMBIE_BLACK_CONE3);
+        }
         else if (mHelmType == HelmType::HELMTYPE_PAIL && aDamageIndexAfterDamage == 1)
         {
             aBodyReanim->SetImageOverride("anim_bucket", IMAGE_REANIM_ZOMBIE_BUCKET2);
@@ -7518,6 +10206,16 @@ int Zombie::TakeHelmDamage(int theDamage, unsigned int theDamageFlags)
         {
             TOD_ASSERT(aBodyReanim);
             aBodyReanim->SetImageOverride("anim_bucket", IMAGE_REANIM_ZOMBIE_BUCKET3);
+        }
+        else if (mHelmType == HelmType::HELMTYPE_BLACK_PAIL && aDamageIndexAfterDamage == 1)
+        {
+            TOD_ASSERT(aBodyReanim);
+            aBodyReanim->SetImageOverride("anim_bucket", IMAGE_REANIM_ZOMBIE_BLACK_BUCKET2);
+        }
+        else if (mHelmType == HelmType::HELMTYPE_BLACK_PAIL && aDamageIndexAfterDamage == 2)
+        {
+            TOD_ASSERT(aBodyReanim);
+            aBodyReanim->SetImageOverride("anim_bucket", IMAGE_REANIM_ZOMBIE_BLACK_BUCKET3);
         }
         else if (mHelmType == HelmType::HELMTYPE_DIGGER && aDamageIndexAfterDamage == 1)
         {
@@ -7559,6 +10257,16 @@ int Zombie::TakeHelmDamage(int theDamage, unsigned int theDamageFlags)
             Reanimation* aHeadReanim = mApp->ReanimationGet(mSpecialHeadReanimID);
             aHeadReanim->SetImageOverride("anim_idle", IMAGE_REANIM_TALLNUT_CRACKED2);
         }
+        else if (mHelmType == HelmType::HELMTYPE_PUMPKIN && aDamageIndexAfterDamage == 1)
+        {
+            Reanimation* aHeadReanim = mApp->ReanimationGet(mSpecialHeadReanimID);
+            aHeadReanim->SetImageOverride("Pumpkin_front", IMAGE_REANIM_PUMPKIN_DAMAGE1);
+        }
+        else if (mHelmType == HelmType::HELMTYPE_PUMPKIN && aDamageIndexAfterDamage == 2)
+        {
+            Reanimation* aHeadReanim = mApp->ReanimationGet(mSpecialHeadReanimID);
+            aHeadReanim->SetImageOverride("Pumpkin_front", IMAGE_REANIM_PUMPKIN_DAMAGE3);
+        }
     }
     return aDamageRemaining;
 }
@@ -7596,6 +10304,17 @@ void Zombie::TakeBodyDamage(int theDamage, unsigned int theDamageFlags)
     int aBodyHealthOrigin = mBodyHealth;
     int aDamageIndexBeforeDamage = GetBodyDamageIndex();
     mBodyHealth -= theDamage;
+
+    if (TestBit(theDamageFlags, (int)DamageFlags::DAMAGE_FIRE))
+    {
+        // If this fire hit is what makes the head fall off OR kills it outright
+        if (mHasHead && aBodyHealthOrigin >= mBodyMaxHealth / 3 && mBodyHealth < mBodyMaxHealth / 3)
+        {
+            ApplyBurn(); // Immediately start the ash animation
+            return;      // Skip the normal death logic
+        }
+    }
+
     int aDamageIndexAfterDamage = GetBodyDamageIndex();
     if (mZombieType == ZombieType::ZOMBIE_ZAMBONI)
     {
@@ -7724,6 +10443,12 @@ void Zombie::TakeBodyDamage(int theDamage, unsigned int theDamageFlags)
 
     if (mBodyHealth <= 0)
     {
+        if (TestBit(theDamageFlags, (int)DamageFlags::DAMAGE_FIRE))
+        {
+            ApplyBurn();
+            return;
+        }
+
         mBodyHealth = 0;
         PlayDeathAnim(theDamageFlags);
         DropLoot();
@@ -7732,6 +10457,15 @@ void Zombie::TakeBodyDamage(int theDamage, unsigned int theDamageFlags)
 
 void Zombie::TakeDamage(int theDamage, unsigned int theDamageFlags)
 {
+    if (mZombieType == ZOMBIE_RED_NEWSPAPER)
+    {
+        // Check for the FIRE flag OR if the damage is high enough to be an instant-kill explosion
+        if (TestBit(theDamageFlags, DAMAGE_FIRE) || theDamage >= 900)
+        {
+            return;
+        }
+    }
+
     if (mZombiePhase == ZombiePhase::PHASE_JACK_IN_THE_BOX_POPPING || IsDeadOrDying())
         return;
 
@@ -7794,7 +10528,12 @@ Zombie::~Zombie()
 
 bool Zombie::CanBeChilled()
 {
-    if (mZombieType == ZombieType::ZOMBIE_ZAMBONI || IsBobsledTeamWithSled())
+    if (mZombieType == ZOMBIE_FLAG)
+        return false;
+
+    if (mZombieType == ZombieType::ZOMBIE_ZAMBONI || 
+        mZombieType == ZombieType::ZOMBIE_SNOW_HEAD || 
+        IsBobsledTeamWithSled())
         return false;
 
     if (IsDeadOrDying())
@@ -7946,8 +10685,6 @@ void Zombie::SetRow(int theRow)
 
 void Zombie::RiseFromGrave(int theCol, int theRow)
 {
-    TOD_ASSERT(mZombiePhase == ZombiePhase::PHASE_ZOMBIE_NORMAL);
-
     mPosX = mBoard->GridToPixelX(theCol, mRow) - 25;
     mPosY = GetPosYBasedOnRow(theRow);
     SetRow(theRow);
@@ -8034,23 +10771,78 @@ bool Zombie::IsZombotany(ZombieType theZombieType)
         theZombieType == ZombieType::ZOMBIE_TALLNUT_HEAD || 
         theZombieType == ZombieType::ZOMBIE_JALAPENO_HEAD || 
         theZombieType == ZombieType::ZOMBIE_GATLING_HEAD ||
-        theZombieType == ZombieType::ZOMBIE_SQUASH_HEAD;
+        theZombieType == ZombieType::ZOMBIE_SQUASH_HEAD ||
+        theZombieType == ZombieType::ZOMBIE_REPEATER_HEAD ||
+        theZombieType == ZombieType::ZOMBIE_SNOW_HEAD ||
+        theZombieType == ZombieType::ZOMBIE_SUNFLOWER_HEAD ||
+        theZombieType == ZombieType::ZOMBIE_CHERRY_HEAD ||
+        theZombieType == ZombieType::ZOMBIE_POTATO_HEAD ||
+        theZombieType == ZombieType::ZOMBIE_CHOMPER_HEAD ||
+        theZombieType == ZombieType::ZOMBIE_SUNSHROOM_HEAD ||
+        theZombieType == ZombieType::ZOMBIE_FUMESHROOM_HEAD ||
+        theZombieType == ZombieType::ZOMBIE_GRAVEBUSTER_HEAD ||
+        theZombieType == ZombieType::ZOMBIE_HYPNOSHROOM_HEAD ||
+        theZombieType == ZombieType::ZOMBIE_SCAREDYSHROOM_HEAD ||
+        theZombieType == ZombieType::ZOMBIE_ICESHROOM_HEAD ||
+        theZombieType == ZombieType::ZOMBIE_DOOMSHROOM_HEAD ||
+        theZombieType == ZombieType::ZOMBIE_THREEPEATER_HEAD ||
+        theZombieType == ZombieType::ZOMBIE_PLANTERN_HEAD ||
+        theZombieType == ZombieType::ZOMBIE_CACTUS_HEAD ||
+        theZombieType == ZombieType::ZOMBIE_BLOVER_HEAD ||
+        theZombieType == ZombieType::ZOMBIE_STARFRUIT_HEAD ||
+        theZombieType == ZombieType::ZOMBIE_PUMPKIN_HEAD ||
+        theZombieType == ZombieType::ZOMBIE_CABBAGEPULT_HEAD ||
+        theZombieType == ZombieType::ZOMBIE_KERNELPULT_HEAD ||
+        theZombieType == ZombieType::ZOMBIE_COFFEE_HEAD ||
+        theZombieType == ZombieType::ZOMBIE_GARLIC_HEAD;
 }
 
 bool Zombie::ZombieTypeCanGoInPool(ZombieType theZombieType)
 {
-    return 
-        theZombieType == ZombieType::ZOMBIE_NORMAL || 
-        theZombieType == ZombieType::ZOMBIE_TRAFFIC_CONE || 
-        theZombieType == ZombieType::ZOMBIE_PAIL || 
-        theZombieType == ZombieType::ZOMBIE_FLAG || 
-        theZombieType == ZombieType::ZOMBIE_SNORKEL || 
-        theZombieType == ZombieType::ZOMBIE_DOLPHIN_RIDER || 
-        theZombieType == ZombieType::ZOMBIE_PEA_HEAD || 
-        theZombieType == ZombieType::ZOMBIE_WALLNUT_HEAD || 
-        theZombieType == ZombieType::ZOMBIE_JALAPENO_HEAD || 
-        theZombieType == ZombieType::ZOMBIE_GATLING_HEAD || 
-        theZombieType == ZombieType::ZOMBIE_TALLNUT_HEAD;
+    return
+        theZombieType == ZombieType::ZOMBIE_NORMAL ||
+        theZombieType == ZombieType::ZOMBIE_TRAFFIC_CONE ||
+        theZombieType == ZombieType::ZOMBIE_PAIL ||
+        theZombieType == ZombieType::ZOMBIE_FLAG ||
+        theZombieType == ZombieType::ZOMBIE_SNORKEL ||
+        theZombieType == ZombieType::ZOMBIE_DOLPHIN_RIDER ||
+        theZombieType == ZombieType::ZOMBIE_PEA_HEAD ||
+        theZombieType == ZombieType::ZOMBIE_WALLNUT_HEAD ||
+        theZombieType == ZombieType::ZOMBIE_JALAPENO_HEAD ||
+        theZombieType == ZombieType::ZOMBIE_GATLING_HEAD ||
+        theZombieType == ZombieType::ZOMBIE_TALLNUT_HEAD ||
+        theZombieType == ZombieType::ZOMBIE_FOOTBALL ||
+        theZombieType == ZombieType::ZOMBIE_NEWSPAPER ||
+        theZombieType == ZombieType::ZOMBIE_DANCER ||
+        theZombieType == ZombieType::ZOMBIE_BACKUP_DANCER ||
+        theZombieType == ZombieType::ZOMBIE_GARGANTUAR ||
+        theZombieType == ZombieType::ZOMBIE_REDEYE_GARGANTUAR ||
+        theZombieType == ZombieType::ZOMBIE_BLACK_CONEHEAD ||
+        theZombieType == ZombieType::ZOMBIE_BLACK_BUCKETHEAD ||
+        theZombieType == ZombieType::ZOMBIE_BLACK_DOOR ||
+        theZombieType == ZombieType::ZOMBIE_RED_NEWSPAPER ||
+        theZombieType == ZombieType::ZOMBIE_RED_EYE_NEWSPAPER ||
+        theZombieType == ZombieType::ZOMBIE_REPEATER_HEAD ||
+        theZombieType == ZombieType::ZOMBIE_SNOW_HEAD ||
+        theZombieType == ZombieType::ZOMBIE_SUNFLOWER_HEAD ||
+        theZombieType == ZombieType::ZOMBIE_CHERRY_HEAD ||
+        theZombieType == ZombieType::ZOMBIE_POTATO_HEAD ||
+        theZombieType == ZombieType::ZOMBIE_CHOMPER_HEAD ||
+        theZombieType == ZombieType::ZOMBIE_SUNSHROOM_HEAD ||
+        theZombieType == ZombieType::ZOMBIE_FUMESHROOM_HEAD ||
+        theZombieType == ZombieType::ZOMBIE_HYPNOSHROOM_HEAD ||
+        theZombieType == ZombieType::ZOMBIE_SCAREDYSHROOM_HEAD ||
+        theZombieType == ZombieType::ZOMBIE_ICESHROOM_HEAD ||
+        theZombieType == ZombieType::ZOMBIE_DOOMSHROOM_HEAD ||
+        theZombieType == ZombieType::ZOMBIE_THREEPEATER_HEAD ||
+        theZombieType == ZombieType::ZOMBIE_PLANTERN_HEAD ||
+        theZombieType == ZombieType::ZOMBIE_CACTUS_HEAD ||
+        theZombieType == ZombieType::ZOMBIE_STARFRUIT_HEAD ||
+        theZombieType == ZombieType::ZOMBIE_PUMPKIN_HEAD ||
+        theZombieType == ZombieType::ZOMBIE_CABBAGEPULT_HEAD ||
+        theZombieType == ZombieType::ZOMBIE_KERNELPULT_HEAD ||
+        theZombieType == ZombieType::ZOMBIE_COFFEE_HEAD ||
+        theZombieType == ZombieType::ZOMBIE_GARLIC_HEAD;
 }
 
 bool Zombie::ZombieTypeCanGoOnHighGround(ZombieType theZombieType)
@@ -8087,7 +10879,14 @@ Rect Zombie::GetZombieAttackRect()
 
     if (IsWalkingBackwards())
     {
-        aAttackRect.mX = mWidth - aAttackRect.mX - aAttackRect.mWidth;
+        if (mZombieType == ZOMBIE_GARGANTUAR || mZombieType == ZOMBIE_REDEYE_GARGANTUAR)
+        {
+            aAttackRect.mX = 20;
+        }
+        else
+        {
+            aAttackRect.mX = mWidth - aAttackRect.mX - aAttackRect.mWidth;
+        }
     }
 
     ZombieDrawPosition aDrawPos;
@@ -8313,6 +11112,15 @@ void Zombie::ApplyButter()
 
     UpdateAnimSpeed();
     StopZombieSound();
+}
+
+void Zombie::ApplyPoison()
+{
+    if (IsDeadOrDying())
+        return;
+
+    mIsPoisoned = true;
+    mPoisonCountdown = 500; // 5 seconds (100 ticks per second)
 }
 
 void Zombie::MowDown()
@@ -8572,7 +11380,7 @@ void Zombie::AttachShield()
 {
     const char* aTrackName;
     Reanimation* aBodyReanim = mApp->ReanimationGet(mBodyReanimID);
-    if (mShieldType == ShieldType::SHIELDTYPE_DOOR)
+    if (mShieldType == ShieldType::SHIELDTYPE_DOOR || mShieldType == ShieldType::SHIELDTYPE_BLACK_DOOR)
     {
         ShowDoorArms(true);
         ReanimShowPrefix("Zombie_outerarm_screendoor", RENDER_GROUP_OVER_SHIELD);
@@ -8656,6 +11464,16 @@ void Zombie::ReanimShowTrack(const char* theTrackName, int theRenderGroup)
 
 void Zombie::PlayDeathAnim(unsigned int theDamageFlags)
 {
+    if (mIsOrange)
+    {
+        int aPosX = mX + mWidth / 2;
+        int aPosY = mY + mHeight / 2;
+        mBoard->KillAllZombiesInRadius(mRow, aPosX, aPosY, 60, 0, true, 127);
+        mApp->AddTodParticle(aPosX, aPosY, mRenderOrder + 1, ParticleEffect::PARTICLE_POTATO_MINE);
+        mBoard->ShakeBoard(3, -4);
+        mApp->PlaySample(SOUND_POTATO_MINE);
+    }
+
     if (mZombiePhase == ZombiePhase::PHASE_ZOMBIE_DYING || mZombiePhase == ZombiePhase::PHASE_ZOMBIE_BURNED || mZombiePhase == ZombiePhase::PHASE_ZOMBIE_MOWERED)
         return;
 
@@ -8877,6 +11695,28 @@ void Zombie::UpdateDeath()
         case ZombieType::ZOMBIE_JALAPENO_HEAD:
         case ZombieType::ZOMBIE_GATLING_HEAD:
         case ZombieType::ZOMBIE_SQUASH_HEAD:
+        case ZombieType::ZOMBIE_REPEATER_HEAD:
+        case ZombieType::ZOMBIE_SUNFLOWER_HEAD:
+        case ZombieType::ZOMBIE_CHERRY_HEAD:
+        case ZombieType::ZOMBIE_SNOW_HEAD:
+        case ZombieType::ZOMBIE_CHOMPER_HEAD:
+        case ZombieType::ZOMBIE_POTATO_HEAD:
+        case ZombieType::ZOMBIE_FUMESHROOM_HEAD:
+        case ZombieType::ZOMBIE_HYPNOSHROOM_HEAD:
+        case ZombieType::ZOMBIE_SCAREDYSHROOM_HEAD:
+        case ZombieType::ZOMBIE_GRAVEBUSTER_HEAD:
+        case ZombieType::ZOMBIE_ICESHROOM_HEAD:
+        case ZombieType::ZOMBIE_SUNSHROOM_HEAD:
+        case ZombieType::ZOMBIE_DOOMSHROOM_HEAD:
+        case ZombieType::ZOMBIE_THREEPEATER_HEAD:
+        case ZombieType::ZOMBIE_PLANTERN_HEAD:
+        case ZombieType::ZOMBIE_CACTUS_HEAD:
+        case ZombieType::ZOMBIE_STARFRUIT_HEAD:
+        case ZombieType::ZOMBIE_PUMPKIN_HEAD:
+        case ZombieType::ZOMBIE_CABBAGEPULT_HEAD:
+        case ZombieType::ZOMBIE_KERNELPULT_HEAD:
+        case ZombieType::ZOMBIE_COFFEE_HEAD:
+        case ZombieType::ZOMBIE_GARLIC_HEAD:
         case ZombieType::ZOMBIE_DUCKY_TUBE:
             if (aBodyReanim->IsAnimPlaying("anim_superlongdeath"))
             {
@@ -10434,4 +13274,13 @@ void Zombie::SetupWaterTrack(const char* theTrackName)
     aTrackInstance->mIgnoreExtraAdditiveColor = true;
     aTrackInstance->mIgnoreColorOverride = true;
     aTrackInstance->mIgnoreClipRect = true;
+}
+
+void Zombie::ApplyCorrosion()
+{
+    if (!mIsCorroded && (mHelmType != HELMTYPE_NONE || mShieldType != SHIELDTYPE_NONE))
+    {
+        mIsCorroded = true;
+        mCorrosionCountdown = 100; 
+    }
 }

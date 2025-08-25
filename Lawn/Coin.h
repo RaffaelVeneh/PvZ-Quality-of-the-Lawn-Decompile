@@ -3,7 +3,7 @@
 
 #include "GameObject.h"
 #include "System/PlayerInfo.h"
-
+#include "../ConstEnums.h"
 class HitResult;
 namespace Sexy
 {
@@ -37,6 +37,8 @@ public:
     bool                    mHasBouncyArrow;        
     bool                    mHitGround;             
     int                     mTimesDropped;          
+    bool                    mIsBeingStolen;
+    ZombieID                mTargetZombieID;
 
 public:
     Coin();
