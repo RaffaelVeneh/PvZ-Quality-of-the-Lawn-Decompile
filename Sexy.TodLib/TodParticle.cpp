@@ -119,6 +119,10 @@ ParticleParams gLawnParticleArray[(int)ParticleEffect::NUM_PARTICLES] = {
 	{ ParticleEffect::PARTICLE_CREDITS_FOG, "particles\\Credits_fog.xml" },
 	{ ParticleEffect::PARTICLE_PERSENT_PICK_UP_ARROW, "particles\\UpsellArrow.xml" },
 	{ ParticleEffect::PARTICLE_FUMECLOUD_LEFT, "particles\\LeftFumeCloud.xml" },
+	{ ParticleEffect::PARTICLE_GLOOMCLOUD_RANGER, "particles\\GloomCloudRanger.xml" },
+	{ ParticleEffect::PARTICLE_ZOMBIE_BLACK_TRAFFIC_CONE, "particles\\ZombieBlackTrafficCone.xml" },
+	{ ParticleEffect::PARTICLE_ZOMBIE_BLACK_PAIL, "particles\\ZombieBlackPail.xml" },
+	{ ParticleEffect::PARTICLE_ZOMBIE_GIGA_HELMET, "particles\\ZombieGigaHelmet.xml" },
 };  
 
 bool TodParticleLoadADef(TodParticleDefinition* theParticleDef, const char* theParticleFileName)
@@ -1194,9 +1198,9 @@ TodParticleHolder::~TodParticleHolder()
 
 void TodParticleHolder::InitializeHolder()
 {
-	mParticleSystems.DataArrayInitialize(1024U, "particle systems");
-	mEmitters.DataArrayInitialize(1024U, "emitters");
-	mParticles.DataArrayInitialize(1024U, "particles");
+	mParticleSystems.DataArrayInitialize(8192U, "particle systems");
+	mEmitters.DataArrayInitialize(16384U, "emitters");
+	mParticles.DataArrayInitialize(32768U, "particles");
 	mParticleListNodeAllocator.Initialize(1024, sizeof(TodListNode<ParticleID>));
 	mEmitterListNodeAllocator.Initialize(1024, sizeof(TodListNode<ParticleEmitterID>));
 }

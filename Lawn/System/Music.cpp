@@ -30,6 +30,7 @@ Music::Music()
 	mMusicDisabled = false;
 	mFadeOutCounter = 0;
 	mFadeOutDuration = 0;
+	m_currentCustomMusic = "";
 }
 
 MusicFileData gMusicFileData[MusicFile::NUM_MUSIC_FILES];  
@@ -203,14 +204,15 @@ void Music::MusicCreditScreenInit()
 void Music::StopAllMusic()
 {
 	if (mMusicInterface != nullptr)
-	{
+		{
 		if (mCurMusicFileMain != MusicFile::MUSIC_FILE_NONE)
-			mMusicInterface->StopMusic(mCurMusicFileMain);
+			 mMusicInterface->StopMusic(mCurMusicFileMain);
 		if (mCurMusicFileDrums != MusicFile::MUSIC_FILE_NONE)
-			mMusicInterface->StopMusic(mCurMusicFileDrums);
+			 mMusicInterface->StopMusic(mCurMusicFileDrums);
 		if (mCurMusicFileHihats != MusicFile::MUSIC_FILE_NONE)
-			mMusicInterface->StopMusic(mCurMusicFileHihats);
-	}
+			 mMusicInterface->StopMusic(mCurMusicFileHihats);
+			mMusicInterface->StopMusic(0);
+		}
 
 	mCurMusicTune = MusicTune::MUSIC_TUNE_NONE;
 	mCurMusicFileMain = MusicFile::MUSIC_FILE_NONE;
@@ -223,6 +225,7 @@ void Music::StopAllMusic()
 	mPauseOffsetDrums = 0;
 	mPaused = false;
 	mFadeOutCounter = 0;
+	m_currentCustomMusic = "";
 }
 
 HMUSIC Music::GetBassMusicHandle(MusicFile theMusicFile)
@@ -686,12 +689,21 @@ void Music::StartGameMusic()
 		MakeSureMusicIsPlaying(MusicTune::MUSIC_TUNE_PUZZLE_CEREBRAWL);
 	else if (mApp->mBoard->StageHasFog())
 		MakeSureMusicIsPlaying(MusicTune::MUSIC_TUNE_FOG_RIGORMORMIST);
-	else if (mApp->mBoard->StageIsNight())
+	else if (mApp->mBoard->StageIsNight() && !mApp->mBoard->IsNightRoof())
 		MakeSureMusicIsPlaying(MusicTune::MUSIC_TUNE_NIGHT_MOONGRAINS);
 	else if (mApp->mBoard->StageHas6Rows())
 		MakeSureMusicIsPlaying(MusicTune::MUSIC_TUNE_POOL_WATERYGRAVES);
-	else if (mApp->mBoard->StageHasRoof())
+	else if (mApp->mBoard->StageHasRoof() && !mApp->mBoard->IsNightRoof())
 		MakeSureMusicIsPlaying(MusicTune::MUSIC_TUNE_ROOF_GRAZETHEROOF);
+	else if (mApp->mBoard->IsNightRoof() && !mApp->IsFinalBossLevel())
+	{
+		PlayCustomMusic("music\\Lunacy-Cadabreath.mp3"); // You can change the filename here
+		return;
+	}
+	else if (mApp->mBoard->IsEvening() && !mApp->mBoard->IsNightRoof())
+	{
+		PlayCustomMusic("music\\tombstone-woody.mp3");
+	}
 	else
 		MakeSureMusicIsPlaying(MusicTune::MUSIC_TUNE_DAY_GRASSWALK);
 }
@@ -740,9 +752,36 @@ void Music::GameMusicPause(bool thePause)
 			PlayMusic(mCurMusicTune, mPauseOffset, mPauseOffsetDrums);
 		mPaused = false;
 	}
+	PauseCustomMusic(thePause);
 }
 
 int Music::GetNumLoadingTasks()
 {
 	return 3500 * 2;  
+}
+
+void Music::PlayCustomMusic(const std::string& theMusicFile)
+{
+	StopAllMusic();
+
+	m_currentCustomMusic = theMusicFile;
+
+	mApp->mMusicInterface->LoadMusic(0, theMusicFile);
+	mApp->mMusicInterface->PlayMusic(0, 0, false);
+}
+
+void Music::PauseCustomMusic(bool aPause)
+{
+	// Only do something if our custom music is currently active
+	if (!m_currentCustomMusic.empty())
+	{
+		if (aPause)
+		{
+			mApp->mMusicInterface->PauseMusic(0); // Pause the main music channel
+		}
+		else
+		{
+			mApp->mMusicInterface->ResumeMusic(0); // Resume the main music channel
+		}
+	}
 }

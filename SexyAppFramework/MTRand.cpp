@@ -122,7 +122,6 @@ void MTRand::SRand(unsigned long seed)
 
 unsigned long MTRand::Next()
 {
-	DBG_ASSERT(gRandAllowed==0);
 	return NextNoAssert();
 }
 
@@ -171,8 +170,7 @@ unsigned long MTRand::NextNoAssert(unsigned long range)
 
 unsigned long MTRand::Next(unsigned long range)
 {
-	DBG_ASSERT(gRandAllowed==0);
-	return NextNoAssert( range );
+	return NextNoAssert(range);
 }
 
 float MTRand::NextNoAssert(float range)
@@ -182,7 +180,6 @@ float MTRand::NextNoAssert(float range)
 
 float MTRand::Next(float range)
 {
-	DBG_ASSERT(gRandAllowed==0);
 	return NextNoAssert(range);
 }
 

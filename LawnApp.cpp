@@ -127,7 +127,7 @@ LawnApp::LawnApp()
 	mSfxVolume = 0.5525;
 	mAutoStartLoadingThread = false;
 	mDebugKeysEnabled = false;
-	isFastMode = false;
+	isFastMode = 0;
 	mProdName = "PlantsVsZombies";
 	mVersion = "v2.1";
 	mReconVersion = "PvZ: QoTL " + mVersion;
@@ -163,6 +163,7 @@ LawnApp::LawnApp()
 	mDRM = nullptr;
 	mPlayedQuickplay = false;
 	StartDiscord();
+	mLastPlantPlanted = SEED_NONE;
 }
 
 LawnApp::~LawnApp()
@@ -1540,12 +1541,13 @@ bool LawnApp::UpdatePlayerProfileForFinishingLevel()
 	}
 	else if (IsSurvivalMode())
 	{
+		int aLevel = mPlayerInfo->mLevel;
 		if (mBoard->IsFinalSurvivalStage())
 		{
 			aUnlockedNewChallenge = !HasBeatenChallenge(mGameMode);
 			mBoard->SurvivalSaveScore();
 
-			if (aUnlockedNewChallenge && HasFinishedAdventure())
+			if ((aUnlockedNewChallenge && HasFinishedAdventure()) || aLevel > 60)
 			{
 				int aNumTrophies = GetNumTrophies(ChallengePage::CHALLENGE_PAGE_SURVIVAL);
 				if (aNumTrophies != 8 && aNumTrophies != 9)
@@ -1559,10 +1561,15 @@ bool LawnApp::UpdatePlayerProfileForFinishingLevel()
 	{
 		aUnlockedNewChallenge = !HasBeatenChallenge(mGameMode);
 		mPlayerInfo->mChallengeRecords[GetCurrentChallengeIndex()]++;
+		int aLevel = mPlayerInfo->mLevel;
 
-		if (!HasFinishedAdventure() && (mGameMode == GameMode::GAMEMODE_SCARY_POTTER_3 || mGameMode == GameMode::GAMEMODE_PUZZLE_I_ZOMBIE_3))
+		if ((!HasFinishedAdventure() || aLevel < 61)  && (mGameMode == GameMode::GAMEMODE_SCARY_POTTER_3 || mGameMode == GameMode::GAMEMODE_PUZZLE_I_ZOMBIE_3))
 		{
 			aUnlockedNewChallenge = false;
+		}
+		else if (aLevel >= 61)
+		{
+			aUnlockedNewChallenge = true;
 		}
 
 		if (aUnlockedNewChallenge)
@@ -1581,8 +1588,9 @@ bool LawnApp::UpdatePlayerProfileForFinishingLevel()
 	{
 		aUnlockedNewChallenge = !HasBeatenChallenge(mGameMode);
 		mPlayerInfo->mChallengeRecords[GetCurrentChallengeIndex()]++;
+		int aLevel = mPlayerInfo->mLevel;
 
-		if (aUnlockedNewChallenge && HasFinishedAdventure())
+		if (aUnlockedNewChallenge && (HasFinishedAdventure() || aLevel > 60))
 		{
 			int aNumTrophies = GetNumTrophies(ChallengePage::CHALLENGE_PAGE_CHALLENGE);
 			if (aNumTrophies <= 17)
@@ -1605,7 +1613,7 @@ void LawnApp::CheckForGameEnd()
 {
 	if (mBoard == nullptr || !mBoard->mLevelComplete)
 		return;
-	isFastMode = false;
+	isFastMode = 0;
 
 	if (mPlayedQuickplay)
 	{
@@ -1642,7 +1650,7 @@ void LawnApp::CheckForGameEnd()
 		int aLevel = mBoard->mLevel;
 		KillBoard();
 
-		if (IsFirstTimeAdventureMode() && aLevel < 50)
+		if (IsFirstTimeAdventureMode() && aLevel < 60 && aLevel != 54)
 		{
 			ShowAwardScreen(AwardType::AWARD_FORLEVEL, true);
 		}
@@ -1658,7 +1666,7 @@ void LawnApp::CheckForGameEnd()
 				ShowAwardScreen(AwardType::AWARD_CREDITS_ZOMBIENOTE, true);
 			}
 		}
-		else if (aLevel == 9 || aLevel == 19 || aLevel == 29 || aLevel == 39 || aLevel == 49)
+		else if (aLevel == 9 || aLevel == 19 || aLevel == 29 || aLevel == 39 || aLevel == 49 || aLevel == 59)
 		{
 			ShowAwardScreen(AwardType::AWARD_FORLEVEL, true);
 		}
@@ -1669,11 +1677,12 @@ void LawnApp::CheckForGameEnd()
 	}
 	else if (IsSurvivalMode())
 	{
+		int aLevel = mPlayerInfo->mLevel;
 		if (mBoard->IsFinalSurvivalStage())
 		{
 			KillBoard();
 
-			if (aUnlockedNewChallenge && HasFinishedAdventure())
+			if (aUnlockedNewChallenge && (HasFinishedAdventure() || aLevel > 60))
 			{
 				ShowAwardScreen(AwardType::AWARD_FORLEVEL, true);
 			}
@@ -1711,8 +1720,9 @@ void LawnApp::CheckForGameEnd()
 	else
 	{
 		KillBoard();
+		int aLevel = mPlayerInfo->mLevel;
 
-		if (aUnlockedNewChallenge && HasFinishedAdventure())
+		if (aUnlockedNewChallenge && (HasFinishedAdventure() || aLevel > 60))
 		{
 			ShowAwardScreen(AwardType::AWARD_FORLEVEL, true);
 		}
@@ -1805,11 +1815,24 @@ void LawnApp::UpdateFrames()
 	}
 	else if (gFastMo)
 	{
-		aUpdateCount = 20;
+		if (isFastMode == 0 || isFastMode == 2)
+		{
+			isFastMode == 1;
+			aUpdateCount = mSpeedModifier;
+		}
+		else
+		{
+			isFastMode == 0;
+		}
 	}
-	else if (isFastMode)
+	else if (isFastMode == 1)
 	{
+		gSlowMo = false;
 		aUpdateCount = mSpeedModifier;
+	}
+	else if (isFastMode == 0)
+	{
+		gSlowMo = false;
 	}
 
 	for (int i = 0; i < aUpdateCount; i++)
@@ -1865,14 +1888,29 @@ void LawnApp::UpdateFrames()
 void LawnApp::ToggleSlowMo()
 {
 	gSlowMoCounter = 0;
-	gSlowMo = !gSlowMo;
-	gFastMo = false;
+	if (isFastMode == 0 || isFastMode == 1)
+	{
+		gSlowMo = !gSlowMo;
+		isFastMode = 2;
+	}
+	else
+	{
+		isFastMode = 0;
+		gSlowMo = !gSlowMo;
+	}
 }
 
 void LawnApp::ToggleFastMo()
 {
 	gSlowMo = false;
-	gFastMo = !gFastMo;
+	if (isFastMode == 0 || isFastMode == 2)
+	{
+		isFastMode = 1;
+	}
+	else
+	{
+		isFastMode = 0;
+	}
 }
 
 void LawnApp::LoadGroup(const char* theGroupName, int theGroupAveMsToLoad)
@@ -1957,6 +1995,7 @@ void LawnApp::LoadingThreadProc()
 	TodHesitationTrace("trail");
 	
 	TodParticleLoadDefinitions(gLawnParticleArray, LENGTH(gLawnParticleArray));
+	ReanimatorEnsureDefinitionLoaded(ReanimationType::REANIM_ZENGARDEN_SPROUT, true);
 	aDuration = max(aTimer.GetDuration(), 0);
 	aTimer.Start();
 
@@ -2432,11 +2471,11 @@ bool LawnApp::IsMiniBossLevel()
 
 	if (mPlayedQuickplay)
 	{
-		return mQuickLevel == 10 || mQuickLevel == 20 || mQuickLevel == 30;
+		return mQuickLevel == 10 || mQuickLevel == 20 || mQuickLevel == 30 || mQuickLevel == 50 || mQuickLevel == 55;
 	}
 	else
 	{
-		return mPlayerInfo->mLevel == 10 || mPlayerInfo->mLevel == 20 || mPlayerInfo->mLevel == 30;
+		return mPlayerInfo->mLevel == 10 || mPlayerInfo->mLevel == 20 || mPlayerInfo->mLevel == 30 || mPlayerInfo->mLevel == 50 || mPlayerInfo->mLevel == 55;
 	}
 }
 
@@ -2449,9 +2488,9 @@ bool LawnApp::IsFinalBossLevel()
 		return true;
 
 	if (mPlayedQuickplay)
-		return mQuickLevel == 50;
+		return mQuickLevel == 60;
 
-	return IsAdventureMode() && mPlayerInfo->mLevel == 50;
+	return IsAdventureMode() && mPlayerInfo->mLevel == 60;
 }
 
 bool LawnApp::IsChallengeWithoutSeedBank()
@@ -2479,11 +2518,11 @@ bool LawnApp::IsNight()
 
 	if (mPlayedQuickplay)
 	{
-		return (mQuickLevel >= 11 && mQuickLevel <= 20) || (mQuickLevel >= 31 && mQuickLevel <= 40) || mQuickLevel == 50;
+		return (mQuickLevel >= 11 && mQuickLevel <= 20) || (mQuickLevel >= 31 && mQuickLevel <= 40) || (mQuickLevel >= 51 && mQuickLevel <= 60);
 	}
 	else
 	{
-		return (mPlayerInfo->mLevel >= 11 && mPlayerInfo->mLevel <= 20) || (mPlayerInfo->mLevel >= 31 && mPlayerInfo->mLevel <= 40) || mPlayerInfo->mLevel == 50;
+		return (mPlayerInfo->mLevel >= 11 && mPlayerInfo->mLevel <= 20) || (mPlayerInfo->mLevel >= 31 && mPlayerInfo->mLevel <= 40) || (mPlayerInfo->mLevel >= 51 && mPlayerInfo->mLevel <= 60);
 	}
 }
 
@@ -2538,6 +2577,41 @@ void LawnApp::CloseRequestAsync()
 
 SeedType LawnApp::GetAwardSeedForLevel(int theLevel)
 {
+	/*
+	if (theLevel == 51)
+	{
+		return SeedType::SEED_SPROUT;
+	}
+	if (theLevel == 52)
+	{
+		return SeedType::SEED_COMMANDOPEA;
+	}
+	if (theLevel == 53)
+	{
+		return SeedType::SEED_SHRINKING_VIOLET;
+	}
+	if (theLevel == 54)
+	{
+		return SeedType::SEED_HATTREMWITCH;
+	}
+	if (theLevel == 55)
+	{
+		return SeedType::SEED_PICKLEDPEPPER;
+	}
+	if (theLevel == 56)
+	{
+		return SeedType::SEED_NIGHTCAP;
+	}
+	if (theLevel == 57)
+	{
+		return SeedType::SEED_SWEETPOTATO;
+	}
+	if (theLevel == 58)
+	{
+		return SeedType::SEED_SWEETPOTATO;
+	}
+	*/
+
 	int aArea = (theLevel - 1) / LEVELS_PER_AREA + 1;
 	int aSub = (theLevel - 1) % LEVELS_PER_AREA + 1;
 	int aSeedsHasGot = (aArea - 1) * 8 + aSub;  
@@ -2549,9 +2623,9 @@ SeedType LawnApp::GetAwardSeedForLevel(int theLevel)
 	{
 		aSeedsHasGot -= 1;  
 	}
-	if (aSeedsHasGot > 40)
+	if (aSeedsHasGot > 49)
 	{
-		aSeedsHasGot = 40;
+		aSeedsHasGot = 49;
 	}
 	
 	return (SeedType)aSeedsHasGot;
@@ -2560,7 +2634,7 @@ SeedType LawnApp::GetAwardSeedForLevel(int theLevel)
 int LawnApp::GetSeedsAvailable()
 {
 	int aLevel = mPlayerInfo->mLevel;
-	if (HasFinishedAdventure() || aLevel > 50)
+	if (HasFinishedAdventure() || aLevel > 70)
 	{
 		return 49;
 	}
@@ -2579,6 +2653,7 @@ bool LawnApp::HasSeedType(SeedType theSeedType)
 		return mPlayerInfo->mPurchases[theSeedType - SeedType::SEED_GATLINGPEA];
 	*/
 
+	/*
 	if (theSeedType == SeedType::SEED_TWINSUNFLOWER)
 	{
 		return mPlayerInfo->mPurchases[(int)StoreItem::STORE_ITEM_PLANT_TWINSUNFLOWER] > 0;
@@ -2607,20 +2682,48 @@ bool LawnApp::HasSeedType(SeedType theSeedType)
 	{
 		return mPlayerInfo->mPurchases[(int)StoreItem::STORE_ITEM_PLANT_COBCANNON] > 0;
 	}
-	if (theSeedType == SeedType::SEED_IMITATER)
+	*/
+
+	/*
+	if (theSeedType == SeedType::SEED_SPROUT)
 	{
-		return mPlayerInfo->mPurchases[(int)StoreItem::STORE_ITEM_PLANT_IMITATER] > 0;
+		return mPlayerInfo->mLevel >= 52 || HasFinishedAdventure();
 	}
+	if (theSeedType == SeedType::SEED_COMMANDOPEA)
+	{
+		return mPlayerInfo->mLevel >= 53 || HasFinishedAdventure();
+	}
+	if (theSeedType == SeedType::SEED_SHRINKING_VIOLET)
+	{
+		return mPlayerInfo->mLevel >= 54 || HasFinishedAdventure();
+	}
+	if (theSeedType == SeedType::SEED_HATTREMWITCH)
+	{
+		return mPlayerInfo->mLevel >= 55 || HasFinishedAdventure();
+	}
+	if (theSeedType == SeedType::SEED_PICKLEDPEPPER)
+	{
+		return mPlayerInfo->mLevel >= 56 || HasFinishedAdventure();
+	}
+	if (theSeedType == SeedType::SEED_NIGHTCAP)
+	{
+		return mPlayerInfo->mLevel >= 57 || HasFinishedAdventure();
+	}
+	if (theSeedType == SeedType::SEED_SWEETPOTATO)
+	{
+		return mPlayerInfo->mLevel >= 58 || HasFinishedAdventure();
+	}
+	if (theSeedType == SeedType::SEED_SUNBEAN)
+	{
+		return mPlayerInfo->mLevel >= 59 || HasFinishedAdventure();
+	}
+	*/
 	if(mTodCheatKeys){
 		if (theSeedType == SeedType::SEED_EXPLODE_O_NUT)
 		{
 			return true;
 		}
 		if (theSeedType == SeedType::SEED_GIANT_WALLNUT)
-		{
-			return true;
-		}
-		if (theSeedType == SeedType::SEED_SPROUT)
 		{
 			return true;
 		}
@@ -2632,11 +2735,13 @@ bool LawnApp::HasSeedType(SeedType theSeedType)
 	return theSeedType < GetSeedsAvailable();
 }
 
+
 bool LawnApp::SeedTypeAvailable(SeedType theSeedType)
 {
-	return (theSeedType == SeedType::SEED_GATLINGPEA && mPlayerInfo->mPurchases[StoreItem::STORE_ITEM_PLANT_GATLINGPEA]) || HasSeedType(theSeedType);
+	return (theSeedType == SeedType::SEED_IMITATER && mPlayerInfo->mPurchases[StoreItem::STORE_ITEM_PLANT_IMITATER]) || HasSeedType(theSeedType);
 }
 
+/*
 bool LawnApp::HasAllUpgrades()
 {
 	int availablePlants = 0;
@@ -2647,6 +2752,7 @@ bool LawnApp::HasAllUpgrades()
 	}
 	return availablePlants == 9;
 }
+*/
 
 Reanimation* LawnApp::AddReanimation(float theX, float theY, int theRenderOrder, ReanimationType theReanimationType)
 {
@@ -3354,6 +3460,8 @@ void LawnApp::PreloadForUser()
 	mCompletedLoadingThreadTasks += 340;
 	ReanimatorEnsureDefinitionLoaded(ReanimationType::REANIM_ZOMBIE_HAND, true);
 	mCompletedLoadingThreadTasks += 68;
+
+	ReanimatorEnsureDefinitionLoaded(ReanimationType::REANIM_ZENGARDEN_SPROUT, true);
 
 	if (mPlayerInfo)
 	{

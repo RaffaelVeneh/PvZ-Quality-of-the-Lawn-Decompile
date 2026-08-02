@@ -232,6 +232,48 @@ Melon-pult
 [MELON_PULT_TOOLTIP]
 Does heavy damage to groups of zombies
 
+[SUN_BEAN]
+Sunbean
+
+[SUN_BEAN_TOOLTIP]
+Spawn a Sun from zombie who eat him in 3x3 area
+
+[COMMANDO_PEA]
+Commando Pea
+
+[COMMANDO_PEA_TOOLTIP]
+Snipe Zombie really fast
+
+[SWEET_POTATO]
+Sweet Potato
+
+[SWEET_POTATO_TOOLTIP]
+Redirect Zombie to him
+
+[HATTREM_WITCH]
+Hattrem Witch
+
+[HATTREM_WITCH_TOOLTIP]
+Turn Zombie into Fume-shroom
+
+[SHRINKING_VIOLET]
+Shrinking Violet
+
+[SHRINKING_VIOLET_TOOLTIP]
+Shrink Large Group of Zombie
+
+[PICKLED_PEPPER]
+Pickled Pepper
+
+[PICKLED_PEPPER_TOOLTIP]
+Summon large fire area that burn the zombies
+
+[NIGHTCAP]
+Nightcap
+
+[NIGHTCAP_TOOLTIP]
+Attack Zombie in area in ninja style
+
 [GATLING_PEA]
 Gatling Pea
 
@@ -311,6 +353,9 @@ Giant Wall-nut
 
 [SPROUT]
 Sprout
+
+[SPROUT_TOOLTIP]
+Spawn Random Seed
 
 [MARIGOLD_SPROUT]
 Marigold Sprout
@@ -860,6 +905,28 @@ Melon-pults do heavy damage to groups of zombies.
 {SHORTLINE}
 {FLAVOR}There's no false modesty with Melon-pult. "Sun-for-damage, I deliver the biggest punch on 
 the lawn," he says. "I'm not bragging. Run the numbers. You'll see."
+
+[SUN_BEAN_DESCRIPTION_HEADER]
+Sunbean damage the zombie upon death and spawn sun from group of zombies.
+
+[SUN_BEAN_DESCRIPTION]
+{SHORTLINE}
+{KEYWORD}Damage:{STAT} Massive
+{KEYWORD}Range:{STAT} 3x3
+{KEYWORD}Special:{STAT} Kill Puny zombie who eat him and spawn sun
+{SHORTLINE}
+{FLAVOR}"Sun-for-SUN!", he said. is it worth it to spend a sun for SUN? well i guess only this guy know
+
+[COMMANDO_PEA_DESCRIPTION_HEADER]
+Commando Pea will snipe the zombie nearby.
+
+[COMMANDO_PEA_DESCRIPTION]
+{SHORTLINE}
+{KEYWORD}Damage:{STAT} very heavy
+{KEYWORD}Range:{STAT} front
+{KEYWORD}Special:{STAT} Targeting any zombies in front of him
+{SHORTLINE}
+{FLAVOR}"One pea, one zombie. That's the rule." This elite sharpshooter isn't here to spray peas around—he's here to end threats fast. Commandopea deals devastating damage with pinpoint accuracy, sniping the nearest zombie in high speed on any lane ahead of him. The zombie will not know who hit them, well of course if he's not "reloading".
 
 [GATLING_PEA_DESCRIPTION_HEADER]
 Gatling Peas shoot four peas at a time.
@@ -1694,6 +1761,49 @@ Hey neighbor! Got some new items for sale!
 {NO_CLICK}I've got it... 
 [CRAZY_DAVE_4004]
 {NO_CLICK}{SHAKE}Morticulturalist!!!{MOUTH_BIG_SMILE}
+
+[CRAZY_DAVE_4101]
+Hello, Neighbor.
+[CRAZY_DAVE_4102]
+usually he's here but...{DELAY_50}
+[CRAZY_DAVE_4103]
+hmmm, i think someone move him to another level
+[CRAZY_DAVE_4104]
+Well anyway it's thunderstorm right now on the roof, 
+[CRAZY_DAVE_4105]
+Be careful of the lightning, it can help you by dealing damage to zombies
+[CRAZY_DAVE_4106]
+{SHAKE}But it deal greater damage to your plant!
+[CRAZY_DAVE_4107]
+Anyway Good Luck!{MOUTH_BIG_SMILE}
+
+[CRAZY_DAVE_4201]
+Heya, do you like gambling?
+[CRAZY_DAVE_4202]
+Cause if you do, then you gonna love or hate it more!{MOUTH_BIG_SMILE}
+[CRAZY_DAVE_4203]
+oh... me? of course i love it
+[CRAZY_DAVE_4204]
+In the past i used to spend million dollars!
+[CRAZY_DAVE_4205]
+But somehow they kept yelling at me "we don't accept monopoly money"
+[CRAZY_DAVE_4206]
+I think i know Why...
+[CRAZY_DAVE_4207]
+{SHAKE}Because I'm CRAZY!!!{MOUTH_BIG_SMILE}
+
+[CRAZY_DAVE_10001]
+Hello, Neighbor.
+[CRAZY_DAVE_10002]
+This level actually still under construction!
+[CRAZY_DAVE_10003]
+So there won't be any zombies except the tiny one
+[CRAZY_DAVE_10004]
+But hey, no one stop you from playing it{MOUTH_BIG_SMILE}
+[CRAZY_DAVE_10005]
+So have fun i guess?
+[CRAZY_DAVE_10006]
+{SHAKE}ENJOY!!!
 
 [MENU_BUTTON]
 Menu

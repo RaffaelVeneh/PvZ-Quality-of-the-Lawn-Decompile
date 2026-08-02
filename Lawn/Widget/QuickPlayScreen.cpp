@@ -93,8 +93,8 @@ void QuickPlayScreen::Draw(Graphics* g)
     g->SetClipRect(130, 30, 530, 370);
     switch (mBackground)
     {
-    case BackgroundType::BACKGROUND_1_DAY:				g->DrawImage(Sexy::IMAGE_BACKGROUND1, -130, 0);                       break;
-    case BackgroundType::BACKGROUND_2_NIGHT:			g->DrawImage(Sexy::IMAGE_BACKGROUND2, -130, 0);						break;
+    case BackgroundType::BACKGROUND_1_DAY:				g->DrawImage(Sexy::IMAGE_BACKGROUND1, -130, 0);                         break;
+    case BackgroundType::BACKGROUND_2_NIGHT:			g->DrawImage(Sexy::IMAGE_BACKGROUND2, -130, 0);						    break;
     case BackgroundType::BACKGROUND_3_POOL:
         g->DrawImage(Sexy::IMAGE_BACKGROUND3, -130, 0);
         DrawPool(g, false);
@@ -103,8 +103,9 @@ void QuickPlayScreen::Draw(Graphics* g)
         g->DrawImage(Sexy::IMAGE_BACKGROUND4, -130, 0);
         DrawPool(g, true);
         break;
-    case BackgroundType::BACKGROUND_5_ROOF:				g->DrawImage(Sexy::IMAGE_BACKGROUND5, -130, 0);						break;
-    case BackgroundType::BACKGROUND_6_BOSS:				g->DrawImage(Sexy::IMAGE_BACKGROUND6BOSS, -130, 0);					break;
+    case BackgroundType::BACKGROUND_5_ROOF:				g->DrawImage(Sexy::IMAGE_BACKGROUND5, -130, 0);						    break;
+    case BackgroundType::BACKGROUND_6_BOSS:				g->DrawImage(Sexy::IMAGE_BACKGROUND6BOSS, -130, 0);					    break;
+    case BackgroundType::BACKGROUND_7_EVENING:			g->DrawImage(Sexy::IMAGE_BACKGROUND7, -130, 0);                         break;
     default:											TOD_ASSERT();											break;
     }
     if (mDisplayZombie)
@@ -240,15 +241,20 @@ void QuickPlayScreen::ChooseBackground()
         groupName = "DelayLoad_Background4";
         mBackground = BackgroundType::BACKGROUND_4_FOG;
     }
-    else if (mApp->mQuickLevel < FINAL_LEVEL)
+    else if (mApp->mQuickLevel <= 5 * LEVELS_PER_AREA)
     {
         groupName = "DelayLoad_Background5";
         mBackground = BackgroundType::BACKGROUND_5_ROOF;
     }
-    else if (mApp->mQuickLevel == FINAL_LEVEL)
+    else if (mApp->mQuickLevel <= 6 * LEVELS_PER_AREA)
     {
         groupName = "DelayLoad_Background6";
         mBackground = BackgroundType::BACKGROUND_6_BOSS;
+    }
+    else if (mApp->mQuickLevel <= 7 * LEVELS_PER_AREA)
+    {
+        groupName = "DelayLoad_Background7";
+        mBackground = BackgroundType::BACKGROUND_7_EVENING;
     }
     else
     {

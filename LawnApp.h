@@ -132,13 +132,14 @@ public:
 	bool							mMuteSoundsForCutscene;							
 	Achievements*					mAchievements;
 	CursorWidget*					mCursor;
-	bool							isFastMode;
+	int								isFastMode;
 	SexyString						mVersion;
 	SexyString						mReconVersion;
 	bool							mPlayedQuickplay;
 	time_t							mStartTime;
 	SexyString                      mDetails;
 	SexyString                      mState;
+	SeedType						mLastPlantPlanted;
 
 public:
 	LawnApp();

@@ -25,7 +25,7 @@ enum MusicTune
 	MUSIC_TUNE_MINIGAME_LOONBOON,				
 	MUSIC_TUNE_CONVEYER,						
 	MUSIC_TUNE_FINAL_BOSS_BRAINIAC_MANIAC,		
-	MUSIC_TUNE_CREDITS_ZOMBIES_ON_YOUR_LAWN,	// MV
+	MUSIC_TUNE_CREDITS_ZOMBIES_ON_YOUR_LAWN,
 	NUM_MUSIC_TUNES
 };
 
@@ -85,7 +85,8 @@ public:
 	bool						mPaused;							
 	bool						mMusicDisabled;						
 	int							mFadeOutCounter;					
-	int							mFadeOutDuration;					
+	int							mFadeOutDuration;	
+	std::string					m_currentCustomMusic;
 
 public:
 	Music();
@@ -112,6 +113,8 @@ public:
 	unsigned long				GetMusicOrder(MusicFile theMusicFile);
 	void						MusicCreditScreenInit();
 	int							GetNumLoadingTasks();
+	void						PlayCustomMusic(const std::string& theMusicFile);
+	void						PauseCustomMusic(bool aPause);
 };
 
 #endif

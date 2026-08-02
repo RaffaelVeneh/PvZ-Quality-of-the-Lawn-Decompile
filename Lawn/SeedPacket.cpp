@@ -132,8 +132,17 @@ void SeedPacket::SetActivate(bool theActive)
 	}
 }
 
+
+bool gSeedNoCooldownCheat = false;
 void SeedPacket::Update()
 {
+	if (gSeedNoCooldownCheat && mPacketType != SeedType::SEED_NONE) {
+		mRefreshing = false;
+		mRefreshCounter = 0;
+		if (!mActive)
+			Activate();
+	}
+
 	if (mApp->mGameScene != GameScenes::SCENE_PLAYING || mPacketType == SeedType::SEED_NONE)
 	{
 		return;
@@ -260,6 +269,11 @@ void SeedPacketDrawSeed(Graphics* g, float x, float y, SeedType theSeedType, See
 
 void DrawSeedPacket(Graphics* g, float x, float y, SeedType theSeedType, SeedType theImitaterType, float thePercentDark, int theGrayness, bool theDrawCost, bool theUseCurrentCost)
 {
+	if (theSeedType == SEED_NONE)
+	{
+		return; // Don't try to draw an invalid seed packet
+	}
+
 	SeedType aSeedType = theSeedType;
 	if (aSeedType == SeedType::SEED_IMITATER && theImitaterType != SeedType::SEED_NONE)
 	{
@@ -424,6 +438,20 @@ void DrawSeedPacket(Graphics* g, float x, float y, SeedType theSeedType, SeedTyp
 		aScale = 0.5f;
 		aOffsetX = 5.0f;
 		aOffsetY = 10.0f;
+		break;
+
+	case SeedType::SEED_SHRINKING_VIOLET:
+		aScale = 0.45f;  // change this value to scale the plant image on the packet
+		aOffsetX = 8.0f; // adjust X offset so the image is centered
+		aOffsetY = 14.0f; // adjust Y offset as needed
+		break;
+
+	case SeedType::SEED_NIGHTCAP:
+	case SeedType::SEED_HATTREMWITCH:
+	case SeedType::SEED_HATTREMSAGE:
+		aScale = 0.35f;  // change this value to scale the plant image on the packet
+		aOffsetX = 12.0f; // adjust X offset so the image is centered
+		aOffsetY = 16.0f; // adjust Y offset as needed
 		break;
 
 	case SeedType::SEED_GATLINGPEA:
@@ -649,7 +677,7 @@ void SeedPacket::Draw(Graphics* g)
 		{
 			aPercentDark = 0.0f;
 		}
-		else if ((!mBoard->CanTakeSunMoney(aCost) && aDrawCost) || aPercentDark > 1.0f || !mBoard->PlantingRequirementsMet(aUseSeedType))
+		else if ((!mBoard->CanTakeSunMoney(aCost) && aDrawCost) || aPercentDark > 1.0f)
 		{
 			aGrayness = 128;
 		}
@@ -689,10 +717,12 @@ bool SeedPacket::CanPickUp()
 			return false;
 		}
 
+		/* unused
 		if (!mBoard->PlantingRequirementsMet(aUseSeedType))
 		{
 			return false;
 		}
+		*/
 	}
 
 	return true;
@@ -745,6 +775,7 @@ void SeedPacket::MouseDown(int x, int y, int theClickCount)
 			return;
 		}
 
+		/* unused 
 		if (!mBoard->PlantingRequirementsMet(aUseSeedType))
 		{
 			mApp->PlaySample(SOUND_BUZZER);
@@ -787,9 +818,11 @@ void SeedPacket::MouseDown(int x, int y, int theClickCount)
 
 			return;
 		}
+		*/
 	}
 
 	mBoard->ClearAdvice(AdviceType::ADVICE_CANT_AFFORD_PLANT);
+	/* unused 
 	mBoard->ClearAdvice(AdviceType::ADVICE_PLANT_NEEDS_REPEATER);
 	mBoard->ClearAdvice(AdviceType::ADVICE_PLANT_NEEDS_MELONPULT);
 	mBoard->ClearAdvice(AdviceType::ADVICE_PLANT_NEEDS_SUNFLOWER);
@@ -798,6 +831,7 @@ void SeedPacket::MouseDown(int x, int y, int theClickCount)
 	mBoard->ClearAdvice(AdviceType::ADVICE_PLANT_NEEDS_MAGNETSHROOM);
 	mBoard->ClearAdvice(AdviceType::ADVICE_PLANT_NEEDS_FUMESHROOM);
 	mBoard->ClearAdvice(AdviceType::ADVICE_PLANT_NEEDS_LILYPAD);
+	*/
 
 	if (mApp->mGameMode == GameMode::GAMEMODE_CHALLENGE_BEGHOULED || mApp->mGameMode == GameMode::GAMEMODE_CHALLENGE_BEGHOULED_TWIST)
 	{
@@ -862,7 +896,8 @@ void SeedPacket::WasPlanted()
 	{
 		Deactivate();
 	}
-	else if (mApp->mGameMode == GameMode::GAMEMODE_CHALLENGE_LAST_STAND && mBoard->mChallenge->mChallengeState != ChallengeState::STATECHALLENGE_LAST_STAND_ONSLAUGHT)
+	else if (mApp->mGameMode == GameMode::GAMEMODE_CHALLENGE_LAST_STAND &&
+		mBoard->mChallenge->mChallengeState != ChallengeState::STATECHALLENGE_LAST_STAND_ONSLAUGHT)
 	{
 		mTimesUsed++;
 		mActive = true;
@@ -1093,6 +1128,9 @@ void SeedPacket::SetPacketType(SeedType theSeedType, SeedType theImitaterType)
 	mRefreshTime = 0;
 	mRefreshing = false;
 	mActive = true;
+
+	if (theSeedType == SeedType::SEED_MARIGOLD)
+		return;
 
 	SeedType aUseSeedType = theSeedType;
 	if (theSeedType == SeedType::SEED_IMITATER && theImitaterType != SeedType::SEED_NONE)

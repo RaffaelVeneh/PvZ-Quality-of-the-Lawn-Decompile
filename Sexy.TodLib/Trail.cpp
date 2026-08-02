@@ -266,7 +266,7 @@ void Trail::Draw(Graphics* g)
 
 void TrailHolder::InitializeHolder()
 {
-	mTrails.DataArrayInitialize(1024U, "trails");
+	mTrails.DataArrayInitialize(4096U, "trails");
 }
 
 void TrailHolder::DisposeHolder()

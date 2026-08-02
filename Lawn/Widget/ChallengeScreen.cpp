@@ -250,6 +250,11 @@ void ChallengeScreen::SetUnlockChallengeIndex(ChallengePage thePage, bool theIsI
 
 int ChallengeScreen::MoreTrophiesNeeded(int theChallengeIndex)
 {
+	if (mApp->HasFinishedAdventure() || mApp->mPlayerInfo->mLevel > 60)
+	{
+		return 0; // Returning 0 means "0 accomplishments needed," so the challenge is unlocked.
+	}
+
 	ChallengeDefinition& aDef = GetChallengeDefinition(theChallengeIndex);
 	if (mApp->mGameMode == GAMEMODE_UPSELL && mApp->mGameScene == SCENE_LEVEL_INTRO)
 	{
@@ -570,16 +575,17 @@ SexyString ChallengeScreen::GetPageTitle(ChallengePage thePage)
 
 bool ChallengeScreen::IsPageUnlocked(ChallengePage thePage)
 {
+	int aLevel = mApp->mPlayerInfo->mLevel;
 	switch (thePage)
 	{
 	case ChallengePage::CHALLENGE_PAGE_CHALLENGE:
-		return mApp->HasFinishedAdventure() || mApp->mPlayerInfo->mHasUnlockedMinigames;
+		return mApp->HasFinishedAdventure() || mApp->mPlayerInfo->mHasUnlockedMinigames || aLevel > 60;
 	case ChallengePage::CHALLENGE_PAGE_PUZZLE:
-		return mApp->HasFinishedAdventure() || mApp->mPlayerInfo->mHasUnlockedPuzzleMode;
+		return mApp->HasFinishedAdventure() || mApp->mPlayerInfo->mHasUnlockedPuzzleMode || aLevel > 60;
 	case ChallengePage::CHALLENGE_PAGE_SURVIVAL:
-		return mApp->HasFinishedAdventure() || mApp->mPlayerInfo->mHasUnlockedSurvivalMode;
+		return mApp->HasFinishedAdventure() || mApp->mPlayerInfo->mHasUnlockedSurvivalMode || aLevel > 60;
 	case ChallengePage::CHALLENGE_PAGE_LIMBO:
-		return mApp->HasFinishedAdventure();
+		return mApp->HasFinishedAdventure() || aLevel > 60;
 	}
 	return false;
 }
@@ -641,6 +647,7 @@ void ChallengeScreen::UpdateToolTip()
 	{
 		ChallengeDefinition& aDef = GetChallengeDefinition(aChallengeMode);
 		ButtonWidget* aChallengeButton = mChallengeButtons[aChallengeMode];
+		int aLevel = mApp->mPlayerInfo->mLevel;
 		if (aChallengeButton->mVisible && aChallengeButton->mDisabled &&
 			aChallengeButton->Contains(mApp->mWidgetManager->mLastMouseX, mApp->mWidgetManager->mLastMouseY) &&
 			AccomplishmentsNeeded(aChallengeMode) <= 1)
@@ -654,7 +661,7 @@ void ChallengeScreen::UpdateToolTip()
 				{
 					if (IsScaryPotterLevel(aDef.mChallengeMode))
 					{
-						if (!mApp->HasFinishedAdventure() && aDef.mChallengeMode == GAMEMODE_SCARY_POTTER_4)
+						if (!mApp->HasFinishedAdventure() && aDef.mChallengeMode == GAMEMODE_SCARY_POTTER_4 && aLevel <= 60)
 						{
 							aLabel = _S("[FINISH_ADVENTURE_TOOLTIP]");
 						}
@@ -665,7 +672,7 @@ void ChallengeScreen::UpdateToolTip()
 					}
 					else if (IsIZombieLevel(aDef.mChallengeMode))
 					{
-						if (!mApp->HasFinishedAdventure() && aDef.mChallengeMode == GAMEMODE_PUZZLE_I_ZOMBIE_4)
+						if (!mApp->HasFinishedAdventure() && aDef.mChallengeMode == GAMEMODE_PUZZLE_I_ZOMBIE_4 && aLevel <= 60)
 						{
 							aLabel = _S("[FINISH_ADVENTURE_TOOLTIP]");
 						}
@@ -675,7 +682,7 @@ void ChallengeScreen::UpdateToolTip()
 						}
 					}
 				}
-				else if (!mApp->HasFinishedAdventure() || mApp->IsTrialStageLocked())
+				else if ((!mApp->HasFinishedAdventure() || mApp->IsTrialStageLocked()) && aLevel <= 60)
 				{
 					aLabel = _S("[FINISH_ADVENTURE_TOOLTIP]");
 				}

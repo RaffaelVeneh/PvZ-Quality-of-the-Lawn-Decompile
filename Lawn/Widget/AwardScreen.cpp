@@ -226,7 +226,7 @@ bool AwardScreen::IsPaperNote()
         return true;
 
     int aLevel = mApp->mPlayerInfo->mLevel;
-    return mApp->IsAdventureMode() && (aLevel == 10 || aLevel == 20 || aLevel == 30 || aLevel == 40 || aLevel == 50);
+    return mApp->IsAdventureMode() && (aLevel == 10 || aLevel == 20 || aLevel == 30 || aLevel == 40 || aLevel == 50 || aLevel == 60);
 }
 
 void AwardScreen::DrawBottom(Graphics* g, SexyString theTitle, SexyString theAward, SexyString theMessage)
@@ -374,7 +374,20 @@ void AwardScreen::Draw(Graphics* g)
             TodDrawString(g, _S("[FOUND_NOTE]"), BOARD_WIDTH / 2, 70, Sexy::FONT_DWARVENTODCRAFT24, Color(255, 200, 0, 255), DS_ALIGN_CENTER);
             mState = "Zombie Note (" + mApp->GetStageString(aLevel).erase(0, 1) + ")";
         }
-        else if (aLevel == 1 && mApp->HasFinishedAdventure())
+        else if (aLevel == 55)
+        {
+            DrawBottom(g, _S("[FOUND_MONEY_BAG]"), _S("[MONEY_BAG]"), _S("[MONEY_BAG_DESCRIPTION]"));
+            g->DrawImage(Sexy::IMAGE_MONEYBAG_HI_RES, BOARD_WIDTH / 2 - Sexy::IMAGE_MONEYBAG_HI_RES->mWidth / 2, 137);
+        }
+        else if (aLevel == 60)
+        {
+            g->DrawImage(Sexy::IMAGE_BACKGROUND1, -700, -300, 2800, 1200);
+            g->DrawImage(Sexy::IMAGE_ZOMBIE_NOTE, 80, 80);
+            g->DrawImage(Sexy::IMAGE_ZOMBIE_FINAL_NOTE, 114, 138);
+            TodDrawString(g, _S("[FOUND_NOTE]"), BOARD_WIDTH / 2, 70, Sexy::FONT_DWARVENTODCRAFT24, Color(255, 200, 0, 255), DS_ALIGN_CENTER);
+            mState = "Zombie Note (" + mApp->GetStageString(aLevel).erase(0, 1) + ")";
+        }
+        else if ((aLevel == 1 && mApp->HasFinishedAdventure()) || aLevel > 60)
         {
             DrawBottom(g, _S("[WIN_MESSAGE1]"), _S("[SILVER_SUNFLOWER_TROPHY]"), _S("[WIN_MESSAGE2]"));
             TodDrawImageCelCenterScaledF(g, Sexy::IMAGE_SUNFLOWER_TROPHY, 325, 65, 0, 0.6f, 0.6f);
@@ -590,6 +603,11 @@ void AwardScreen::ExitScreen()
                 mApp->PreNewGame(GAMEMODE_CHALLENGE_ZEN_GARDEN, false);
                 mApp->mZenGarden->SetupForZenTutorial();
                 return;
+            }
+            else if (aLevel == 59)
+            {
+                mApp->KillAwardScreen();
+                mApp->ShowAwardScreen(AWARD_CREDITS_ZOMBIENOTE, true);
             }
 
             mApp->KillAwardScreen();

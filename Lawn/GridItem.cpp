@@ -86,6 +86,15 @@ void GridItem::DrawGridItem(Graphics* g)
     case GridItemType::GRIDITEM_SQUIRREL:           DrawSquirrel(g);                                break;
     case GridItemType::GRIDITEM_STINKY:             DrawStinky(g);                                  break;
     case GridItemType::GRIDITEM_IZOMBIE_BRAIN:      DrawIZombieBrain(g);                            break;
+    case GridItemType::GRIDITEM_FIRE_PLACE:
+    {
+        Reanimation* aFireReanim = mApp->ReanimationTryToGet(mGridItemReanimID);
+        if (aFireReanim)
+        {
+            aFireReanim->Draw(g);
+        }
+        break;
+    }
     default:                                        TOD_ASSERT();                                   break;
     }
 
@@ -585,6 +594,30 @@ void GridItem::Update()
     if (mGridItemType == GridItemType::GRIDITEM_IZOMBIE_BRAIN)
     {
         UpdateBrain();
+    }
+    if (mGridItemType == GridItemType::GRIDITEM_FIRE_PLACE)
+    {
+        mGridItemCounter--;
+        if (mGridItemCounter <= 0)
+        {
+            GridItemDie();
+            return;
+        }
+
+        // Damage zombies every tick (2 damage * 100 ticks/sec = 200 DPS)
+        Rect aGridRect(mBoard->GridToPixelX(mGridX, mGridY), mBoard->GridToPixelY(mGridX, mGridY), 80, 100);
+        Zombie* aZombie = nullptr;
+        while (mBoard->IterateZombies(aZombie))
+        {
+            if (!aZombie->IsDeadOrDying() && aZombie->mRow == mGridY && !aZombie->IsFlying())
+            {
+                Rect aZombieRect = aZombie->GetZombieRect();
+                if (GetRectOverlap(aGridRect, aZombieRect) > 0)
+                {
+                    aZombie->TakeDamage(2, (1U << DAMAGE_FIRE) | (1U << DAMAGE_BYPASSES_SHIELD));
+                }
+            }
+        }
     }
 }
 

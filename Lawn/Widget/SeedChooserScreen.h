@@ -121,7 +121,9 @@ public:
     /*inline*/ void         RemoveToolTip();
     /*inline*/ void         CancelLawnView();
     virtual void            MouseUp(int x, int y, int theClickCount);
+
     bool                    IsImitaterUnselectable(SeedType seedType);
+
     bool                    IsOverImitater(int x, int y);
     virtual void            MouseDown(int x, int y, int theClickCount);
     /*inline*/ bool         PickedPlantType(SeedType theSeedType);

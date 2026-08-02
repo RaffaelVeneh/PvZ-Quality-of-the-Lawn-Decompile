@@ -47,6 +47,7 @@ ReanimationParams gLawnReanimationArray[(int)ReanimationType::NUM_REANIMS] = {
 	{ ReanimationType::REANIM_MARIGOLD,                             "reanim\\Marigold.reanim",                          0 },
 	{ ReanimationType::REANIM_ICESHROOM,                            "reanim\\IceShroom.reanim",                         0 },
 	{ ReanimationType::REANIM_ZOMBIE_FOOTBALL,                      "reanim\\Zombie_football.reanim",                   0 },
+	{ ReanimationType::REANIM_ZOMBIE_GIGA_FOOTBALL,                 "reanim\\Zombie_gigafootball.reanim",               0 },
 	{ ReanimationType::REANIM_ZOMBIE_NEWSPAPER,                     "reanim\\Zombie_paper.reanim",                      0 },
 	{ ReanimationType::REANIM_ZOMBIE_ZAMBONI,                       "reanim\\Zombie_zamboni.reanim",                    0 },
 	{ ReanimationType::REANIM_SPLASH,                               "reanim\\splash.reanim",                            0 },
@@ -175,6 +176,19 @@ ReanimationParams gLawnReanimationArray[(int)ReanimationType::NUM_REANIMS] = {
 	{ ReanimationType::REANIM_SOUR_STARFRUIT,						"reanim\\SourStarfruit.reanim",						0 },
 	{ ReanimationType::REANIM_POISONPULT,							"reanim\\Poisonpult.reanim",						0 },
 	{ ReanimationType::REANIM_CORROSION_GARLIC,						"reanim\\CorrosionGarlic.reanim",					0 },
+	{ ReanimationType::REANIM_ABSOLUTELEAF,							"reanim\\Absoluteleaf.reanim",						0 },
+	{ ReanimationType::REANIM_COMMANDOPEA,                          "reanim\\CommandoPea.reanim",						0 },
+	{ ReanimationType::REANIM_SHRINKING_VIOLET,                     "reanim\\ShrinkingViolet.reanim",					0 },
+	{ ReanimationType::REANIM_HATTREMWITCH,                         "reanim\\HattremWitch.reanim",						0 },
+	{ ReanimationType::REANIM_PICKLEDPEPPER,                        "reanim\\pickledpepper.reanim",                     0 },
+	{ ReanimationType::REANIM_NIGHTCAP,                             "reanim\\Nightcap.reanim",                          0 },
+	{ ReanimationType::REANIM_SWEETPOTATO,                          "reanim\\SweetPotato.reanim",                       0 },
+	{ ReanimationType::REANIM_SUNBEAN,                              "reanim\\SunBean.reanim",                           0 },
+	{ ReanimationType::REANIM_SUNBEAN_BOMB,							"reanim\\SunBeanBomb.reanim",                       0 },
+	{ ReanimationType::REANIM_GENERALPEA,							"reanim\\GeneralPea.reanim",                        0 },
+	{ ReanimationType::REANIM_SWEETEST_POTATO,                      "reanim\\SweetestPotato.reanim",                    0 },
+	{ ReanimationType::REANIM_HATTREMSAGE,							"reanim\\HattremSage.reanim",						0 },
+	{ ReanimationType::REANIM_DARKCAP,								"reanim\\Darkcap.reanim",							0 },
 };
 
 ReanimatorTransform::ReanimatorTransform() :
@@ -1069,7 +1083,7 @@ ReanimationHolder::~ReanimationHolder()
 
 void ReanimationHolder::InitializeHolder()
 {
-	mReanimations.DataArrayInitialize(1024U, "reanims");
+	mReanimations.DataArrayInitialize(16384U, "reanims");
 }
 
 Reanimation* ReanimationHolder::AllocReanimation(float theX, float theY, int theRenderOrder, ReanimationType theReanimationType)

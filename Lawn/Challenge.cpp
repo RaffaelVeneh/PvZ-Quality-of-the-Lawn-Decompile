@@ -36,11 +36,15 @@ int gZombieWaves[NUM_LEVELS] = {
 	20, 20, 20, 30, 20, 20, 30, 20, 30, 30,
 	10, 20, 20, 20, 20, 20, 20, 20, 30, 20,
 	10, 20, 20, 30, 20, 20, 30, 30, 40, 30,
+	20, 20, 30, 30, 30, 30, 40, 40, 40, 40,
+	30, 30, 40, 40, 30, 40, 40, 40, 40, 40,
 };
 
 ZombieAllowedLevels gZombieAllowedLevels[NUM_ZOMBIE_TYPES] = {  
 	{ ZOMBIE_NORMAL,
 		{
+			1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
+			1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
 			1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
 			1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
 			1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
@@ -55,6 +59,8 @@ ZombieAllowedLevels gZombieAllowedLevels[NUM_ZOMBIE_TYPES] = {
 			1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
 			1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
 			1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
+			1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
+			1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
 		}
 	},
 	{ ZOMBIE_TRAFFIC_CONE,
@@ -63,7 +69,8 @@ ZombieAllowedLevels gZombieAllowedLevels[NUM_ZOMBIE_TYPES] = {
 			0, 1, 1, 1, 1, 1, 1, 1, 1, 1,
 			1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
 			1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
-			1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
+			1, 1, 1, 1, 1, 1, 1, 1, 1, 0,
+			0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
 		}
 	},
 	{ ZOMBIE_POLEVAULTER,
@@ -73,6 +80,7 @@ ZombieAllowedLevels gZombieAllowedLevels[NUM_ZOMBIE_TYPES] = {
 			0, 0, 0, 1, 0, 0, 0, 0, 1, 0,
 			0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
 			0, 1, 0, 0, 0, 0, 0, 0, 0, 0,
+			1, 1, 0, 1, 1, 1, 0, 1, 0, 0,
 		}
 	},
 	{ ZOMBIE_PAIL,
@@ -82,6 +90,7 @@ ZombieAllowedLevels gZombieAllowedLevels[NUM_ZOMBIE_TYPES] = {
 			0, 1, 0, 1, 0, 0, 1, 0, 1, 1,
 			0, 0, 0, 0, 0, 0, 1, 0, 1, 1,
 			0, 1, 0, 0, 1, 0, 0, 0, 1, 1,
+			1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
 		}
 	},
 	{ ZOMBIE_NEWSPAPER,
@@ -100,6 +109,7 @@ ZombieAllowedLevels gZombieAllowedLevels[NUM_ZOMBIE_TYPES] = {
 			0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
 			1, 1, 1, 1, 0, 1, 1, 1, 1, 1,
 			0, 0, 0, 0, 1, 1, 1, 1, 0, 0,
+			1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
 		}
 	},
 	{ ZOMBIE_RED_EYE_NEWSPAPER,
@@ -109,6 +119,7 @@ ZombieAllowedLevels gZombieAllowedLevels[NUM_ZOMBIE_TYPES] = {
 			0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
 			0, 1, 1, 1, 0, 1, 0, 0, 1, 1,
 			0, 0, 0, 0, 1, 1, 0, 1, 1, 0,
+			1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
 		}
 	},
 	{ ZOMBIE_DOOR,
@@ -117,6 +128,7 @@ ZombieAllowedLevels gZombieAllowedLevels[NUM_ZOMBIE_TYPES] = {
 			0, 0, 1, 1, 0, 0, 1, 0, 1, 1,
 			1, 0, 0, 0, 0, 0, 0, 1, 0, 0,
 			0, 0, 1, 1, 1, 0, 0, 1, 1, 0,
+			0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
 			0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
 		}
 	},
@@ -127,6 +139,7 @@ ZombieAllowedLevels gZombieAllowedLevels[NUM_ZOMBIE_TYPES] = {
 			0, 0, 0, 1, 1, 1, 0, 1, 1, 0,
 			0, 0, 0, 1, 0, 0, 0, 0, 1, 0,
 			0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+			0, 0, 1, 0, 0, 1, 0, 1, 0, 0,
 		}
 	},
 	{ ZOMBIE_DOOR_BUCKETHEAD,
@@ -136,12 +149,14 @@ ZombieAllowedLevels gZombieAllowedLevels[NUM_ZOMBIE_TYPES] = {
 			0, 0, 0, 0, 0, 0, 1, 1, 1, 0,
 			0, 0, 0, 1, 0, 1, 0, 1, 1, 0,
 			0, 0, 0, 0, 0, 1, 1, 1, 1, 1,
+			0, 0, 1, 1, 0, 0, 0, 0, 1, 1,
 		}
 	},
 	{ ZOMBIE_BLACK_CONEHEAD,
 		{
 			0, 0, 0, 0, 0, 0, 0, 0, 1, 1,
 			0, 0, 0, 0, 1, 1, 1, 1, 1, 1,
+			1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
 			1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
 			1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
 			1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
@@ -154,6 +169,7 @@ ZombieAllowedLevels gZombieAllowedLevels[NUM_ZOMBIE_TYPES] = {
 			0, 1, 0, 1, 0, 1, 1, 1, 1, 0,
 			0, 0, 1, 1, 0, 1, 1, 0, 1, 0,
 			0, 0, 0, 1, 1, 1, 1, 1, 1, 1,
+			1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
 		}
 	},
 	{ ZOMBIE_BLACK_DOOR,
@@ -161,6 +177,7 @@ ZombieAllowedLevels gZombieAllowedLevels[NUM_ZOMBIE_TYPES] = {
 			0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
 			0, 0, 0, 0, 0, 0, 0, 0, 1, 1,
 			0, 0, 0, 1, 0, 1, 1, 1, 1, 0,
+			0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
 			0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
 			0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
 		}
@@ -172,6 +189,7 @@ ZombieAllowedLevels gZombieAllowedLevels[NUM_ZOMBIE_TYPES] = {
 			0, 1, 0, 0, 1, 0, 1, 1, 1, 0,
 			0, 1, 0, 1, 0, 1, 1, 1, 1, 0,
 			0, 0, 0, 1, 1, 1, 1, 1, 1, 1,
+			0, 1, 0, 0, 0, 0, 0, 0, 0, 0,
 		}
 	},
 	{ ZOMBIE_DANCER,
@@ -181,6 +199,7 @@ ZombieAllowedLevels gZombieAllowedLevels[NUM_ZOMBIE_TYPES] = {
 			0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
 			0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
 			0, 0, 0, 1, 1, 1, 1, 1, 1, 1,
+			0, 1, 0, 1, 0, 1, 1, 1, 1, 0,
 		}
 	},
 	{ ZOMBIE_BACKUP_DANCER,
@@ -189,7 +208,8 @@ ZombieAllowedLevels gZombieAllowedLevels[NUM_ZOMBIE_TYPES] = {
 			0, 0, 0, 0, 0, 0, 0, 1, 1, 1,
 			0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
 			0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-			0, 0, 0, 0, 0, 0, 0, 0, 0, 0
+			0, 0, 0, 1, 1, 1, 1, 1, 1, 1,
+			0, 1, 0, 1, 0, 1, 1, 1, 1, 0,
 		}
 	},
 	{ ZOMBIE_DUCKY_TUBE, { 0 } },
@@ -198,6 +218,7 @@ ZombieAllowedLevels gZombieAllowedLevels[NUM_ZOMBIE_TYPES] = {
 			0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
 			0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
 			0, 0, 1, 1, 1, 1, 1, 0, 1, 1,
+			0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
 			0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
 			0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
 		}
@@ -209,6 +230,7 @@ ZombieAllowedLevels gZombieAllowedLevels[NUM_ZOMBIE_TYPES] = {
 			0, 0, 0, 0, 0, 1, 1, 0, 1, 1,
 			0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
 			0, 0, 0, 0, 0, 1, 1, 0, 1, 0,
+			0, 0, 0, 1, 0, 0, 1, 0, 1, 0,
 		}
 	},
 	{ ZOMBIE_BOBSLED,
@@ -217,7 +239,8 @@ ZombieAllowedLevels gZombieAllowedLevels[NUM_ZOMBIE_TYPES] = {
 			0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
 			0, 0, 0, 0, 0, 1, 1, 0, 1, 1,
 			0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-			0, 0, 0, 0, 0, 1, 0, 0, 1, 0,
+			0, 0, 0, 0, 0, 1, 1, 0, 1, 0,
+			0, 0, 0, 1, 0, 0, 1, 0, 1, 0,
 		}
 	},
 	{ ZOMBIE_DOLPHIN_RIDER,
@@ -226,6 +249,7 @@ ZombieAllowedLevels gZombieAllowedLevels[NUM_ZOMBIE_TYPES] = {
 			0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
 			0, 0, 0, 0, 0, 0, 0, 1, 1, 1,
 			0, 0, 0, 1, 0, 0, 0, 0, 0, 0,
+			0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
 			0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
 		}
 	},
@@ -236,6 +260,7 @@ ZombieAllowedLevels gZombieAllowedLevels[NUM_ZOMBIE_TYPES] = {
 			0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
 			1, 1, 0, 0, 0, 0, 1, 0, 0, 1,
 			0, 0, 0, 0, 0, 1, 1, 1, 1, 1,
+			0, 0, 0, 1, 1, 1, 1, 0, 1, 0,
 		}
 	},
 	{ ZOMBIE_ENRAGED_JACK,
@@ -245,6 +270,7 @@ ZombieAllowedLevels gZombieAllowedLevels[NUM_ZOMBIE_TYPES] = {
 			0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
 			1, 0, 0, 1, 1, 0, 1, 0, 1, 1,
 			0, 0, 0, 1, 1, 1, 1, 0, 1, 1,
+			1, 0, 0, 1, 0, 1, 1, 0, 1, 0,
 		}
 	},
 	{ ZOMBIE_BALLOON,
@@ -253,6 +279,7 @@ ZombieAllowedLevels gZombieAllowedLevels[NUM_ZOMBIE_TYPES] = {
 			0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
 			0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
 			0, 0, 1, 1, 0, 0, 0, 0, 1, 1,
+			0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
 			0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
 		}
 	},
@@ -263,6 +290,7 @@ ZombieAllowedLevels gZombieAllowedLevels[NUM_ZOMBIE_TYPES] = {
 			0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
 			0, 0, 1, 1, 0, 0, 0, 0, 1, 1,
 			0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+			1, 0, 1, 1, 0, 0, 0, 0, 1, 1,
 		}
 	},
 	{ ZOMBIE_BLACK_BALLOON,
@@ -272,6 +300,7 @@ ZombieAllowedLevels gZombieAllowedLevels[NUM_ZOMBIE_TYPES] = {
 			0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
 			0, 0, 0, 1, 0, 0, 0, 0, 1, 1,
 			0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+			0, 0, 0, 1, 0, 0, 0, 0, 1, 1,
 		}
 	},
 	{ ZOMBIE_DIGGER,
@@ -280,6 +309,7 @@ ZombieAllowedLevels gZombieAllowedLevels[NUM_ZOMBIE_TYPES] = {
 			0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
 			0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
 			0, 0, 0, 0, 0, 1, 1, 0, 0, 1,
+			0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
 			0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
 		}
 	},
@@ -290,6 +320,7 @@ ZombieAllowedLevels gZombieAllowedLevels[NUM_ZOMBIE_TYPES] = {
 			0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
 			0, 0, 0, 0, 0, 0, 0, 1, 1, 1,
 			0, 0, 0, 1, 0, 0, 0, 0, 0, 0,
+			1, 0, 0, 1, 0, 1, 0, 1, 0, 0,
 		}
 	},
 	{ ZOMBIE_YETI, {0} },
@@ -300,6 +331,7 @@ ZombieAllowedLevels gZombieAllowedLevels[NUM_ZOMBIE_TYPES] = {
 			0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
 			0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
 			1, 1, 0, 0, 0, 1, 1, 0, 1, 1,
+			1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
 		}
 	},
 	{ ZOMBIE_LADDER,
@@ -309,6 +341,7 @@ ZombieAllowedLevels gZombieAllowedLevels[NUM_ZOMBIE_TYPES] = {
 			0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
 			0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
 			0, 0, 1, 1, 1, 1, 1, 0, 1, 1,
+			1, 0, 1, 1, 1, 1, 1, 0, 1, 1,
 		}
 	},
 	{ ZOMBIE_CATAPULT,
@@ -318,6 +351,7 @@ ZombieAllowedLevels gZombieAllowedLevels[NUM_ZOMBIE_TYPES] = {
 			0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
 			0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
 			0, 0, 0, 0, 0, 1, 1, 0, 1, 1,
+			0, 1, 0, 1, 0, 1, 1, 0, 1, 1,
 		}
 	},
 	{ ZOMBIE_GARGANTUAR,
@@ -327,6 +361,7 @@ ZombieAllowedLevels gZombieAllowedLevels[NUM_ZOMBIE_TYPES] = {
 			0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
 			0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
 			0, 0, 0, 0, 0, 0, 0, 1, 1, 1,
+			1, 1, 0, 0, 0, 0, 0, 1, 1, 1,
 		}
 	},
 	{ ZOMBIE_IMP,
@@ -336,10 +371,31 @@ ZombieAllowedLevels gZombieAllowedLevels[NUM_ZOMBIE_TYPES] = {
 			0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
 			0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
 			0, 0, 0, 0, 0, 0, 0, 1, 1, 1,
+			1, 1, 0, 0, 0, 0, 0, 1, 1, 1,
+		}
+	},
+	{ ZOMBIE_GIGA_FOOTBALL, 
+		{
+			0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+			0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+			0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+			0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+			0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+			0, 0, 1, 1, 1, 1, 1, 1, 1, 1,
 		}
 	},
 	{ ZOMBIE_BOSS, {0} },
-	{ ZOMBIE_REDEYE_GARGANTUAR, {0} },
+	{ ZOMBIE_REDEYE_GARGANTUAR,
+		{
+			0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+			0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+			0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+			0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+			0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+			0, 0, 0, 0, 0, 1, 1, 1, 1, 0,
+		}
+	},
+	
 	{ ZOMBIE_PEA_HEAD, {0} },
 	{ ZOMBIE_WALLNUT_HEAD, {0} },
 	{ ZOMBIE_JALAPENO_HEAD, {0} },
@@ -397,6 +453,7 @@ Challenge::Challenge()
 	mBeghouledMatchesThisMove = 0;
 	mRainCounter = 0;
 	mTreeOfWisdomTalkIndex = 0;
+	mStormyNightCounter = 0;
 	for (int i = 0; i < 6; i++)
 		mReanimClouds[i] = REANIMATIONID_NULL;
 	memset(mBeghouledEated, 0, sizeof(mBeghouledEated));
@@ -490,6 +547,14 @@ void Challenge::InitLevel()
 	{
 		TreeOfWisdomInit();
 	}
+
+	if (mBoard->IsNightRoof())
+	{
+		mStormyNightCounter = 1000; // 5 seconds until the first strike
+		mChallengeState = STATECHALLENGE_STORM_FLASH_2;
+		mChallengeStateCounter = 100;
+		mApp->PlayFoley(FOLEY_RAIN);
+	}
 }
 
 void Challenge::StartLevel()
@@ -533,10 +598,16 @@ void Challenge::StartLevel()
 	{
 		ScaryPotterStart();
 	}
-	if (mApp->IsLittleTroubleLevel() || mApp->IsStormyNightLevel() || mApp->IsBungeeBlitzLevel() || aGameMode == GAMEMODE_CHALLENGE_INVISIGHOUL)
+	if (mApp->IsLittleTroubleLevel() || mApp->IsStormyNightLevel() || mApp->IsBungeeBlitzLevel() || aGameMode == GAMEMODE_CHALLENGE_INVISIGHOUL || mBoard->mLevel == 55)
 	{
 		mBoard->mZombieCountDown = 200;
 		mBoard->mZombieCountDownStart = mBoard->mZombieCountDown;
+		mConveyorBeltCounter = 200;
+	}
+	if (mBoard->mLevel == 55)
+	{
+		mBoard->mZombieCountDown = 200;
+		mBoard->mZombieCountDownStart = 200;
 		mConveyorBeltCounter = 200;
 	}
 	if (mApp->IsSurvivalMode() && mSurvivalStage == 0)
@@ -1767,6 +1838,32 @@ void Challenge::UpdateConveyorBelt()
 		aSeedPickArray[7].mItem = SEED_PUMPKINSHELL;
 		aSeedPickArray[7].mWeight = 10;
 	}
+	else if (mBoard->mLevel == 50)
+	{
+		aSeedPickCount = 7;
+		aSeedPickArray[0].mItem = SEED_FLOWERPOT;
+		aSeedPickArray[0].mWeight = 35;
+		aSeedPickArray[1].mItem = SEED_MELONPULT;
+		aSeedPickArray[1].mWeight = 10;
+		aSeedPickArray[2].mItem = SEED_GARLIC;
+		aSeedPickArray[2].mWeight = 10;
+		aSeedPickArray[3].mItem = SEED_CABBAGEPULT;
+		aSeedPickArray[3].mWeight = 15;
+		aSeedPickArray[4].mItem = SEED_KERNELPULT;
+		aSeedPickArray[4].mWeight = 15;
+		aSeedPickArray[5].mItem = SEED_UMBRELLA;
+		aSeedPickArray[5].mWeight = 10;
+		aSeedPickArray[6].mItem = SEED_INSTANT_COFFEE;
+		aSeedPickArray[6].mWeight = 5;
+	}
+	else if (mBoard->mLevel == 55)
+	{
+		aSeedPickCount = 2;
+		aSeedPickArray[0].mItem = SEED_FLOWERPOT;
+		aSeedPickArray[0].mWeight = 55;
+		aSeedPickArray[1].mItem = SEED_SPROUT;
+		aSeedPickArray[1].mWeight = 45;
+	}
 	else if (mApp->IsFinalBossLevel())
 	{
 		aSeedPickCount = 6;
@@ -2169,6 +2266,11 @@ void Challenge::ZombieAtePlant(Zombie* theZombie, Plant* thePlant)
 
 void Challenge::Update()
 {
+	if (mBoard->IsNightRoof())
+	{
+		UpdateNightRoof();
+	}
+
 	if (mApp->IsStormyNightLevel())
 		UpdateStormyNight();
 
@@ -2182,7 +2284,7 @@ void Challenge::Update()
 		return;
 	}
 
-	if (mApp->mGameMode == GAMEMODE_CHALLENGE_RAINING_SEEDS || mApp->IsStormyNightLevel())
+	if (mApp->mGameMode == GAMEMODE_CHALLENGE_RAINING_SEEDS || mApp->IsStormyNightLevel() || mBoard->IsNightRoof())
 	{
 		UpdateRain();
 	}
@@ -2264,6 +2366,76 @@ void Challenge::Update()
 	if (aReanim && aReanim->mIsAttachment)
 	{
 		aReanim->Update();
+	}
+}
+
+void Challenge::UpdateNightRoof()
+{
+	// Countdown the timer for the next strike
+	mStormyNightCounter--;
+	if (mStormyNightCounter <= 0 && mChallengeState != STATECHALLENGE_STORM_FLASH_1)
+	{
+		mStormyNightCounter = 1000; // Reset for another 5 seconds
+
+		// Pick a random tile in columns 5-9 (indices 4-8) on the 5 roof rows
+		mStormyNightGridX = RandRangeInt(4, 8);
+		mStormyNightGridY = RandRangeInt(0, 4);
+
+		// Trigger the game's built-in flash effect sequence and thunder sound
+		mChallengeState = STATECHALLENGE_STORM_FLASH_1;
+		mChallengeStateCounter = 10;
+		mApp->PlaySample(SOUND_THUNDER);
+	}
+
+	// This switch statement handles the visual flashing and the damage event
+	switch (mChallengeState)
+	{
+	case STATECHALLENGE_STORM_FLASH_1:
+		if (!mBoard->mPaused)
+		{
+			mChallengeStateCounter--;
+		}
+		if (mChallengeStateCounter <= 0)
+		{
+			mChallengeState = STATECHALLENGE_STORM_FLASH_2;
+			mChallengeStateCounter = 10;
+
+			// Apply damage and create a crater at the moment of the big flash
+			int aPixelX = mBoard->GridToPixelX(mStormyNightGridX, mStormyNightGridY) + 40;
+			int aPixelY = mBoard->GridToPixelY(mStormyNightGridX, mStormyNightGridY) + 40;
+
+			mApp->AddTodParticle(aPixelX, aPixelY, (int)RenderLayer::RENDER_LAYER_TOP, ParticleEffect::PARTICLE_POWIE);
+
+			mBoard->DamageAllPlantsInRadius(aPixelX, aPixelY, 40, 3000);
+			mBoard->DamageAllZombiesInRadius(mStormyNightGridY, aPixelX, aPixelY, 40, 450, 0, false, 127);
+		}
+		break;
+
+	case STATECHALLENGE_STORM_FLASH_2:
+		if (!mBoard->mPaused)
+		{
+			mChallengeStateCounter--;
+		}
+		if (mChallengeStateCounter <= 0)
+		{
+			mChallengeState = STATECHALLENGE_STORM_FLASH_3;
+			mChallengeStateCounter = 120;
+		}
+		break;
+
+	case STATECHALLENGE_STORM_FLASH_3:
+		if (!mBoard->mPaused)
+		{
+			mChallengeStateCounter--;
+		}
+		if (mChallengeStateCounter <= 0)
+		{
+			mChallengeState = STATECHALLENGE_NORMAL;
+		}
+		break;
+
+	default:
+		break;
 	}
 }
 
@@ -2712,7 +2884,6 @@ void Challenge::InitZombieWaves()
 	}
 	else if (aGameMode == GAMEMODE_CHALLENGE_WAR_AND_PEAS)
 	{
-		/*
 		aList[ZOMBIE_PEA_HEAD] = true;
 		aList[ZOMBIE_WALLNUT_HEAD] = true;
 		aList[ZOMBIE_REPEATER_HEAD] = true;
@@ -2721,8 +2892,6 @@ void Challenge::InitZombieWaves()
 		aList[ZOMBIE_CHERRY_HEAD] = true;
 		aList[ZOMBIE_POTATO_HEAD] = true;
 		aList[ZOMBIE_CHOMPER_HEAD] = true;
-		*/
-		aList[ZOMBIE_GARLIC_HEAD] = true;
 	}
 	else if (aGameMode == GAMEMODE_CHALLENGE_WAR_AND_PEAS_2)
 	{
@@ -3059,7 +3228,7 @@ void Challenge::DrawStormFlash(Graphics* g, int theTime, int theMaxAmount)
 
 void Challenge::DrawWeather(Graphics* g)
 {
-	if (mApp->IsStormyNightLevel() || mApp->mGameMode == GAMEMODE_CHALLENGE_RAINING_SEEDS)
+	if (mApp->IsStormyNightLevel() || mApp->mGameMode == GAMEMODE_CHALLENGE_RAINING_SEEDS || mBoard->IsNightRoof())
 		DrawRain(g);
 
 	if (mApp->IsStormyNightLevel())
@@ -4906,9 +5075,10 @@ bool Challenge::IZombieEatBrain(Zombie* theZombie)
 
 void Challenge::IZombiePlantDropRemainingSun(Plant* thePlant)
 {
-	if (thePlant->mSeedType == SEED_SUNFLOWER)
+	if (thePlant->mSeedType == SeedType::SEED_SUNFLOWER || thePlant->mSeedType == SeedType::SEED_SUNSHROOM || thePlant->mSeedType == SeedType::SEED_TWINSUNFLOWER)
 	{
-		int aSunCount = thePlant->mPlantHealth / 40 + 1;
+		int aHealth = thePlant->mPlantHealth > 0 ? thePlant->mPlantHealth : 0;
+		int aSunCount = aHealth / 40 + 1;
 		for (int i = 0; i < aSunCount; i++)
 		{
 			mBoard->AddCoin(thePlant->mX + 5 * i, thePlant->mY, COIN_SUN, COIN_MOTION_FROM_PLANT);

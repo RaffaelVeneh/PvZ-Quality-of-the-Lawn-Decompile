@@ -378,7 +378,7 @@ void SeedChooserScreen::Draw(Graphics* g)
 			(aSeedState == SEED_IN_CHOOSER || mBoard->mCutScene->mSeedChoosing))
 		{
 			bool aGrayed = false;
-			if (((SeedNotRecommendedToPick(aSeedType) || SeedNotAllowedToPick(aSeedType) || IsImitaterUnselectable(aSeedType)) && aSeedState == SEED_IN_CHOOSER) || SeedNotAllowedDuringTrial(aSeedType))
+			if (((SeedNotRecommendedToPick(aSeedType) || SeedNotAllowedToPick(aSeedType)) && aSeedState == SEED_IN_CHOOSER) || SeedNotAllowedDuringTrial(aSeedType))
 				aGrayed = true;
 
 			int aPosX, aPosY;
@@ -506,10 +506,12 @@ void SeedChooserScreen::LandFlyingSeed(ChosenSeed& theChosenSeed)
 		theChosenSeed.mTimeEndMotion = 0;
 		theChosenSeed.mSeedState = SEED_IN_CHOOSER;
 		mSeedsInFlight--;
+		/*
 		if (theChosenSeed.mSeedType == SEED_IMITATER)
 		{
 			theChosenSeed.mImitaterType = SEED_NONE;
 		}
+		*/
 	}
 }
 
@@ -519,8 +521,6 @@ void SeedChooserScreen::UpdateCursor()
 	SeedType aMouseSeedType = SeedHitTest(mLastMouseX, mLastMouseY);
 	if (aMouseSeedType != SEED_NONE)
 	{
-		if (IsImitaterUnselectable(aMouseSeedType))
-			aMouseSeedType = SEED_NONE;
 		ChosenSeed& aMouseChosenSeed = mChosenSeeds[aMouseSeedType];
 		if (aMouseChosenSeed.mSeedState == SEED_IN_BANK && aMouseChosenSeed.mCrazyDavePicked)
 			aMouseSeedType = SEED_NONE;
@@ -643,13 +643,7 @@ bool SeedChooserScreen::FlyProtectionCurrentlyPlanted()
 
 bool SeedChooserScreen::CheckSeedUpgrade(SeedType theSeedTypeTo, SeedType theSeedTypeFrom)
 {
-	if (mApp->IsSurvivalMode() || !PickedPlantType(theSeedTypeTo) || PickedPlantType(theSeedTypeFrom))
-		return true;
-
-	SexyString aWarning = TodStringTranslate(_S("[SEED_CHOOSER_UPGRADE_WARNING]"));
-	aWarning = TodReplaceString(aWarning, _S("{UPGRADE_TO}"), Plant::GetNameString(theSeedTypeTo));
-	aWarning = TodReplaceString(aWarning, _S("{UPGRADE_FROM}"), Plant::GetNameString(theSeedTypeFrom));
-	return DisplayRepickWarningDialog(aWarning.c_str());
+	return true;
 }
 
 void SeedChooserScreen::OnStartButton()
@@ -749,7 +743,10 @@ void SeedChooserScreen::PickRandomSeeds()
 	{
 		SeedType aSeedType;
 		do aSeedType = (SeedType)Rand(mApp->GetSeedsAvailable());
+		/*
 		while (!mApp->SeedTypeAvailable(aSeedType) || aSeedType == SEED_IMITATER || mChosenSeeds[aSeedType].mSeedState != SEED_IN_CHOOSER);
+		*/
+		while (!mApp->SeedTypeAvailable(aSeedType) || mChosenSeeds[aSeedType].mSeedState != SEED_IN_CHOOSER);
 		ChosenSeed& aChosenSeed = mChosenSeeds[aSeedType];
 		aChosenSeed.mTimeStartMotion = 0;
 		aChosenSeed.mTimeEndMotion = 0;
@@ -925,14 +922,16 @@ void SeedChooserScreen::ClickedSeedInChooser(ChosenSeed& theChosenSeed)
 	if (mSeedsInBank >= 0)
 		mPrevPlant = FindSeedInBank(mSeedsInBank - 1);
 
-
+	/*
 	if ((mSeedsInBank == 0 || Plant::IsUpgrade(mPrevPlant)) && theChosenSeed.mSeedType == SEED_IMITATER)
 		return;
+	
 
 	if (theChosenSeed.mSeedType == SEED_IMITATER)
 		theChosenSeed.mImitaterType = FindSeedInBank(mSeedsInBank - 1);
 	else
 		mPreviousType = theChosenSeed.mSeedType;
+	*/
 
 	theChosenSeed.mTimeStartMotion = mSeedChooserAge;
 	theChosenSeed.mTimeEndMotion = mSeedChooserAge + 25;
@@ -1035,7 +1034,9 @@ void SeedChooserScreen::ShowToolTip()
 			if (aSeedType == SEED_IMITATER)
 			{
 				mToolTip->SetTitle(Plant::GetNameString(aSeedType, aChosenSeed.mImitaterType));
+				/*
 				mToolTip->SetLabel(Plant::GetToolTip(aChosenSeed.mImitaterType == SEED_NONE ? SEED_IMITATER : aChosenSeed.mImitaterType));
+				*/
 			}
 			else
 			{
@@ -1099,7 +1100,7 @@ void SeedChooserScreen::MouseUp(int x, int y, int theClickCount)
 
 bool SeedChooserScreen::IsImitaterUnselectable(SeedType seedType)
 {
-	return seedType == SEED_IMITATER && (mSeedsInBank == 0 || mSeedsInBank == mBoard->mSeedBank->mNumPackets || Plant::IsUpgrade(mPreviousType) || SeedNotAllowedToPick(mPreviousType));
+	return seedType == SEED_IMITATER && (mSeedsInBank == 0 || mSeedsInBank == mBoard->mSeedBank->mNumPackets || Plant::IsUpgrade(mPreviousType));
 }
 
 bool SeedChooserScreen::IsOverImitater(int x, int y)

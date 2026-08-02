@@ -67,6 +67,13 @@ void Coin::CoinInitialize(int theX, int theY, CoinType theCoinType, CoinMotion t
             mHeight = 78;
         }
 
+        if (mType == CoinType::COIN_BIG_WHITE_SUN)
+        {
+            aSunReanim->mColorOverride = Color(255, 255, 255, 255);
+            aSunReanim->mFilterEffect = FilterEffect::FILTER_EFFECT_WHITE;
+            aSunReanim->mExtraOverlayColor = Color(200, 200, 200, 150);
+        }
+
         aSunReanim->SetPosition(mPosX + aPosX, mPosY + aPosY);
         aSunReanim->mLoopType = ReanimLoopType::REANIM_LOOP;
         aSunReanim->mAnimRate = 6.0f;
@@ -390,7 +397,7 @@ void Coin::CoinInitialize(int theX, int theY, CoinType theCoinType, CoinMotion t
     {
         aScale = 0.5f;
     }
-    else if (mType == CoinType::COIN_LARGESUN)
+    else if (mType == CoinType::COIN_LARGESUN || mType == CoinType::COIN_BIG_WHITE_SUN)
     {
         aScale = 2.0f;
     }
@@ -423,7 +430,7 @@ bool Coin::IsMoney()
 
 bool Coin::IsSun()
 {
-    return mType == CoinType::COIN_SUN || mType == CoinType::COIN_SMALLSUN || mType == CoinType::COIN_LARGESUN || mType == CoinType::COIN_WHITE_SUN;
+    return mType == CoinType::COIN_SUN || mType == CoinType::COIN_SMALLSUN || mType == CoinType::COIN_LARGESUN || mType == CoinType::COIN_WHITE_SUN || mType == CoinType::COIN_BIG_WHITE_SUN;
 }
 
 bool Coin::IsPresentWithAdvice()
@@ -840,7 +847,7 @@ Color Coin::GetColor()
 
 SeedType Coin::GetFinalSeedPacketType()
 {
-    if (mApp->IsFirstTimeAdventureMode() && mBoard && mBoard->mLevel <= 50)
+    if (mApp->IsFirstTimeAdventureMode() && mBoard && mBoard->mLevel <= 60)
     {
         return mApp->GetAwardSeedForLevel(mBoard->mLevel);
     }
@@ -1381,7 +1388,7 @@ int Coin::GetSunValue()
 
 int Coin::GetCoinValue(CoinType theCoinType)
 {
-    return theCoinType == CoinType::COIN_SILVER ? 1 : theCoinType == CoinType::COIN_GOLD ? 5 : theCoinType == CoinType::COIN_DIAMOND ? 100 : 0;
+    return theCoinType == CoinType::COIN_SILVER ? 1 : theCoinType == CoinType::COIN_GOLD ? 5 : theCoinType == CoinType::COIN_DIAMOND ? 100 : theCoinType == CoinType::COIN_BIG_WHITE_SUN ? 200 : 0;
 }
 
 void Coin::PlayLaunchSound()

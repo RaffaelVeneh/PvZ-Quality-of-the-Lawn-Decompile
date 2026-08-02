@@ -345,7 +345,7 @@ void CutScene::PreloadResources()
 		}
 	}
 
-	if (mApp->IsFirstTimeAdventureMode() && mBoard->mLevel <= 50)
+	if (mApp->IsFirstTimeAdventureMode() && mBoard->mLevel <= 60)
 	{
 		Plant::PreloadPlantResources(mApp->GetAwardSeedForLevel(mBoard->mLevel));
 	}
@@ -788,6 +788,18 @@ void CutScene::StartLevelIntro()
 	{
 		mCrazyDaveDialogStart = 1201;
 	}
+	else if (mApp->IsFirstTimeAdventureMode() && aLevel == 51)
+	{
+		mCrazyDaveDialogStart = 4101;
+	}
+	else if (mApp->IsFirstTimeAdventureMode() && aLevel == 55)
+	{
+		mCrazyDaveDialogStart = 4201;
+	}
+	else if (mApp->IsFirstTimeAdventureMode() && aLevel == 61)
+	{
+		mCrazyDaveDialogStart = 10001;
+	}
 	else if (mApp->IsBungeeBlitzLevel() && mApp->IsAdventureMode())
 	{
 		mCrazyDaveDialogStart = mApp->IsFirstTimeAdventureMode() ? 1301 : 1304;
@@ -874,7 +886,7 @@ void CutScene::StartLevelIntro()
 		}
 		else if (mApp->IsAdventureMode())
 		{
-			if (mBoard->mBackground == BackgroundType::BACKGROUND_1_DAY || mBoard->mBackground == BackgroundType::BACKGROUND_2_NIGHT)
+			if (mBoard->mBackground == BackgroundType::BACKGROUND_1_DAY || mBoard->mBackground == BackgroundType::BACKGROUND_2_NIGHT || mBoard->mBackground == BackgroundType::BACKGROUND_7_EVENING)
 			{
 				aHouseMessage = TodStringTranslate(_S("[PLAYERS_HOUSE]"));
 			}

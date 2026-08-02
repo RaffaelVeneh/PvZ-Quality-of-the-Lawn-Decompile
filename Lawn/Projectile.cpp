@@ -49,6 +49,7 @@ ProjectileDefinition gProjectileDefinition[] = {
 	{ ProjectileType::PROJECTILE_ZOMBIE_CABBAGE,0,  40  },
 	{ ProjectileType::PROJECTILE_ZOMBIE_KERNEL, 0,  20  }, 
 	{ ProjectileType::PROJECTILE_ZOMBIE_BUTTER, 0,  80  },
+	{ ProjectileType::PROJECTILE_PEA_SNIPE,		0,  350 },
 };
 
 Projectile::Projectile()
@@ -104,7 +105,7 @@ void Projectile::ProjectileInitialize(int theX, int theY, int theRenderOrder, in
 	mClickBackoffCounter = 0;
 	mAnimTicksPerFrame = 0;
 
-	if (mProjectileType == PROJECTILE_BOUNCING_PEA)
+	if (mProjectileType == ProjectileType::PROJECTILE_BOUNCING_PEA)
 	{
 		mVelX = 3.33f;
 	}
@@ -234,7 +235,24 @@ Plant* Projectile::FindCollisionTargetPlant()
 		Rect aPlantRect = aPlant->GetPlantRect();
 		if (GetRectOverlap(aProjectileRect, aPlantRect) > 8)
 		{
-			if (mProjectileType == ProjectileType::PROJECTILE_ZOMBIE_PEA || mProjectileType == ProjectileType::PROJECTILE_ZOMBIE_SNOWPEA || mProjectileType == ProjectileType::PROJECTILE_ZOMBIE_PUFF)
+			if (aPlant->mSeedType == SEED_UMBRELLA || aPlant->mSeedType == SEED_ABSOLUTELEAF)
+			{
+				if (mProjectileType != PROJECTILE_ZOMBIE_SPIKE && 
+					mProjectileType != PROJECTILE_ZOMBIE_STAR && 
+					mProjectileType != PROJECTILE_ZOMBIE_BUTTER)
+				{
+					aPlant->DoSpecial();
+					if (aPlant->mSeedType == SEED_UMBRELLA) // Only damage normal Umbrella Leaf
+					{
+						aPlant->TakeDamage(GetProjectileDef().mDamage, 0U);
+					}
+					Reflect();
+					return nullptr; // No direct collision, projectile is reflected
+				}
+			}
+			if (mProjectileType == ProjectileType::PROJECTILE_ZOMBIE_PEA || 
+				mProjectileType == ProjectileType::PROJECTILE_ZOMBIE_SNOWPEA || 
+				mProjectileType == ProjectileType::PROJECTILE_ZOMBIE_PUFF)
 			{
 				return mBoard->GetTopPlantAt(aPlant->mPlantCol, aPlant->mRow, PlantPriority::TOPPLANT_EATING_ORDER);
 			}
@@ -290,7 +308,9 @@ Zombie* Projectile::FindCollisionTarget()
 	Zombie* aZombie = nullptr;
 	while (mBoard->IterateZombies(aZombie))
 	{
-		if ((aZombie->mZombieType == ZombieType::ZOMBIE_BOSS || aZombie->mRow == mRow) && aZombie->EffectedByDamage((unsigned int)mDamageRangeFlags))
+		bool aHomingProjectile = (mMotionType == MOTION_HOMING || mMotionType == MOTION_HOMING_FAST);
+
+		if ((aHomingProjectile || aZombie->mZombieType == ZombieType::ZOMBIE_BOSS || aZombie->mRow == mRow) && aZombie->EffectedByDamage((unsigned int)mDamageRangeFlags))
 		{
 			if (aZombie->mZombiePhase == ZombiePhase::PHASE_SNORKEL_WALKING_IN_POOL && mPosZ >= 45.0f)
 			{
@@ -465,6 +485,24 @@ bool Projectile::CantHitHighGround()
 		mProjectileType == ProjectileType::PROJECTILE_PUFF ||
 		mProjectileType == ProjectileType::PROJECTILE_FIREBALL
 		) && !mOnHighGround;
+}
+
+void Projectile::Reflect()
+{
+	// Convert zombie projectile to player projectile
+	if (mProjectileType == PROJECTILE_ZOMBIE_PEA) mProjectileType = PROJECTILE_PEA;
+	else if (mProjectileType == PROJECTILE_ZOMBIE_SNOWPEA) mProjectileType = PROJECTILE_SNOWPEA;
+	else if (mProjectileType == PROJECTILE_ZOMBIE_CABBAGE) mProjectileType = PROJECTILE_CABBAGE;
+	else if (mProjectileType == PROJECTILE_ZOMBIE_KERNEL) mProjectileType = PROJECTILE_KERNEL;
+	else if (mProjectileType == PROJECTILE_BASKETBALL) mProjectileType = PROJECTILE_BASKETBALL;
+
+	mDamageRangeFlags = (1 << DAMAGES_GROUND);
+
+	// Reverse direction
+	mVelX *= -1;
+	mRotation *= -1;
+	mClickBackoffCounter = 20;
+	mMotionType = MOTION_STRAIGHT;
 }
 
 void Projectile::CheckForHighGround()
@@ -835,6 +873,31 @@ void Projectile::UpdateNormalMotion()
 		mShadowY += mVelY;
 		mRow = mBoard->PixelToGridYKeepOnBoard(mPosX, mPosY);
 	}
+	else if (mMotionType == ProjectileMotion::MOTION_HOMING_FAST)
+	{
+		Zombie* aZombie = mBoard->ZombieTryToGet(mTargetZombieID);
+		if (aZombie && aZombie->EffectedByDamage((unsigned int)mDamageRangeFlags))
+		{
+			Rect aZombieRect = aZombie->GetZombieRect();
+			SexyVector2 aTargetCenter(aZombie->ZombieTargetLeadX(0.0f), aZombieRect.mY + aZombieRect.mHeight / 2);
+			SexyVector2 aProjectileCenter(mPosX + mWidth / 2, mPosY + mHeight / 2);
+			SexyVector2 aToTarget = (aTargetCenter - aProjectileCenter).Normalize();
+			SexyVector2 aMotion(mVelX, mVelY);
+
+			aMotion += aToTarget * (0.001f * mProjectileAge);
+			aMotion = aMotion.Normalize();
+			aMotion *= 20.0f;
+
+			mVelX = aMotion.x;
+			mVelY = aMotion.y;
+			mRotation = -atan2(mVelY, mVelX);
+		}
+
+		mPosY += mVelY;
+		mPosX += mVelX;
+		mShadowY += mVelY;
+		mRow = mBoard->PixelToGridYKeepOnBoard(mPosX, mPosY);
+	}
 	else if (mMotionType == ProjectileMotion::MOTION_STAR)
 	{
 		mPosY += mVelY;
@@ -913,9 +976,13 @@ void Projectile::UpdateNormalMotion()
 	}
 	else
 	{
-		if (mProjectileType == PROJECTILE_BOUNCING_PEA)
+		if (mProjectileType == ProjectileType::PROJECTILE_BOUNCING_PEA)
 		{
 			mPosX += mVelX;
+		}
+		else if (mProjectileType == ProjectileType::PROJECTILE_PEA_SNIPE)
+		{
+			mPosX += 20.33f;
 		}
 		else
 		{
@@ -1130,7 +1197,7 @@ void Projectile::DoImpact(Zombie* theZombie)
 		mApp->PlaySample(SOUND_DOOMSHROOM);
 		mBoard->ShakeBoard(3, -4);
 	}
-	else if (mProjectileType == ProjectileType::PROJECTILE_PEA)
+	else if (mProjectileType == ProjectileType::PROJECTILE_PEA || mProjectileType == ProjectileType::PROJECTILE_PEA_SNIPE)
 	{
 		aSplatPosX -= 15.0f;
 		aEffect = ParticleEffect::PARTICLE_PEA_SPLAT;
@@ -1392,7 +1459,9 @@ void Projectile::Draw(Graphics* g)
 		aScale = 0.9f;
 		g->SetColor(Color::White);
 	}
-	else if (mProjectileType == ProjectileType::PROJECTILE_PEA || mProjectileType == ProjectileType::PROJECTILE_ZOMBIE_PEA || mProjectileType == ProjectileType::PROJECTILE_GRAPESHOT || mProjectileType == ProjectileType::PROJECTILE_BOUNCING_PEA || mProjectileType == ProjectileType::PROJECTILE_BIG_PEA)
+	else if (mProjectileType == ProjectileType::PROJECTILE_PEA || mProjectileType == ProjectileType::PROJECTILE_ZOMBIE_PEA || 
+		mProjectileType == ProjectileType::PROJECTILE_GRAPESHOT || mProjectileType == ProjectileType::PROJECTILE_BOUNCING_PEA || 
+		mProjectileType == ProjectileType::PROJECTILE_BIG_PEA || mProjectileType == ProjectileType::PROJECTILE_PEA_SNIPE)
 	{
 		aImage = IMAGE_PROJECTILEPEA;
 		if (mProjectileType == PROJECTILE_BIG_PEA)
@@ -1430,7 +1499,7 @@ void Projectile::Draw(Graphics* g)
 		Reanimation* aFireReanim = FindReanimAttachment(mAttachmentID);
 		if (aFireReanim)
 		{
-			aFireReanim->mColorOverride = Color(50, 50, 255, 255);
+			aFireReanim->mColorOverride = Color(20, 90, 255, 255); // Rich Deep Sapphire Blue Fire!
 		}
 	}
 	else if (mProjectileType == ProjectileType::PROJECTILE_WHITE_FIRE_PEA)
@@ -1467,10 +1536,12 @@ void Projectile::Draw(Graphics* g)
 	else if (mProjectileType == ProjectileType::PROJECTILE_SPIKE)
 	{
 		aImage = IMAGE_PROJECTILECACTUS;
+		g->SetColor(Color::White);
 	}
 	else if (mProjectileType == ProjectileType::PROJECTILE_ZOMBIE_SPIKE)
 	{
 		aImage = IMAGE_PROJECTILECACTUS;
+		g->SetColor(Color::White);
 		aMirror = true;
 	}
 	else if (mProjectileType == ProjectileType::PROJECTILE_BLUE_SPIKE)
@@ -1488,6 +1559,7 @@ void Projectile::Draw(Graphics* g)
 	else if (mProjectileType == ProjectileType::PROJECTILE_STAR || mProjectileType == ProjectileType::PROJECTILE_ZOMBIE_STAR)
 	{
 		aImage = IMAGE_PROJECTILE_STAR;
+		g->SetColor(Color::White);
 	}
 	else if (mProjectileType == ProjectileType::PROJECTILE_RED_STAR)
 	{
@@ -1499,6 +1571,7 @@ void Projectile::Draw(Graphics* g)
 	{
 		aImage = IMAGE_PUFFSHROOM_PUFF1;
 		aScale = TodAnimateCurveFloat(0, 30, mProjectileAge, 0.3f, 1.0f, TodCurves::CURVE_LINEAR);
+		g->SetColor(Color::White);
 	}
 	else if (mProjectileType == ProjectileType::PROJECTILE_BASKETBALL)
 	{
@@ -1645,6 +1718,7 @@ void Projectile::DrawShadow(Graphics* g)
 	{
 	case ProjectileType::PROJECTILE_PEA:
 	case ProjectileType::PROJECTILE_ZOMBIE_PEA:
+	case ProjectileType::PROJECTILE_PEA_SNIPE:
 		aOffsetX += 3.0f;
 		break;
 

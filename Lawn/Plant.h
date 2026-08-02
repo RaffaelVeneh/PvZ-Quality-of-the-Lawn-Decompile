@@ -2,8 +2,9 @@
 
 #include <string>
 #include "GameObject.h"
+#include "GridItem.h" 
 
-#define MAX_MAGNET_ITEMS 5
+#define MAX_MAGNET_ITEMS 20
 
 enum PlantSubClass
 {
@@ -79,8 +80,17 @@ enum PlantState
     STATE_ZEN_GARDEN_NEEDY,
     STATE_ZEN_GARDEN_HAPPY,
     STATE_MARIGOLD_ENDING,
+    STATE_MARIGOLD_JUMPING,
     STATE_FLOWERPOT_INVULNERABLE,
-    STATE_LILYPAD_INVULNERABLE
+    STATE_LILYPAD_INVULNERABLE,
+    STATE_SPROUT_TRANSFORMING,
+    STATE_COMMANDOPEA_AIMING,
+    STATE_COMMANDOPEA_FIRING,
+    STATE_SHRINKINGVIOLET_TRIGGERED,
+    STATE_HATTREM_SHOOTING,
+    STATE_NIGHTCAP_ATTACKING,
+    STATE_GENERALPEA_AIMING,
+    STATE_GENERALPEA_FIRING,
 };
 
 enum PLANT_LAYER
@@ -136,7 +146,20 @@ enum MagnetItemType
     MAGNET_ITEM_SILVER_COIN,
     MAGNET_ITEM_GOLD_COIN,
     MAGNET_ITEM_DIAMOND,
-    MAGNET_ITEM_PICK_AXE
+    MAGNET_ITEM_PICK_AXE,
+    MAGNET_ITEM_SMALL_SUN,
+    MAGNET_ITEM_NORMAL_SUN,
+    MAGNET_ITEM_LARGE_SUN,
+    MAGNET_ITEM_WHITE_SUN,
+    MAGNET_ITEM_BIG_WHITE_SUN
+};
+
+enum GloomMode
+{
+    GLOOM_NORMAL,
+    GLOOM_RAPID,
+    GLOOM_RANGER,
+    GLOOM_RAPID_RANGER
 };
 
 class MagnetItem
@@ -166,6 +189,8 @@ public:
     PlantState              mState;                         
     int                     mPlantHealth;                   
     int                     mPlantMaxHealth;                
+    int                     mShieldHealth;                  
+    int                     mShieldMaxHealth;               
     int                     mSubclass;                      
     int                     mDisappearCountdown;            
     int                     mDoSpecialCountdown;            
@@ -193,6 +218,7 @@ public:
     float                   mShakeOffsetX;                  
     float                   mShakeOffsetY;                  
     MagnetItem              mMagnetItems[MAX_MAGNET_ITEMS]; 
+    int                     mMagnetItemCount;
     ZombieID                mTargetZombieID;                
     int                     mWakeUpCounter;                 
     PlantOnBungeeState      mOnBungeeState;                 
@@ -215,6 +241,8 @@ public:
     int                     mBoostCounter;
     bool                    mWasShoveled;
     int                     mBlackThreepeaterShotCount;
+    int                     mBlackThreepeaterSpecialBurstCount;
+    int                     mBlackThreepeaterSpecialBurstTimer;
     int                     mIcePlanternChillCounter;
     bool                    mIsIceBoosted;
     int                     mSourStarfruitShotCount;
@@ -223,6 +251,17 @@ public:
     int                     mButteredCounter;
     float                   mButterX;
     float                   mButterY;
+    int                     mPushCounter;
+    int                     mPushCooldown;
+    int                     mJumpCounter;
+    int                     mSunshroomSteaks;
+    GloomMode               mGloomMode;
+    int                     mGloomShotCount;
+    GridItem*               mGraveBusterGraveTarget;
+    Plant*                  mGraveBusterPlantTarget;
+    bool                    mIsHiding;
+    ZombieID                mEatingZombieID;        // To track the zombie that eats this plant
+    bool                    mIsBlowing;
 
 public:
     Plant();
@@ -264,7 +303,8 @@ public:
     void                    UpdateSquash();
     void                    UpdateBombSquash();
     void                    UpdateDoomnut();
-    void                    Plant::UpdatePlanternEffects(float healthMultiplier, int healAmount);
+    void                    GrantPlacementShieldPulse();
+    void                    UpdatePlanternEffects(float healthMultiplier, int healAmount);
     /*inline*/ bool         NotOnGround();
     void                    DoSquashDamage();
     void                    BurnRow(int theRow);
@@ -344,6 +384,24 @@ public:
     bool                    DrawMagnetItemsOnTop();
     void                    TakeDamage(int theDamage, unsigned int theDamageFlags = 0);
     void                    GetButterSplatOffset(int& theOffsetX, int& theOffsetY);
+    void                    UpdateAbsoluteLeaf();
+    void                    UpdateMarigold();
+    void                    UpdateSprout();
+    SeedType                PickRandomSeedType();
+    void                    UpdateCommandoPea();
+    void                    UpdateShrinkingViolet();
+    void                    UpdateHattremWitch();
+    Zombie*                 FindClosestValidHattremTarget();
+    void                    UpdateNightcap();
+    Zombie*                 FindNightcapTarget();
+    void                    UpdateSweetPotato();
+    void                    DoomTakeDamage();
+    void                    UpdateGeneralPea();
+    void                    UpdateSweetestPotato();
+    void                    UpdateHattremSage();
+    bool                    IsHattremTargetException(ZombieType theZombieType);
+    void                    UpdateDarkcap();
+    Zombie*                 FindDarkCapTarget();
 };
 
 float                       PlantDrawHeightOffset(Board* theBoard, Plant* thePlant, SeedType theSeedType, int theCol, int theRow);

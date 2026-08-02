@@ -558,7 +558,7 @@ AttachmentHolder::~AttachmentHolder()
 
 void AttachmentHolder::InitializeHolder()
 {
-	mAttachments.DataArrayInitialize(1024U, "attachments");
+	mAttachments.DataArrayInitialize(8192U, "attachments");
 }
 
 void AttachmentHolder::DisposeHolder()

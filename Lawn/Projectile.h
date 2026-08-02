@@ -92,7 +92,7 @@ public:
     bool                    IsZombieHitBySplash(Zombie* theZombie);
     bool                    PeaAboutToHitTorchwood();
     bool                    GetGargantuars(int theRow, int theX, int theY, int theRadius, int theRowRange);
-
+    void                    Reflect();
 };
 
 #endif

@@ -70,7 +70,10 @@ public:
     int                     mChallengeGridY;                                    
     int                     mScaryPotterPots;                                   
     int                     mRainCounter;                                       
-    int                     mTreeOfWisdomTalkIndex;                             
+    int                     mTreeOfWisdomTalkIndex;             
+    int                     mStormyNightCounter;
+    int                     mStormyNightGridX;
+    int                     mStormyNightGridY;
 
 public:
     Challenge();
@@ -231,6 +234,7 @@ public:
     void                    TreeOfWisdomGiveWisdom();
     void                    TreeOfWisdomSayRepeat();
     bool                    TreeOfWisdomCanFeed();
+    void                    UpdateNightRoof();
 
     GridItem*               GetPortalLeftRight(int theGridX, int theGridY, bool theToLeft = true);
 };

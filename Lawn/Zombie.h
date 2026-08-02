@@ -197,6 +197,12 @@ public:
     ReanimationID                   mLightReanimID;
     ZombieID                        mProtectingZombieID;
     int                             mLaunchKernel;
+    bool                            mIsMagnetTarget;
+    PlantID                         mParentPlantID;
+    int                             mShrinkLevel;
+    int                             mLuredToRow;
+    int                             mLureCooldown;
+    int                             mZomboniAttackTimer;
 
 public:
     Zombie();
@@ -228,6 +234,7 @@ public:
     void                            PickBungeeZombieTarget(int theColumn);
     int                             CountBungeesTargetingSunFlowers();
     Plant*                          FindPlantTarget(ZombieAttackType theAttackType);
+    int                             GetTotalPlantHealthAt(int theX, int theY);
     void                            CheckSquish(ZombieAttackType theAttackType);
     void                            RiseFromGrave(int theCol, int theRow);
     void                            UpdateZombieRiseFromGrave();
@@ -434,6 +441,7 @@ public:
     bool                            IsSquashTarget(Plant* theExcept);
     static /*inline*/ bool			IsZombotany(ZombieType theZombieType);
     void                            ApplyCorrosion();
+    bool                            HasStatusEffect();
 
     //zombotany
     void                            UpdateZombieRepeaterHead();
@@ -456,6 +464,7 @@ public:
     void                            UpdateZombiePumpkinHead();
     void                            UpdateZombieCabbagepultHead();
     void                            UpdateZombieKernelpultHead();
+    void                            UpdateZombieGarlicHead();
 };
 
 class ZombieDefinition

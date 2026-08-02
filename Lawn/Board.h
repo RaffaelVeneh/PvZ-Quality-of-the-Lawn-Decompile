@@ -17,11 +17,11 @@ using namespace Sexy;
 
 #define MAX_GRID_SIZE_X 9
 #define MAX_GRID_SIZE_Y 6
-#define MAX_ZOMBIES_IN_WAVE 50
-#define MAX_ZOMBIE_WAVES 100
+#define MAX_ZOMBIES_IN_WAVE 500
+#define MAX_ZOMBIE_WAVES 1000
 #define MAX_GRAVE_STONES MAX_GRID_SIZE_X * MAX_GRID_SIZE_Y
 #define MAX_POOL_GRID_SIZE 10
-#define MAX_RENDER_ITEMS 2048
+#define MAX_RENDER_ITEMS 32768
 #define PROGRESS_METER_COUNTER 150
 
 class LawnApp;
@@ -497,6 +497,10 @@ public:
 	TodParticleSystem*				AddAttachedParticle(GameObject* pObject, int thePosX, int thePosY, int theRenderOrder, ParticleEffect theEffect);
 	void                            DamageRow(int theRow, int theDamage);
 	void                            PushPlantsInRow(int theRow);
+	bool							IsNightRoof();
+	Zombie*							FindClosestZombie(int x, int y);
+	GridItem*						AddFirePlace(int theGridX, int theGridY, int theDamagePerTick = 2);
+	bool							IsEvening();
 };
 extern bool gShownMoreSunTutorial;
 

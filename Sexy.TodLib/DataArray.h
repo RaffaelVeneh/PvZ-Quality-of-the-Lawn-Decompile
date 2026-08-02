@@ -77,23 +77,29 @@ public:
 
 	void DataArrayFree(T* theItem)
 	{
+		if (theItem == nullptr || mBlock == nullptr) return;
 		DataArrayItem* aItem = (DataArrayItem*)theItem;
-		TOD_ASSERT(DataArrayGet(aItem->mID) == theItem, "Failed: DataArrayFree(0x%x) in %s", theItem, mName);
+		if (DataArrayTryToGet(aItem->mID) != theItem) return;
 		theItem->~T();
 		unsigned int anId = aItem->mID & DATA_ARRAY_INDEX_MASK;
 		aItem->mID = mFreeListHead;
 		mFreeListHead = anId;
-		mSize--;
+		if (mSize > 0) mSize--;
 	}
 
 	void DataArrayFreeAll()
 	{
+		if (mBlock == nullptr) return;
 		T* aItem = nullptr;
 		while (IterateNext(aItem))
-			DataArrayFree(aItem);
-
+		{
+			DataArrayItem* aArrayItem = (DataArrayItem*)aItem;
+			aItem->~T();
+			aArrayItem->mID = 0;
+		}
 		mFreeListHead = 0U;
 		mMaxUsedCount = 0U;
+		mSize = 0U;
 	}
 
 	inline unsigned int DataArrayGetID(T* theItem)

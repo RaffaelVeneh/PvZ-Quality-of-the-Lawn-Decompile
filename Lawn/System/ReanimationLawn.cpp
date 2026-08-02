@@ -210,15 +210,15 @@ MemoryImage* ReanimatorCache::MakeCachedPlantFrame(SeedType theSeedType, DrawVar
 	}
 	else if (theSeedType == SeedType::SEED_EXPLODE_O_NUT)
 	{
-		aMemoryGraphics.SetColorizeImages(true);
 		DrawReanimatorFrame(&aMemoryGraphics, -aOffsetX, -aOffsetY, aPlantDef.mReanimationType, "anim_idle", theDrawVariation);
 	}
 	else
 	{
 		DrawReanimatorFrame(&aMemoryGraphics, -aOffsetX, -aOffsetY + (theSeedType == SeedType::SEED_IMITATER ? 5 : 0), aPlantDef.mReanimationType, "anim_idle", theDrawVariation);
 
-		if (theSeedType == SeedType::SEED_PEASHOOTER || theSeedType == SeedType::SEED_SNOWPEA || theSeedType == SeedType::SEED_REPEATER ||
-			theSeedType == SeedType::SEED_LEFTPEATER || theSeedType == SeedType::SEED_GATLINGPEA)
+		if (theSeedType == SeedType::SEED_PEASHOOTER	|| theSeedType == SeedType::SEED_SNOWPEA		|| theSeedType == SeedType::SEED_REPEATER		||
+			theSeedType == SeedType::SEED_LEFTPEATER	|| theSeedType == SeedType::SEED_GATLINGPEA		|| theSeedType == SeedType::SEED_FIRESHOOTER	||
+			theSeedType == SeedType::SEED_ICEPEA		|| theSeedType == SeedType::SEED_COMMANDOPEA	|| theSeedType == SeedType::SEED_GENERALPEA)
 		{
 			DrawReanimatorFrame(&aMemoryGraphics, -aOffsetX, -aOffsetY, aPlantDef.mReanimationType, "anim_head_idle", theDrawVariation);
 		}
@@ -227,7 +227,7 @@ MemoryImage* ReanimatorCache::MakeCachedPlantFrame(SeedType theSeedType, DrawVar
 			DrawReanimatorFrame(&aMemoryGraphics, -aOffsetX, -aOffsetY, aPlantDef.mReanimationType, "anim_head_idle", theDrawVariation);
 			DrawReanimatorFrame(&aMemoryGraphics, -aOffsetX, -aOffsetY, aPlantDef.mReanimationType, "anim_splitpea_idle", theDrawVariation);
 		}
-		else if (theSeedType == SeedType::SEED_THREEPEATER)
+		else if (theSeedType == SeedType::SEED_THREEPEATER || theSeedType == SeedType::SEED_BLACK_THREEPEATER)
 		{
 			DrawReanimatorFrame(&aMemoryGraphics, -aOffsetX, -aOffsetY, aPlantDef.mReanimationType, "anim_head_idle1", theDrawVariation);
 			DrawReanimatorFrame(&aMemoryGraphics, -aOffsetX, -aOffsetY, aPlantDef.mReanimationType, "anim_head_idle3", theDrawVariation);
@@ -260,8 +260,18 @@ MemoryImage* ReanimatorCache::MakeCachedZombieFrame(ZombieType theZombieType)
 		aReanim.SetFramesForLayer("anim_idle");
 		Zombie::SetupReanimLayers(&aReanim, aUseZombieType);
 
-		if (theZombieType == ZombieType::ZOMBIE_DOOR)
+		if (theZombieType == ZombieType::ZOMBIE_DOOR || theZombieType == ZombieType::ZOMBIE_BLACK_DOOR || theZombieType == ZombieType::ZOMBIE_DOOR_CONEHEAD ||
+			theZombieType == ZombieType::ZOMBIE_DOOR_BUCKETHEAD)
+		{
 			aReanim.AssignRenderGroupToTrack("anim_screendoor", RENDER_GROUP_NORMAL);
+			aReanim.AssignRenderGroupToPrefix("Zombie_outerarm_screendoor", RENDER_GROUP_OVER_SHIELD);
+			aReanim.AssignRenderGroupToPrefix("Zombie_innerarm_screendoor", RENDER_GROUP_OVER_SHIELD);
+			aReanim.AssignRenderGroupToPrefix("Zombie_innerarm_screendoor_hand", RENDER_GROUP_OVER_SHIELD);
+			if (theZombieType == ZombieType::ZOMBIE_BLACK_DOOR)
+			{
+				aReanim.SetImageOverride("anim_screendoor", IMAGE_REANIM_ZOMBIE_BLACK_SCREENDOOR1);
+			}
+		}
 		else if (theZombieType == ZombieType::ZOMBIE_FLAG)
 		{
 			Reanimation aReanimFlag;

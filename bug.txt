@@ -1,0 +1,29 @@
+bug:
+1. enraged jack won't explode - done
+2. gargantuar somehow die when smashing pumpkin - done
+3. absoluteleaf not countering basketball
+4. no rain in nightroof - done
+5. gargantuar and zomboni smash - done
+6. magnet shroom visual
+7. gravebuster causing crash in almanac - done
+8. zombie die before properly spawn causing crash - done
+9. sun didn't spawn when gargantuar smash sunflower in iZombie
+10. after finishing level 70, it not return to level 1 adventure plus - done
+11. pumpkin doesn't protect from garg smash
+12. lilypad won't turn into cattail
+
+improve list:
+
+plant:
+1. power mint
+2. sun bomb - scrapped (replaced with sunbean which almost behave the same)
+
+zombie:
+1. miner zombie
+2. more gargantuar
+3. trashcan - scrapped (the zombie will be very useless)
+4. giga football - done
+
+misc:
+1. create last pick plant mechanism
+2. make final level give gold sunflower trophy (in lawncpp bool LawnApp::EarnedGoldTrophy())

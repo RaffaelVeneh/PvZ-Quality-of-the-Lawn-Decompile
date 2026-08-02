@@ -171,6 +171,7 @@
 <Image id="ZENSHOPBUTTON_HIGHLIGHT" path="zenshopbutton_highlight" />
 <Image id="FASTBUTTON" path="button_speed" />
 <Image id="FASTBUTTON_HIGHLIGHT" path="button_speed_hightlight" />
+<Image id="SLOWMO_HIGHLIGHT" path="button_slowmo_hightlight" />
 <Image id="PRESENT" path="Present" />
 <Image id="PRESENTOPEN" path="PresentOpen" />
 <Image id="SUNFLOWER_TROPHY" path="Sunflower_trophy" cols="2" />
@@ -321,7 +322,11 @@
 <Image id="ZOMBIE_FOOTBALL_HELMET" path="Zombie_football_helmet" />
 <Image id="ZOMBIE_FOOTBALL_HELMET2" path="Zombie_football_helmet2" />
 <Image id="ZOMBIE_FOOTBALL_HELMET3" path="Zombie_football_helmet3" />
+<Image id="ZOMBIE_GIGAFOOTBALL_HELMET" path="Zombie_gigafootball_helmet" />
+<Image id="ZOMBIE_GIGAFOOTBALL_HELMET2" path="Zombie_gigafootball_helmet2" />
+<Image id="ZOMBIE_GIGAFOOTBALL_HELMET3" path="Zombie_gigafootball_helmet3" />
 <Image id="ZOMBIE_FOOTBALL_LEFTARM_HAND" path="Zombie_football_leftarm_hand" />
+<Image id="ZOMBIE_GIGAFOOTBALL_LEFTARM_HAND" path="Zombie_gigafootball_leftarm_hand" />
 <Image id="ZOMBIE_FOOTBALL_LEFTARM_UPPER2" path="zombie_football_leftarm_upper2" />
 <Image id="ZOMBIE_PAPER_LEFTARM_UPPER2" path="Zombie_paper_leftarm_upper2" />
 <Image id="ZOMBIE_PAPER_LEFTARM_LOWER" path="Zombie_paper_leftarm_lower" />
@@ -558,6 +563,38 @@
 <Image id="CORROSION_GARLIC_BODY3" path="CorrosionGarlic_body3" />
 <Image id="CORROSION_GARLIC_BLINK1" path="CorrosionGarlic_blink1" />
 <Image id="CORROSION_GARLIC_BLINK2" path="CorrosionGarlic_blink2" />
+<Image id="ABSOLUTELEAF_LEAF1" path="Absoluteleaf_leaf1" />
+<Image id="ABSOLUTELEAF_LEAF2" path="Absoluteleaf_leaf2" />
+<Image id="ABSOLUTELEAF_LEAF3" path="Absoluteleaf_leaf3" />
+<Image id="ABSOLUTELEAF_LEAF4" path="Absoluteleaf_leaf4" />
+<Image id="ABSOLUTELEAF_LEAF5" path="Absoluteleaf_leaf5" />
+<Image id="ABSOLUTELEAF_LEAF6" path="Absoluteleaf_leaf6" />
+<Image id="ABSOLUTELEAF_LEAF7" path="Absoluteleaf_leaf7" />
+<Image id="ABSOLUTELEAF_BODY" path="Absoluteleaf_body" />
+<Image id="ABSOLUTELEAF_BLINK1" path="Absoluteleaf_blink1" />
+<Image id="ABSOLUTELEAF_BLINK2" path="Absoluteleaf_blink2" />
+<Image id="COMMANDO_HAIR1" path="Commando_hair1" />
+<Image id="COMMANDO_HAIR2" path="Commando_hair2" />
+<Image id="COMMANDO_HAIR3" path="Commando_hair3" />
+<Image id="COMMANDO_HAIR4" path="Commando_hair4" />
+<Image id="COMMANDO_HAIR5" path="Commando_hair5" />
+<Image id="COMMANDO_HEADBAND" path="Commando_headband" />
+<Image id="COMMANDO_HEAD" path="Commando_head" />
+<Image id="SHRINKINGVIOLET_BOTTOM_LEAF1" path="ShrinkingViolet_bottom_leaf1" />
+<Image id="SHRINKINGVIOLET_BOTTOM_LEAF2" path="ShrinkingViolet_bottom_leaf2" />
+<Image id="SHRINKINGVIOLET_BOTTOM_LEAF3" path="ShrinkingViolet_bottom_leaf3" />
+<Image id="SHRINKINGVIOLET_FACE1" path="ShrinkingViolet_face1" />
+<Image id="SHRINKINGVIOLET_FACE2" path="ShrinkingViolet_face2" />
+<Image id="SHRINKINGVIOLET_LEAF1" path="ShrinkingViolet_leaf1" />
+<Image id="SHRINKINGVIOLET_LEAF2" path="ShrinkingViolet_leaf2" />
+<Image id="SHRINKINGVIOLET_LEAF3" path="ShrinkingViolet_leaf3" />
+<Image id="SHRINKINGVIOLET_LEAF4" path="ShrinkingViolet_leaf4" />
+<Image id="SHRINKINGVIOLET_PETALS1" path="ShrinkingViolet_petals1" />
+<Image id="SHRINKINGVIOLET_PETALS2" path="ShrinkingViolet_petals2" />
+<Image id="SHRINKINGVIOLET_PETALS3" path="ShrinkingViolet_petals3" />
+<Image id="SHRINKINGVIOLET_PETALS4" path="ShrinkingViolet_petals4" />
+<Image id="SHRINKINGVIOLET_PETALS5" path="ShrinkingViolet_petals5" />
+<Image id="SHRINKINGVIOLET_STEM" path="ShrinkingViolet_stem" />
 </Resources>
 
 <Resources id="LoadingSounds">
@@ -779,7 +816,14 @@
 <Image id="BACKGROUND6BOSS" path="background6boss" ddsurface="" a8r8g8b8="" />
 <Image id="BACKGROUND6_GAMEOVER_MASK" path="background6_gameover_mask" />
 </Resources>
-  
+
+<Resources id="DelayLoad_Background7">
+<SetDefaults path="images" idprefix="IMAGE_" />
+<Image id="BACKGROUND7" path="background7" ddsurface="" a8r8g8b8="" />
+<Image id="BACKGROUND7_GAMEOVER_INTERIOR_OVERLAY" path="background7_gameover_interior_overlay" />
+<Image id="BACKGROUND7_GAMEOVER_MASK" path="background7_gameover_mask" />
+</Resources>
+	
 <Resources id="DelayLoad_MushroomGarden">
 <SetDefaults path="images" idprefix="IMAGE_" />
 <Image id="BACKGROUND_MUSHROOMGARDEN" path="Background_MushroomGarden" />
