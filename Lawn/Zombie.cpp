@@ -2990,6 +2990,12 @@ void Zombie::UpdateZombieGargantuar()
             }
             else
             {
+                Zombie* aHypnoZombie = FindHypnotizedZombieTarget();
+                if (aHypnoZombie)
+                {
+                    int aDamage = mZombieType == ZombieType::ZOMBIE_REDEYE_GARGANTUAR ? 2000 : 2000;
+                    aHypnoZombie->TakeDamage(aDamage, 0U);
+                }
                 Plant* aPlant = FindPlantTarget(ZombieAttackType::ATTACKTYPE_CHEW);
                 if (aPlant)
                 {
@@ -3137,7 +3143,7 @@ void Zombie::UpdateZombieGargantuar()
     }
     else // Not mind-controlled
     {
-        if (FindPlantTarget(ZombieAttackType::ATTACKTYPE_CHEW))
+        if (FindPlantTarget(ZombieAttackType::ATTACKTYPE_CHEW) || FindHypnotizedZombieTarget() != nullptr)
         {
             doSmash = true;
         }
@@ -8846,7 +8852,7 @@ Zombie* Zombie::FindHypnotizedZombieTarget()
 {
     Rect aAttackRect = GetZombieAttackRect();
     Zombie* aBestZombie = nullptr;
-    int aMinX = 0;
+    int aMinX = 99999;
 
     Zombie* aZombie = nullptr;
     while (mBoard->IterateZombies(aZombie))
@@ -8876,8 +8882,7 @@ Zombie* Zombie::FindGargantuarTargetZombie()
         return nullptr;
     }
 
-    // A hypnotized gargantuar is facing right, so its attack rect should be in front of it.
-    Rect aAttackRect(mX + mWidth - 170, mY + 40, 170, 80);
+    Rect aAttackRect = GetZombieAttackRect();
 
     Zombie* aBestZombie = nullptr;
     int aMaxX = 0;
@@ -10881,8 +10886,11 @@ float Zombie::GetPosYBasedOnRow(int theRow)
 
 Zombie::~Zombie()
 {
-    AttachmentDie(mAttachmentID);
-    StopZombieSound();
+    if (mApp && !mApp->mShutdown)
+    {
+        AttachmentDie(mAttachmentID);
+        StopZombieSound();
+    }
 }
 
 bool Zombie::CanBeChilled()
@@ -11239,14 +11247,7 @@ Rect Zombie::GetZombieAttackRect()
 
     if (IsWalkingBackwards())
     {
-        if (mZombieType == ZOMBIE_GARGANTUAR || mZombieType == ZOMBIE_REDEYE_GARGANTUAR)
-        {
-            aAttackRect.mX = 20;
-        }
-        else
-        {
-            aAttackRect.mX = mWidth - aAttackRect.mX - aAttackRect.mWidth;
-        }
+        aAttackRect.mX = mWidth - aAttackRect.mX - aAttackRect.mWidth;
     }
 
     ZombieDrawPosition aDrawPos;

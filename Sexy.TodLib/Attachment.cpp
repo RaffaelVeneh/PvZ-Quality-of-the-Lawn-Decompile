@@ -733,7 +733,18 @@ void AttachmentDie(AttachmentID& theAttachmentID)
 	if (theAttachmentID == AttachmentID::ATTACHMENTID_NULL)
 		return;
 
-	TOD_ASSERT(gEffectSystem);
+	if (gSexyAppBase && gSexyAppBase->mShutdown)
+	{
+		theAttachmentID = AttachmentID::ATTACHMENTID_NULL;
+		return;
+	}
+
+	if (gEffectSystem == nullptr || gEffectSystem->mAttachmentHolder == nullptr || gEffectSystem->mAttachmentHolder->mAttachments.mBlock == nullptr)
+	{
+		theAttachmentID = AttachmentID::ATTACHMENTID_NULL;
+		return;
+	}
+
 	Attachment* aAttachment = gEffectSystem->mAttachmentHolder->mAttachments.DataArrayTryToGet((unsigned int)theAttachmentID);
 	theAttachmentID = AttachmentID::ATTACHMENTID_NULL;
 	if (aAttachment)
@@ -747,7 +758,18 @@ void AttachmentDetach(AttachmentID& theAttachmentID)
 	if (theAttachmentID == AttachmentID::ATTACHMENTID_NULL)
 		return;
 
-	TOD_ASSERT(gEffectSystem);
+	if (gSexyAppBase && gSexyAppBase->mShutdown)
+	{
+		theAttachmentID = AttachmentID::ATTACHMENTID_NULL;
+		return;
+	}
+
+	if (gEffectSystem == nullptr || gEffectSystem->mAttachmentHolder == nullptr || gEffectSystem->mAttachmentHolder->mAttachments.mBlock == nullptr)
+	{
+		theAttachmentID = AttachmentID::ATTACHMENTID_NULL;
+		return;
+	}
+
 	Attachment* aAttachment = gEffectSystem->mAttachmentHolder->mAttachments.DataArrayTryToGet((unsigned int)theAttachmentID);
 	theAttachmentID = AttachmentID::ATTACHMENTID_NULL;
 	if (aAttachment)

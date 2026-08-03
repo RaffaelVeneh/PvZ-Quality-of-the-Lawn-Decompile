@@ -23,7 +23,10 @@ Coin::Coin()
 
 Coin::~Coin()
 {
-	AttachmentDie(mAttachmentID);
+	if (mApp && !mApp->mShutdown)
+	{
+		AttachmentDie(mAttachmentID);
+	}
 }
 
 void Coin::CoinInitialize(int theX, int theY, CoinType theCoinType, CoinMotion theCoinMotion)

@@ -57,7 +57,8 @@ NewOptionsDialog::NewOptionsDialog(LawnApp* theApp, bool theFromGameSelector, bo
     mSfxVolumeSlider->SetValue(theApp->GetSfxVolume() / 0.65);
 
     mFullscreenCheckbox = MakeNewCheckbox(NewOptionsDialog::NewOptionsDialog_Fullscreen, this, !theApp->mIsWindowed);
-    mHardwareAccelerationCheckbox = MakeNewCheckbox(NewOptionsDialog::NewOptionsDialog_HardwareAcceleration, this, theApp->Is3dAccel());
+    mHardwareAccelerationCheckbox = MakeNewCheckbox(NewOptionsDialog::NewOptionsDialog_HardwareAcceleration, this, true);
+    mHardwareAccelerationCheckbox->SetVisible(false);
     mDebugModeBox = MakeNewCheckbox(-1, this, mApp->mTodCheatKeys);
     mDebugModeBox->SetVisible(false);
 
@@ -165,27 +166,7 @@ NewOptionsDialog::NewOptionsDialog(LawnApp* theApp, bool theFromGameSelector, bo
 
 NewOptionsDialog::~NewOptionsDialog()
 {
-    delete mMusicVolumeSlider;
-    delete mSfxVolumeSlider;
-    delete mFullscreenCheckbox;
-    delete mHardwareAccelerationCheckbox;
-    delete mDebugModeBox;
-    delete mDiscordBox;
-    delete m09FormatBox;
-    delete mBankKeybindsBox;
-    delete mAlmanacButton;
-    delete mRestartButton;
-    delete mBackToMainButton;
-    delete mAdvancedButton;
-    delete mBackToGameButton;
-    delete mLeftPageButton;
-    delete mRightPageButton;
-    delete mSpeedEditWidget;
-    delete mGameAdvancedButton;
-    delete mAutoCollectSunsBox;
-    delete mAutoCollectCoinsBox;
-    delete mZombieHealthbarsBox;
-    delete mRealHardwareAccelerationCheckbox;
+    RemoveAllWidgets(true, true);
 }
 
 int NewOptionsDialog::GetPreferredHeight(int theWidth)
@@ -327,7 +308,7 @@ void NewOptionsDialog::Draw(Sexy::Graphics* g)
     {
         TodDrawString(g, _S("Music"), 186, 140 + aMusicOffset, FONT_DWARVENTODCRAFT18, aTextColor, DrawStringJustification::DS_ALIGN_RIGHT);
         TodDrawString(g, _S("Sound FX"), 186, 167 + aSfxOffset, FONT_DWARVENTODCRAFT18, aTextColor, DrawStringJustification::DS_ALIGN_RIGHT);
-        TodDrawString(g, _S("3D Acceleration"), 274, 197 + a3DAccelOffset, FONT_DWARVENTODCRAFT18, aTextColor, DrawStringJustification::DS_ALIGN_RIGHT);
+        // 3D Acceleration is permanently ON for all modern devices
         TodDrawString(g, _S("Full Screen"), 274, 229 + aFullScreenOffset, FONT_DWARVENTODCRAFT18, aTextColor, DrawStringJustification::DS_ALIGN_RIGHT);
     }
     else

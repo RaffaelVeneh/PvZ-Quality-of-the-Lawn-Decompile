@@ -13,6 +13,16 @@ SexyString (*gGetCurrentLevelName)();
 
 int WINAPI WinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, _In_ LPSTR lpCmdLine, _In_ int nCmdShow)
 {
+	typedef BOOL(WINAPI* SetProcessDPIAwarePtr)();
+	HMODULE hUser32 = GetModuleHandleA("user32.dll");
+	if (hUser32)
+	{
+		SetProcessDPIAwarePtr pSetDPIAware = (SetProcessDPIAwarePtr)GetProcAddress(hUser32, "SetProcessDPIAware");
+		if (pSetDPIAware)
+		{
+			pSetDPIAware();
+		}
+	}
 #ifdef _DEBUG
 	FILE* fDummy;
 	freopen_s(&fDummy, "CONIN$", "r", stdin);

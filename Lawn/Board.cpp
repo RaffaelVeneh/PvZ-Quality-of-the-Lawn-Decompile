@@ -2178,6 +2178,18 @@ void Board::DoPlantingEffects(int theGridX, int theGridY, Plant* thePlant)
 
 Plant* Board::AddPlant(int theGridX, int theGridY, SeedType theSeedType, SeedType theImitaterType)
 {
+	GridItem* aCrater = GetCraterAt(theGridX, theGridY);
+	if (theSeedType == SeedType::SEED_FLOWERPOT && aCrater != nullptr)
+	{
+		aCrater->GridItemDie();
+		mApp->PlayFoley(FoleyType::FOLEY_PLANT);
+		int aPixelX = GridToPixelX(theGridX, theGridY) + 40;
+		int aPixelY = GridToPixelY(theGridX, theGridY) + 40;
+		int aRenderOrder = MakeRenderOrder(RenderLayer::RENDER_LAYER_PLANT, theGridY, 0);
+		mApp->AddTodParticle(aPixelX, aPixelY, aRenderOrder, ParticleEffect::PARTICLE_PLANTING);
+		return nullptr;
+	}
+
 	if (theImitaterType != SeedType::SEED_IMITATER)
 	{
 		mApp->mLastPlantPlanted = theSeedType;
@@ -2953,6 +2965,10 @@ PlantingReason Board::CanPlantAt(int theGridX, int theGridY, SeedType theSeedTyp
 	}
 	if (GetCraterAt(theGridX, theGridY))
 	{
+		if (theSeedType == SeedType::SEED_FLOWERPOT)
+		{
+			return PlantingReason::PLANTING_OK;
+		}
 		return PlantingReason::PLANTING_NOT_ON_CRATER;
 	}
 	if (GetScaryPotAt(theGridX, theGridY) || IsIceAt(theGridX, theGridY))
@@ -4059,13 +4075,16 @@ void Board::MouseDownWithPlant(int x, int y, int theClickCount)
 	else if (mCursorObject->mCursorType == CursorType::CURSOR_TYPE_PLANT_FROM_BANK)
 	{
 		Plant* aPlant = AddPlant(aGridX, aGridY, mCursorObject->mType, mCursorObject->mImitaterType);
-		if (aIsAwake)
+		if (aPlant != nullptr)
 		{
-			aPlant->SetSleeping(false);
-		}
-		else
-		{
-			aPlant->mWakeUpCounter = aWakeUpCounter;
+			if (aIsAwake)
+			{
+				aPlant->SetSleeping(false);
+			}
+			else
+			{
+				aPlant->mWakeUpCounter = aWakeUpCounter;
+			}
 		}
 
 		mSeedBank->mSeedPackets[mCursorObject->mSeedBankIndex].WasPlanted();

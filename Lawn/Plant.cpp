@@ -5988,10 +5988,15 @@ void Plant::DoSpecial()
             }
         }
 
+        bool aHasFlowerPot = (mBoard->GetFlowerPotAt(mPlantCol, mRow) != nullptr);
+
         KillAllPlantsNearDoom();
 
         mApp->AddTodParticle(aPosX, aPosY, (int)RenderLayer::RENDER_LAYER_TOP, ParticleEffect::PARTICLE_DOOM);
-        mBoard->AddACrater(mPlantCol, mRow)->mGridItemCounter = 18000;
+        if (!aHasFlowerPot)
+        {
+            mBoard->AddACrater(mPlantCol, mRow)->mGridItemCounter = 18000;
+        }
         mBoard->ShakeBoard(3, -4);
 
         Die();
@@ -7693,8 +7698,13 @@ void Plant::UpdateDoomnut()
             int aPosX = mX + 40;
             int aPosY = mY + 40;
             mBoard->DamageAllZombiesInRadius(mRow, aPosX, aPosY, 250, 900, 2, true, 127);
+            int aGridX = mBoard->PixelToGridXKeepOnBoard(mX, mY);
+            bool aHasFlowerPot = (mBoard->GetFlowerPotAt(aGridX, mRow) != nullptr);
             mApp->AddTodParticle(aPosX, aPosY, (int)RenderLayer::RENDER_LAYER_TOP, ParticleEffect::PARTICLE_DOOM);
-            mBoard->AddACrater(mBoard->PixelToGridXKeepOnBoard(mX, mY), mRow)->mGridItemCounter = 18000;
+            if (!aHasFlowerPot)
+            {
+                mBoard->AddACrater(aGridX, mRow)->mGridItemCounter = 18000;
+            }
             mBoard->ShakeBoard(15, -15);
             mApp->PlaySample(SOUND_DOOMSHROOM);
 

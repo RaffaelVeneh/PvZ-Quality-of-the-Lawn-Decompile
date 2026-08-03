@@ -58,7 +58,10 @@ Projectile::Projectile()
 
 Projectile::~Projectile()
 {
-	AttachmentDie(mAttachmentID);
+	if (mApp && !mApp->mShutdown)
+	{
+		AttachmentDie(mAttachmentID);
+	}
 }
 
 void Projectile::ProjectileInitialize(int theX, int theY, int theRenderOrder, int theRow, ProjectileType theProjectileType)

@@ -1204,7 +1204,11 @@ bool LawnApp::KillNewOptionsDialog()
 		mDiscordPresence = aNewOptionsDialog->mDiscordBox->IsChecked();
 		mBankKeybinds = aNewOptionsDialog->mBankKeybindsBox->IsChecked();
 		mZeroNineBankFormat = aNewOptionsDialog->m09FormatBox->IsChecked();
-		mSpeedModifier = stoi(aNewOptionsDialog->mSpeedEditWidget->mString.c_str());
+		if (!aNewOptionsDialog->mSpeedEditWidget->mString.empty())
+		{
+			try { mSpeedModifier = std::stoi(aNewOptionsDialog->mSpeedEditWidget->mString.c_str()); }
+			catch (...) {}
+		}
 		mAutoCollectSuns = aNewOptionsDialog->mAutoCollectSunsBox->IsChecked();
 		mAutoCollectCoins = aNewOptionsDialog->mAutoCollectCoinsBox->IsChecked();
 		mZombieHealthbars = aNewOptionsDialog->mZombieHealthbarsBox->IsChecked();
@@ -1438,8 +1442,9 @@ void LawnApp::Init()
 #endif
 	mTimer.Start();
 
-	if ((!Is3DAccelerationSupported() || !Is3DAccelerationRecommended()) && mIs3dAccel)
-		mIs3dAccel = false;
+	mIs3dAccel = true;
+	mFullscreenBits = 32;
+	mAspectNoStretch = true;
 }
 
 bool LawnApp::ChangeDirHook(const char* theIntendedPath)
@@ -2718,16 +2723,30 @@ bool LawnApp::HasSeedType(SeedType theSeedType)
 		return mPlayerInfo->mLevel >= 59 || HasFinishedAdventure();
 	}
 	*/
-	if(mTodCheatKeys){
-		if (theSeedType == SeedType::SEED_EXPLODE_O_NUT)
-		{
-			return true;
-		}
-		if (theSeedType == SeedType::SEED_GIANT_WALLNUT)
-		{
-			return true;
-		}
-		if (theSeedType == SeedType::SEED_LEFTPEATER)
+	if (theSeedType == SeedType::SEED_GATLINGPEA)
+		return mPlayerInfo->mPurchases[StoreItem::STORE_ITEM_PLANT_GATLINGPEA] > 0;
+	if (theSeedType == SeedType::SEED_TWINSUNFLOWER)
+		return mPlayerInfo->mPurchases[StoreItem::STORE_ITEM_PLANT_TWINSUNFLOWER] > 0;
+	if (theSeedType == SeedType::SEED_GLOOMSHROOM)
+		return mPlayerInfo->mPurchases[StoreItem::STORE_ITEM_PLANT_GLOOMSHROOM] > 0;
+	if (theSeedType == SeedType::SEED_CATTAIL)
+		return mPlayerInfo->mPurchases[StoreItem::STORE_ITEM_PLANT_CATTAIL] > 0;
+	if (theSeedType == SeedType::SEED_WINTERMELON)
+		return mPlayerInfo->mPurchases[StoreItem::STORE_ITEM_PLANT_WINTERMELON] > 0;
+	if (theSeedType == SeedType::SEED_GOLD_MAGNET)
+		return mPlayerInfo->mPurchases[StoreItem::STORE_ITEM_PLANT_GOLD_MAGNET] > 0;
+	if (theSeedType == SeedType::SEED_SPIKEROCK)
+		return mPlayerInfo->mPurchases[StoreItem::STORE_ITEM_PLANT_SPIKEROCK] > 0;
+	if (theSeedType == SeedType::SEED_COBCANNON)
+		return mPlayerInfo->mPurchases[StoreItem::STORE_ITEM_PLANT_COBCANNON] > 0;
+	if (theSeedType == SeedType::SEED_IMITATER)
+		return mPlayerInfo->mPurchases[StoreItem::STORE_ITEM_PLANT_IMITATER] > 0;
+
+	if (mTodCheatKeys)
+	{
+		if (theSeedType == SeedType::SEED_EXPLODE_O_NUT ||
+			theSeedType == SeedType::SEED_GIANT_WALLNUT ||
+			theSeedType == SeedType::SEED_LEFTPEATER)
 		{
 			return true;
 		}
@@ -2735,10 +2754,9 @@ bool LawnApp::HasSeedType(SeedType theSeedType)
 	return theSeedType < GetSeedsAvailable();
 }
 
-
 bool LawnApp::SeedTypeAvailable(SeedType theSeedType)
 {
-	return (theSeedType == SeedType::SEED_IMITATER && mPlayerInfo->mPurchases[StoreItem::STORE_ITEM_PLANT_IMITATER]) || HasSeedType(theSeedType);
+	return HasSeedType(theSeedType);
 }
 
 /*

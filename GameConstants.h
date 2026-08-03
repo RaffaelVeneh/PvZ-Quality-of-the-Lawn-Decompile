@@ -4,19 +4,19 @@
 #include "ConstEnums.h"
 constexpr const double PI = 3.141592653589793;
 
-const int			BOARD_WIDTH = 800;
+const int			BOARD_WIDTH = 1066;
 const int			BOARD_HEIGHT = 600;
-const int			WIDE_BOARD_WIDTH = 800;
-const int			BOARD_OFFSET = 220;
+const int			WIDE_BOARD_WIDTH = 1066;
+const int			BOARD_OFFSET = 353;
 const int			BOARD_EDGE = -100;
-const int			BOARD_IMAGE_WIDTH_OFFSET = 1180;
-const int           BOARD_ICE_START = 800;
-const int           LAWN_XMIN = 40;
+const int			BOARD_IMAGE_WIDTH_OFFSET = 1313;
+const int           BOARD_ICE_START = 933;
+const int           LAWN_XMIN = 173;
 const int           LAWN_YMIN = 80;
 const int           HIGH_GROUND_HEIGHT = 30;
 
 const int           SEEDBANK_MAX = 10;
-const int           SEED_BANK_OFFSET_X = 0;
+const int           SEED_BANK_OFFSET_X = 133;
 const int           SEED_BANK_OFFSET_X_END = 10;
 const int           SEED_CHOOSER_OFFSET_Y = 516;
 const int           SEED_PACKET_WIDTH = 50;

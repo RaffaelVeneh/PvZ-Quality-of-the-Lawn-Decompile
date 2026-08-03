@@ -380,9 +380,10 @@ bool D3DInterface::PreDraw()
 		mD3DDevice->SetRenderState(D3DRENDERSTATE_LIGHTING , FALSE);
 
 		// filter states 
-		mD3DDevice->SetTextureStageState(0,D3DTSS_MINFILTER, D3DTFG_POINT); 
-		mD3DDevice->SetTextureStageState(0,D3DTSS_MAGFILTER, D3DTFG_POINT); 
-		mD3DDevice->SetTextureStageState(0,D3DTSS_MIPFILTER, D3DTFG_POINT); 
+		mD3DDevice->SetTextureStageState(0, D3DTSS_MAXANISOTROPY, 16); 
+		mD3DDevice->SetTextureStageState(0, D3DTSS_MINFILTER, D3DTFG_ANISOTROPIC); 
+		mD3DDevice->SetTextureStageState(0, D3DTSS_MAGFILTER, D3DTFG_ANISOTROPIC); 
+		mD3DDevice->SetTextureStageState(0, D3DTSS_MIPFILTER, D3DTFG_LINEAR); 
 //		mD3DDevice->SetTextureStageState(0,D3DTSS_COLORARG2, D3DTA_CURRENT );
 //		mD3DDevice->SetTextureStageState(0,D3DTSS_ALPHAARG2, D3DTA_CURRENT );
 //		mD3DDevice->SetTextureStageState(0,D3DTSS_COLORARG1, D3DTA_TEXTURE );
@@ -393,7 +394,8 @@ bool D3DInterface::PreDraw()
 		hr = mD3DDevice->SetTextureStageState(0, D3DTSS_ADDRESSV, D3DTADDRESS_CLAMP); 
 
 		// Setup non-texture render states 				
-		mD3DDevice->SetRenderState(D3DRENDERSTATE_DITHERENABLE, FALSE); 
+		mD3DDevice->SetRenderState(D3DRENDERSTATE_DITHERENABLE, TRUE); 
+		mD3DDevice->SetRenderState(D3DRENDERSTATE_EDGEANTIALIAS, TRUE); 
 		mD3DDevice->SetRenderState(D3DRENDERSTATE_SPECULARENABLE, FALSE); 
 		mD3DDevice->SetRenderState(D3DRENDERSTATE_ZWRITEENABLE, FALSE); 
 		mD3DDevice->SetRenderState(D3DRENDERSTATE_ZENABLE, FALSE); 
@@ -1158,15 +1160,17 @@ LPDIRECTDRAWSURFACE7 TextureData::GetTextureF(float x, float y, float &width, fl
 ///////////////////////////////////////////////////////////////////////////////
 static void SetLinearFilter(LPDIRECT3DDEVICE7 theDevice, bool linear)
 {
+	linear = true;
 	if (gLinearFilter != linear)
 	{
-		D3DTEXTUREMAGFILTER aFilter = linear ? D3DTFG_LINEAR : D3DTFG_POINT;		
+		D3DTEXTUREMAGFILTER aFilter = D3DTFG_ANISOTROPIC;		
 
-		const char *aDebugContext = linear ? "SetTextureStageState LINEAR" : "SetTextureStageState Point";
+		const char *aDebugContext = "SetTextureStageState ANISOTROPIC";
 
+		theDevice->SetTextureStageState(0, D3DTSS_MAXANISOTROPY, 16);
 		D3DInterface::CheckDXError(theDevice->SetTextureStageState(0,D3DTSS_MINFILTER, aFilter),aDebugContext);
 		D3DInterface::CheckDXError(theDevice->SetTextureStageState(0,D3DTSS_MAGFILTER, aFilter),aDebugContext);
-		D3DInterface::CheckDXError(theDevice->SetTextureStageState(0,D3DTSS_MIPFILTER, aFilter),aDebugContext);
+		D3DInterface::CheckDXError(theDevice->SetTextureStageState(0,D3DTSS_MIPFILTER, D3DTFG_LINEAR),aDebugContext);
 
 		gLinearFilter = linear;
 	}
