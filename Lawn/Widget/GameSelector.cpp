@@ -473,7 +473,8 @@ void GameSelector::SyncButtons()
 void GameSelector::AddTrophySparkle()
 {
 	TOD_ASSERT(mTrophyParticleID == PARTICLESYSTEMID_NULL);
-	TodParticleSystem* aTrophyParticle = mApp->AddTodParticle(85.0f, 380.0f, RenderLayer::RENDER_LAYER_TOP, ParticleEffect::PARTICLE_TROPHY_SPARKLE);
+	const float aPad = (float)(BOARD_OFFSET - 220);
+	TodParticleSystem* aTrophyParticle = mApp->AddTodParticle(85.0f + aPad + 133.0f, 380.0f, RenderLayer::RENDER_LAYER_TOP, ParticleEffect::PARTICLE_TROPHY_SPARKLE);
 	mTrophyParticleID = mApp->ParticleGetID(aTrophyParticle);
 }
 
@@ -678,15 +679,15 @@ void GameSelector::DrawOverlay(Graphics* g)
 
 		g->SetColorizeImages(true);
 		g->SetColor(mAdventureButton->mColors[ButtonWidget::COLOR_BKG]);
-		TodDrawImageCelF(g, Sexy::IMAGE_SELECTORSCREEN_LEVELNUMBERS, aTransAreaX + 486.0f, aTransAreaY + 47.0f, aStage, 0);  // »æÖÆ´ó¹ØÊý
+		TodDrawImageCelF(g, Sexy::IMAGE_SELECTORSCREEN_LEVELNUMBERS, aTransAreaX + 486.0f, aTransAreaY + 127.0f, aStage, 0);  // »æÖÆ´ó¹ØÊý
 		if (aSub < 10)
 		{
-			TodDrawImageCelF(g, Sexy::IMAGE_SELECTORSCREEN_LEVELNUMBERS, aTransSubX + 509.0f, aTransSubY + 50.0f, aSub, 0);
+			TodDrawImageCelF(g, Sexy::IMAGE_SELECTORSCREEN_LEVELNUMBERS, aTransSubX + 509.0f, aTransSubY + 130.0f, aSub, 0);
 		}
 		else if (aSub == 10)
 		{
-			TodDrawImageCelF(g, Sexy::IMAGE_SELECTORSCREEN_LEVELNUMBERS, aTransSubX + 509.0f, aTransSubY + 50.0f, 1, 0);
-			TodDrawImageCelF(g, Sexy::IMAGE_SELECTORSCREEN_LEVELNUMBERS, aTransSubX + 518.0f, aTransSubY + 51.0f, 0, 0);
+			TodDrawImageCelF(g, Sexy::IMAGE_SELECTORSCREEN_LEVELNUMBERS, aTransSubX + 509.0f, aTransSubY + 130.0f, 1, 0);
+			TodDrawImageCelF(g, Sexy::IMAGE_SELECTORSCREEN_LEVELNUMBERS, aTransSubX + 518.0f, aTransSubY + 131.0f, 0, 0);
 		}
 		g->SetColorizeImages(false);
 
@@ -697,7 +698,7 @@ void GameSelector::DrawOverlay(Graphics* g)
 		if (mHasTrophy)
 		{
 			float aAchievementOffset = !HAS_ACHIEVEMENTS ? 45 : 0;
-			float aTrophyX = aTransformLeft.mTransX + (float)(BOARD_OFFSET - 220) + 12.0f;
+			float aTrophyX = aTransformLeft.mTransX + (float)(BOARD_OFFSET - 220) + 12.0f + 133.0f;
 			if (mApp->EarnedGoldTrophy())
 				TodDrawImageCelF(g, Sexy::IMAGE_SUNFLOWER_TROPHY, aTrophyX, aTransformLeft.mTransY + 345.0f + aAchievementOffset, 1, 0);
 			else
@@ -755,19 +756,20 @@ void GameSelector::UpdateTooltip()
 	{
 		int aMouseX = mApp->mWidgetManager->mLastMouseX;
 		int aMouseY = mApp->mWidgetManager->mLastMouseY;
-		if (Rect(50, 325, 85, 142).Contains(aMouseX, aMouseY))
+		const float aPad = (float)(BOARD_OFFSET - 220);
+		if (Rect(50 + (int)aPad + 133, 325, 85, 142).Contains(aMouseX, aMouseY))
 		{
 			if (mApp->EarnedGoldTrophy())
 			{
 				mToolTip->SetLabel(LawnApp::Pluralize(mApp->mPlayerInfo->mFinishedAdventure, _S("[GOLD_SUNFLOWER_TOOLTIP]"), _S("[GOLD_SUNFLOWER_TOOLTIP_PLURAL]")));
-				mToolTip->mX = 32;
+				mToolTip->mX = 32 + (int)aPad + 133;
 				mToolTip->mY = 510;
 				mToolTip->mVisible = true;
 			}
 			else
 			{
 				mToolTip->SetLabel(_S("[SILVER_SUNFLOWER_TOOLTIP]"));
-				mToolTip->mX = 20;
+				mToolTip->mX = 20 + (int)aPad + 133;
 				mToolTip->mY = 495;
 				mToolTip->mVisible = true;
 			}
@@ -1041,7 +1043,7 @@ void GameSelector::Update()
 		TrackButton(mStoreButton, "SelectorScreen_BG_Right", 334.0f + aPad, 441.0f);
 		TrackButton(mChangeUserButton, "woodsign2", 24.0f + aPad, 10.0f);
 		TrackButton(mCreditsButton, "woodsign3", aPad, 0.0f);
-		TrackButton(mAchievementButton, "SelectorScreen_BG_Left", 20.f + aPad, 480.f);
+		TrackButton(mAchievementButton, "SelectorScreen_BG_Left", 20.f + aPad + 133.f, 480.f);
 		TrackButton(mQuickPlayButton, "SelectorScreen_BG_Right", 80.f + aPad, 230.f);
 		aSelectorReanim->SetImageOverride("woodsign2", (mChangeUserButton->mIsOver || mChangeUserButton->mIsDown) ? Sexy::IMAGE_REANIM_SELECTORSCREEN_WOODSIGN2_PRESS : nullptr);
 		aSelectorReanim->SetImageOverride("woodsign3", (mCreditsButton->mIsOver || mCreditsButton->mIsDown) ? Sexy::IMAGE_REANIM_SELECTORSCREEN_WOODSIGN3_PRESS : nullptr);

@@ -54,7 +54,7 @@ TitleScreen::~TitleScreen()
 
 void TitleScreen::DrawToPreload(Graphics* g)
 {
-	g->DrawImageF(IMAGE_PLANTSHADOW, 1000.0f, 0.0f);
+	g->DrawImageF(IMAGE_PLANTSHADOW, 3000.0f, 0.0f);
 }
 
 void TitleScreen::Draw(Graphics* g)
@@ -165,7 +165,7 @@ void TitleScreen::Draw(Graphics* g)
 	else
 	{
 		Graphics aClipG(*g);
-		aClipG.ClipRect(240, aGrassY, mCurBarWidth, IMAGE_LOADBAR_GRASS->mHeight);
+		aClipG.ClipRect(aGrassX - 3, aGrassY, mCurBarWidth, IMAGE_LOADBAR_GRASS->mHeight);
 		aClipG.DrawImage(IMAGE_LOADBAR_GRASS, aGrassX, aGrassY);
 
 		float aRollLen = mCurBarWidth * 0.94f;
@@ -434,7 +434,7 @@ void TitleScreen::Update()
 			{
 				aReanimType = ReanimationType::REANIM_LOADBAR_ZOMBIEHEAD;
 			}
-			float aPosX = aTriggerPoint[i] + 225.0f;
+			float aPosX = mStartButton->mX - 3.0f + aTriggerPoint[i];
 			float aPosY = 511.0f;
 			Reanimation* aSproutReanim = mApp->AddReanimation(aPosX, aPosY, 0, aReanimType);
 			aSproutReanim->mAnimRate = 18.0f;

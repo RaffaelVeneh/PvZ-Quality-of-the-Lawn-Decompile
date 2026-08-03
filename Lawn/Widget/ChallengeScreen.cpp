@@ -14,7 +14,7 @@
 #include "../../SexyAppFramework/Slider.h"
 #include "../../GameConstants.h"
 
-const Rect cChallengeRect = Rect(0, 91, BOARD_WIDTH, 480);
+const Rect cChallengeRect = Rect((int)(BOARD_OFFSET - 220), 91, 800, 480);
 const int cButtonHeight = 118;
 
 ChallengeDefinition gChallengeDefs[NUM_CHALLENGE_MODES] = {
@@ -115,7 +115,8 @@ ChallengeScreen::ChallengeScreen(LawnApp* theApp, ChallengePage thePage)
 	mBackButton->mTextDownOffsetY = 1;
 	mBackButton->mColors[ButtonWidget::COLOR_LABEL] = Color(42, 42, 90);
 	mBackButton->mColors[ButtonWidget::COLOR_LABEL_HILITE] = Color(42, 42, 90);
-	mBackButton->Resize(18, 568, 111, 26);
+	int aPad = (int)(BOARD_OFFSET - 220);
+	mBackButton->Resize(-63 + aPad, 38, 111, 26);
 
 	mChallengesButton = MakeNewButton(ChallengeScreen::ChallengeScreen_Selector, this, _S("Page Selection"), nullptr, Sexy::IMAGE_SEEDCHOOSER_BUTTON2,
 		Sexy::IMAGE_SEEDCHOOSER_BUTTON2_GLOW, Sexy::IMAGE_SEEDCHOOSER_BUTTON2_GLOW);
@@ -124,7 +125,7 @@ ChallengeScreen::ChallengeScreen(LawnApp* theApp, ChallengePage thePage)
 	mChallengesButton->mColors[ButtonWidget::COLOR_LABEL] = Color(42, 42, 90);
 	mChallengesButton->mColors[ButtonWidget::COLOR_LABEL_HILITE] = Color(42, 42, 90);
 	int aWidth = 111;
-	mChallengesButton->Resize(618 + (aWidth / 2), 568, aWidth, 26);
+	mChallengesButton->Resize(718 + (aWidth / 2) + aPad, 38, aWidth, 26);
 	
 	for (int aChallengeMode = 0; aChallengeMode < NUM_CHALLENGE_MODES; aChallengeMode++)
 	{
@@ -134,9 +135,9 @@ ChallengeScreen::ChallengeScreen(LawnApp* theApp, ChallengePage thePage)
 		aChallengeButton->mDoFinger = true;
 		aChallengeButton->mFrameNoDraw = true;
 		if (aChlDef.mPage == CHALLENGE_PAGE_CHALLENGE || aChlDef.mPage == CHALLENGE_PAGE_LIMBO || aChlDef.mPage == CHALLENGE_PAGE_PUZZLE)
-			aChallengeButton->Resize(38 + aChlDef.mCol * 155, 93 + aChlDef.mRow * 119, 104, 115);
+			aChallengeButton->Resize(38 + aPad + aChlDef.mCol * 155, 93 + aChlDef.mRow * 119, 104, 115);
 		else
-			aChallengeButton->Resize(38 + aChlDef.mCol * 155, 125 + aChlDef.mRow * 145, 104, 115);
+			aChallengeButton->Resize(38 + aPad + aChlDef.mCol * 155, 125 + aChlDef.mRow * 145, 104, 115);
 		if (MoreTrophiesNeeded(aChallengeMode))
 		{
 			aChallengeButton->mDoFinger = false;
@@ -180,7 +181,7 @@ ChallengeScreen::ChallengeScreen(LawnApp* theApp, ChallengePage thePage)
 	mSlider = new Slider(IMAGE_OPTIONS_SLIDERSLOT_PLANT, IMAGE_OPTIONS_SLIDERKNOB_PLANT, 0, this);
 	mSlider->SetValue(max(0.0, min(mMaxScrollPosition, mScrollPosition)));
 	mSlider->mHorizontal = false;
-	mSlider->Resize(775, cChallengeRect.mY, 20, cChallengeRect.mHeight);
+	mSlider->Resize(775 + (int)(BOARD_OFFSET - 220), cChallengeRect.mY, 20, cChallengeRect.mHeight);
 	mSlider->mThumbOffsetX = -5;
 
 
@@ -379,7 +380,8 @@ void ChallengeScreen::DrawButton(Graphics* g, int theChallengeIndex)
 	{
 		aChallengeButton->mMouseVisible = cChallengeRect.Contains(mWidgetManager->mLastMouseX, mWidgetManager->mLastMouseY);
 		ChallengeDefinition& aDef = GetChallengeDefinition(theChallengeIndex);
-		aChallengeButton->mX = 38 + aDef.mCol * 155;
+		int aPad = (int)(BOARD_OFFSET - 220);
+		aChallengeButton->mX = 38 + aPad + aDef.mCol * 155;
 		mButtonStartYOffset = cChallengeRect.mY + (aDef.mPage == CHALLENGE_PAGE_SURVIVAL ? 34 : 2);
 		mButtonYOffset = cButtonHeight + (aDef.mPage == CHALLENGE_PAGE_SURVIVAL ? 30 : 2);
 		aChallengeButton->mY = mButtonStartYOffset + aDef.mRow * mButtonYOffset - mScrollPosition;
@@ -412,7 +414,6 @@ void ChallengeScreen::DrawButton(Graphics* g, int theChallengeIndex)
 				g->SetColorizeImages(true);
 			}
 			g->SetClipRect(cChallengeRect);
-			g->SetScale(0.5f, 0.5f, aPosX + 13, aPosY + 4);
 			if (mPageIndex == CHALLENGE_PAGE_SURVIVAL)
 			{
 				g->DrawImageCel(Sexy::IMAGE_SURVIVAL_THUMBNAILS, aPosX + 13, aPosY + 4, aDef.mChallengeIconIndex);
@@ -421,7 +422,6 @@ void ChallengeScreen::DrawButton(Graphics* g, int theChallengeIndex)
 			{
 				g->DrawImageCel(Sexy::IMAGE_CHALLENGE_THUMBNAILS, aPosX + 13, aPosY + 4, aDef.mChallengeIconIndex);
 			}
-			g->SetScale(1.0f, 1.0f, aPosX + 13, aPosY + 4);
 
 			bool aHighLight = aChallengeButton->mIsOver && theChallengeIndex != mUnlockChallengeIndex;
 			g->SetColorizeImages(false);
@@ -483,15 +483,16 @@ void ChallengeScreen::DrawButton(Graphics* g, int theChallengeIndex)
 
 void ChallengeScreen::Draw(Graphics* g)
 {
+	int aPad = (int)(BOARD_OFFSET - 220);
 	g->SetLinearBlend(true);
 	g->DrawImage(Sexy::IMAGE_CHALLENGE_BACKGROUND, 0, 0);
 
-	TodDrawString(g, GetPageTitle(mPageIndex), 400, 58, Sexy::FONT_HOUSEOFTERROR28, Color(220, 220, 220), DS_ALIGN_CENTER);
+	TodDrawString(g, GetPageTitle(mPageIndex), 400 + aPad, 58, Sexy::FONT_HOUSEOFTERROR28, Color(220, 220, 220), DS_ALIGN_CENTER);
 
 	int aTrophiesGot = mApp->GetNumTrophies(mPageIndex);
 	int aTrophiesTotal = mApp->GetTotalTrophies(mPageIndex);
-	TodDrawString(g, aTrophiesTotal > 0 ? StrFormat(_S("%d/%d"), aTrophiesGot, aTrophiesTotal) : "None", 739, 73, Sexy::FONT_DWARVENTODCRAFT12, Color(255, 240, 0), DS_ALIGN_CENTER);
-	TodDrawImageScaledF(g, Sexy::IMAGE_TROPHY, 718, 26, 0.5f, 0.5f);
+	TodDrawString(g, aTrophiesTotal > 0 ? StrFormat(_S("%d/%d"), aTrophiesGot, aTrophiesTotal) : "None", 739 + aPad, 73, Sexy::FONT_DWARVENTODCRAFT12, Color(255, 240, 0), DS_ALIGN_CENTER);
+	TodDrawImageScaledF(g, Sexy::IMAGE_TROPHY, 718 + (float)aPad, 26, 0.5f, 0.5f);
 
 	for (int aChallengeMode = 0; aChallengeMode < NUM_CHALLENGE_MODES; aChallengeMode++)
 		DrawButton(g, aChallengeMode);
