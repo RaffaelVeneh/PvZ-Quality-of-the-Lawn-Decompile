@@ -104,6 +104,8 @@ public:
 
 	inline unsigned int DataArrayGetID(T* theItem)
 	{
+		if (theItem == nullptr)
+			return 0;
 		DataArrayItem* aItem = (DataArrayItem*)theItem;
 		TOD_ASSERT(DataArrayGet(aItem->mID) == theItem, "Failed: DataArrayGetID(0x%x) for %s", theItem, mName);
 		return aItem->mID;

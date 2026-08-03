@@ -848,9 +848,20 @@ void Projectile::UpdateNormalMotion()
 			mApp->PlayFoley(FOLEY_BONK); // Make a bounce sound
 		}
 	}
-	else if (mMotionType == ProjectileMotion::MOTION_HOMING)
+	else if (mMotionType == ProjectileMotion::MOTION_HOMING || mMotionType == ProjectileMotion::MOTION_HOMING_FAST)
 	{
+		float aSpeed = (mMotionType == ProjectileMotion::MOTION_HOMING_FAST) ? 12.0f : 2.0f;
 		Zombie* aZombie = mBoard->ZombieTryToGet(mTargetZombieID);
+		if (aZombie == nullptr || aZombie->mDead || aZombie->mZombiePhase == ZombiePhase::PHASE_ZOMBIE_DYING)
+		{
+			Zombie* aNewTarget = mBoard->FindClosestZombie(mPosX, mPosY);
+			if (aNewTarget != nullptr)
+			{
+				mTargetZombieID = mBoard->ZombieGetID(aNewTarget);
+				aZombie = aNewTarget;
+			}
+		}
+
 		if (aZombie && aZombie->EffectedByDamage((unsigned int)mDamageRangeFlags))
 		{
 			Rect aZombieRect = aZombie->GetZombieRect();
@@ -861,36 +872,17 @@ void Projectile::UpdateNormalMotion()
 
 			aMotion += aToTarget * (0.001f * mProjectileAge);
 			aMotion = aMotion.Normalize();
-			aMotion *= 2.0f;
+			aMotion *= aSpeed;
 
 			mVelX = aMotion.x;
 			mVelY = aMotion.y;
 			mRotation = -atan2(mVelY, mVelX);
 		}
-
-		mPosY += mVelY;
-		mPosX += mVelX;
-		mShadowY += mVelY;
-		mRow = mBoard->PixelToGridYKeepOnBoard(mPosX, mPosY);
-	}
-	else if (mMotionType == ProjectileMotion::MOTION_HOMING_FAST)
-	{
-		Zombie* aZombie = mBoard->ZombieTryToGet(mTargetZombieID);
-		if (aZombie && aZombie->EffectedByDamage((unsigned int)mDamageRangeFlags))
+		else
 		{
-			Rect aZombieRect = aZombie->GetZombieRect();
-			SexyVector2 aTargetCenter(aZombie->ZombieTargetLeadX(0.0f), aZombieRect.mY + aZombieRect.mHeight / 2);
-			SexyVector2 aProjectileCenter(mPosX + mWidth / 2, mPosY + mHeight / 2);
-			SexyVector2 aToTarget = (aTargetCenter - aProjectileCenter).Normalize();
-			SexyVector2 aMotion(mVelX, mVelY);
-
-			aMotion += aToTarget * (0.001f * mProjectileAge);
-			aMotion = aMotion.Normalize();
-			aMotion *= 20.0f;
-
-			mVelX = aMotion.x;
-			mVelY = aMotion.y;
-			mRotation = -atan2(mVelY, mVelX);
+			mVelX = aSpeed;
+			mVelY = 0.0f;
+			mRotation = 0.0f;
 		}
 
 		mPosY += mVelY;
@@ -976,17 +968,24 @@ void Projectile::UpdateNormalMotion()
 	}
 	else
 	{
-		if (mProjectileType == ProjectileType::PROJECTILE_BOUNCING_PEA)
+		if (mVelY != 0.0f)
+		{
+			mPosX += mVelX;
+			mPosY += mVelY;
+			mShadowY += mVelY;
+			mRow = mBoard->PixelToGridYKeepOnBoard((int)mPosX, (int)mPosY);
+		}
+		else if (mProjectileType == ProjectileType::PROJECTILE_BOUNCING_PEA)
 		{
 			mPosX += mVelX;
 		}
 		else if (mProjectileType == ProjectileType::PROJECTILE_PEA_SNIPE)
 		{
-			mPosX += 20.33f;
+			mPosX += (mVelX > 0.0f) ? mVelX : 20.33f;
 		}
 		else
 		{
-			mPosX += 3.33f;
+			mPosX += (mVelX > 0.0f) ? mVelX : 3.33f;
 		}
 	}
 

@@ -1451,6 +1451,10 @@ void Plant::UpdateShooter()
         {
             hasTarget = (FindTargetZombie(mRow, WEAPON_PRIMARY) || FindTargetZombie(mRow, WEAPON_SECONDARY));
         }
+        else if (aWeaponDef.mPattern == PATTERN_TARGETED_STRAIGHT || aWeaponDef.mPattern == PATTERN_HOMING || mSeedType == SeedType::SEED_CATTAIL)
+        {
+            hasTarget = (FindTargetZombie(mRow, WEAPON_PRIMARY) != nullptr);
+        }
         else if (mSeedType == SeedType::SEED_CACTUS || mSeedType == SeedType::SEED_MAD_CACTUS)
         {
             hasTarget = (FindTargetZombie(mRow, WEAPON_PRIMARY) || FindTargetZombie(mRow, WEAPON_SECONDARY));
@@ -6785,9 +6789,33 @@ void Plant::Fire(Zombie* theTargetZombie, int theRow, PlantWeapon thePlantWeapon
         }
         else if (mSeedType == SeedType::SEED_COMMANDOPEA || mSeedType == SeedType::SEED_GENERALPEA)
         {
-            // This is now handled in UpdateCommandoPea, but we set the projectile type here
-            aProjectile->mMotionType = ProjectileMotion::MOTION_HOMING_FAST;
-            aProjectile->mTargetZombieID = mBoard->ZombieGetID(theTargetZombie);
+            float aSpeed = 16.0f;
+            if (theTargetZombie != nullptr)
+            {
+                Rect aZombieRect = theTargetZombie->GetZombieRect();
+                float aTargetX = (float)theTargetZombie->ZombieTargetLeadX(0.0f);
+                float aTargetY = (float)(aZombieRect.mY + aZombieRect.mHeight / 2);
+                float aDx = aTargetX - (float)aOriginX;
+                float aDy = aTargetY - (float)aOriginY;
+                float aDist = sqrtf(aDx * aDx + aDy * aDy);
+                if (aDist > 1.0f)
+                {
+                    aProjectile->mVelX = (aDx / aDist) * aSpeed;
+                    aProjectile->mVelY = (aDy / aDist) * aSpeed;
+                }
+                else
+                {
+                    aProjectile->mVelX = aSpeed;
+                    aProjectile->mVelY = 0.0f;
+                }
+            }
+            else
+            {
+                aProjectile->mVelX = aSpeed;
+                aProjectile->mVelY = 0.0f;
+            }
+            aProjectile->mMotionType = ProjectileMotion::MOTION_STRAIGHT;
+            aProjectile->mRotation = -atan2f(aProjectile->mVelY, aProjectile->mVelX);
         }
         else if (mSeedType == SeedType::SEED_COBCANNON)
         {
@@ -7273,6 +7301,10 @@ PlantWeaponDef GetPlantWeaponDef(SeedType theSeedType)
         return { 1, 25, 25, 35.0f, PATTERN_STAR_5WAY, PROJECTILE_RED_STAR };
     case SeedType::SEED_SPLITPEA:
         return { 2, 25, 26, 45.0f, PATTERN_SPLIT_BACK, PROJECTILE_PEA };
+    case SeedType::SEED_COMMANDOPEA:
+        return { 1, 25, 26, 45.0f, PATTERN_TARGETED_STRAIGHT, PROJECTILE_PEA_SNIPE };
+    case SeedType::SEED_GENERALPEA:
+        return { 2, 20, 26, 45.0f, PATTERN_TARGETED_STRAIGHT, PROJECTILE_PEA_SNIPE };
     case SeedType::SEED_CATTAIL:
         return { 2, 25, 25, 35.0f, PATTERN_HOMING, PROJECTILE_SPIKE };
     default:
