@@ -243,6 +243,8 @@ public:
     int                     mBlackThreepeaterShotCount;
     int                     mBlackThreepeaterSpecialBurstCount;
     int                     mBlackThreepeaterSpecialBurstTimer;
+    int                     mShootingBurstCount;
+    int                     mShootingBurstTimer;
     int                     mIcePlanternChillCounter;
     bool                    mIsIceBoosted;
     int                     mSourStarfruitShotCount;
@@ -424,3 +426,27 @@ public:
 extern PlantDefinition gPlantDefs[SeedType::NUM_SEED_TYPES];
 
 /*inline*/ PlantDefinition& GetPlantDefinition(SeedType theSeedType);
+
+enum FiringPattern
+{
+    PATTERN_STRAIGHT = 0,
+    PATTERN_THREE_ROW,
+    PATTERN_SPLIT_BACK,
+    PATTERN_STAR_5WAY,
+    PATTERN_LOBBED,
+    PATTERN_HOMING,
+    PATTERN_AREA_ROW,
+    PATTERN_AREA_AROUND
+};
+
+struct PlantWeaponDef
+{
+    int             mShotCount;
+    int             mSubShotInterval;
+    int             mAnimFrameDelay;
+    float           mAnimSpeed;
+    FiringPattern   mPattern;
+    ProjectileType  mDefaultProjectile;
+};
+
+PlantWeaponDef GetPlantWeaponDef(SeedType theSeedType);

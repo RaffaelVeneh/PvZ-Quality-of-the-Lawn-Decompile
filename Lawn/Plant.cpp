@@ -30,9 +30,9 @@ PlantDefinition gPlantDefs[SeedType::NUM_SEED_TYPES] = {
     { SeedType::SEED_CHERRYBOMB,        nullptr, ReanimationType::REANIM_CHERRYBOMB,    3,  150,    5000,   PlantSubClass::SUBCLASS_NORMAL,     0,      _S("CHERRY_BOMB"),      1 },
     { SeedType::SEED_WALLNUT,           nullptr, ReanimationType::REANIM_WALLNUT,       2,  50,     3000,   PlantSubClass::SUBCLASS_NORMAL,     0,      _S("WALL_NUT"),         0 },
     { SeedType::SEED_POTATOMINE,        nullptr, ReanimationType::REANIM_POTATOMINE,    37, 25,     3000,   PlantSubClass::SUBCLASS_NORMAL,     0,      _S("POTATO_MINE"),      0 },
-    { SeedType::SEED_SNOWPEA,           nullptr, ReanimationType::REANIM_SNOWPEA,       4,  175,    750,    PlantSubClass::SUBCLASS_SHOOTER,    150,    _S("SNOW_PEA"),         1 },
+    { SeedType::SEED_SNOWPEA,           nullptr, ReanimationType::REANIM_SNOWPEA,       4,  175,    750,    PlantSubClass::SUBCLASS_SHOOTER,    150,    _S("SNOW_PEA"),         2 },
     { SeedType::SEED_CHOMPER,           nullptr, ReanimationType::REANIM_CHOMPER,       31, 150,    750,    PlantSubClass::SUBCLASS_NORMAL,     0,      _S("CHOMPER"),          0 },
-    { SeedType::SEED_REPEATER,          nullptr, ReanimationType::REANIM_REPEATER,      5,  200,    750,    PlantSubClass::SUBCLASS_SHOOTER,    150,    _S("REPEATER"),         1 },
+    { SeedType::SEED_REPEATER,          nullptr, ReanimationType::REANIM_REPEATER,      5,  200,    750,    PlantSubClass::SUBCLASS_SHOOTER,    150,    _S("REPEATER"),         2 },
     { SeedType::SEED_PUFFSHROOM,        nullptr, ReanimationType::REANIM_PUFFSHROOM,    6,  0,      750,    PlantSubClass::SUBCLASS_SHOOTER,    150,    _S("PUFF_SHROOM"),      1 },
     { SeedType::SEED_SUNSHROOM,         nullptr, ReanimationType::REANIM_SUNSHROOM,     7,  25,     750,    PlantSubClass::SUBCLASS_NORMAL,     2000,   _S("SUN_SHROOM"),       0 },
     { SeedType::SEED_FUMESHROOM,        nullptr, ReanimationType::REANIM_FUMESHROOM,    9,  75,     750,    PlantSubClass::SUBCLASS_SHOOTER,    150,    _S("FUME_SHROOM"),      1 },
@@ -165,6 +165,8 @@ void Plant::PlantInitialize(int theGridX, int theGridY, SeedType theSeedType, Se
     mLaunchRate = aPlantDef.mLaunchRate;
     mSubclass = aPlantDef.mSubClass;
     mRenderOrder = CalcRenderOrder();
+    mShootingBurstCount = 0;
+    mShootingBurstTimer = 0;
     mHealCountdown = 0;
     mPlantMaxHealthOriginal = 0;
     mIsBoostedByPlantern = false;
@@ -1042,27 +1044,25 @@ bool Plant::FindTargetAndFire(int theRow, PlantWeapon thePlantWeapon)
     }
     else if (aHeadReanim && aHeadReanim->TrackExists("anim_shooting"))
     {
+        PlantWeaponDef aWeaponDef = GetPlantWeaponDef(mSeedType);
         aHeadReanim->StartBlend(20);
         aHeadReanim->mLoopType = ReanimLoopType::REANIM_PLAY_ONCE_AND_HOLD;
-        aHeadReanim->mAnimRate = 35.0f;
+        aHeadReanim->mAnimRate = aWeaponDef.mAnimSpeed;
         aHeadReanim->SetFramesForLayer("anim_shooting");
-
-        mShootingCounter = 33;
-        if (mSeedType == SeedType::SEED_REPEATER || mSeedType == SeedType::SEED_SPLITPEA || mSeedType == SeedType::SEED_LEFTPEATER)
+        mShootingCounter = aWeaponDef.mAnimFrameDelay;
+    }
+    else if (mSeedType == SeedType::SEED_CACTUS || mSeedType == SeedType::SEED_MAD_CACTUS)
+    {
+        if (mState == PlantState::STATE_CACTUS_HIGH)
         {
-            aHeadReanim->mAnimRate = 45.0f;
+            PlayBodyReanim("anim_shootinghigh", ReanimLoopType::REANIM_PLAY_ONCE_AND_HOLD, 20, 35.0f);
+            mShootingCounter = 23;
+        }
+        else
+        {
+            PlayBodyReanim("anim_shooting", ReanimLoopType::REANIM_PLAY_ONCE_AND_HOLD, 20, 35.0f);
             mShootingCounter = 26;
         }
-        else if (mSeedType == SeedType::SEED_GATLINGPEA)
-        {
-            aHeadReanim->mAnimRate = 38.0f;
-            mShootingCounter = 100;
-        }
-    }
-    else if (mState == PlantState::STATE_CACTUS_HIGH)
-    {
-        PlayBodyReanim("anim_shootinghigh", ReanimLoopType::REANIM_PLAY_ONCE_AND_HOLD, 20, 35.0f);
-        mShootingCounter = 23;
     }
     else if (mSeedType == SeedType::SEED_GLOOMSHROOM)
     {
@@ -1355,34 +1355,67 @@ void Plant::FireSourStarfruit()
 
 void Plant::UpdateShooter()
 {
-    if (mChilledCounter > 0 && mBoard->mMainCounter % 2 == 1) // Add this check
+    if (mChilledCounter > 0 && mBoard->mMainCounter % 2 == 1)
         return;
 
+    PlantWeaponDef aWeaponDef = GetPlantWeaponDef(mSeedType);
+
+    // --- Active Burst Sub-Shot Processing ---
+    if (mShootingBurstCount > 0 && mShootingCounter == 0)
+    {
+        if (aWeaponDef.mPattern == PATTERN_THREE_ROW)
+        {
+            LaunchThreepeater();
+        }
+        else if (aWeaponDef.mPattern == PATTERN_STAR_5WAY)
+        {
+            if (mSeedType == SeedType::SEED_SOUR_STARFRUIT)
+                LaunchSourStarfruit();
+            else
+                LaunchStarFruit();
+        }
+        else if (mSeedType == SeedType::SEED_CACTUS || mSeedType == SeedType::SEED_MAD_CACTUS)
+        {
+            if (mState == PlantState::STATE_CACTUS_HIGH)
+                FindTargetAndFire(mRow, PlantWeapon::WEAPON_PRIMARY);
+            else if (mState == PlantState::STATE_CACTUS_LOW)
+                FindTargetAndFire(mRow, PlantWeapon::WEAPON_SECONDARY);
+        }
+        else
+        {
+            FindTargetAndFire(mRow, PlantWeapon::WEAPON_PRIMARY);
+            if (aWeaponDef.mPattern == PATTERN_SPLIT_BACK)
+            {
+                FindTargetAndFire(mRow, PlantWeapon::WEAPON_SECONDARY);
+            }
+        }
+
+        mShootingBurstCount--;
+    }
+
+    // --- Primary Launch Countdown ---
     mLaunchCounter--;
     if (mIsBoosted)
     {
-        mLaunchCounter--; // 100%
-        mLaunchCounter--; // 100%
-        //each 'mLaunchCounter--;' will boost by 100%
+        mLaunchCounter--;
+        mLaunchCounter--;
     }
     if (mLaunchCounter <= 0)
     {
-        // --- Dynamic Fire Rate Logic ---
         int aNewLaunchRate = mLaunchRate;
 
         if (mSeedType == SEED_GLOOMSHROOM)
         {
             if (mGloomMode == GLOOM_RAPID || mGloomMode == GLOOM_RAPID_RANGER)
             {
-                aNewLaunchRate = 133; // 200 / 1.5 = ~133 (50% faster)
+                aNewLaunchRate = 133;
             }
         }
 
         if (mSeedType == SeedType::SEED_SPLITPEA)
         {
             bool aTargetInFront = (FindTargetZombie(mRow, PlantWeapon::WEAPON_PRIMARY) != nullptr);
-
-            bool aTargetBehind = false; // Check for zombies physically behind (Somehow this work, so Do Not Change!)
+            bool aTargetBehind = false;
             Rect aBackRect = GetPlantAttackRect(PlantWeapon::WEAPON_SECONDARY);
             Zombie* aZombieIter = nullptr;
             while (mBoard->IterateZombies(aZombieIter))
@@ -1398,87 +1431,50 @@ void Plant::UpdateShooter()
                 }
             }
 
-            if (aTargetBehind) aNewLaunchRate /= 3; // 3x faster
-            else if (aTargetInFront) aNewLaunchRate *= 1.5; // 50% slower
+            if (aTargetBehind) aNewLaunchRate /= 3;
+            else if (aTargetInFront) aNewLaunchRate *= 1.5;
         }
 
         if (mIsOnPotAndLily)
         {
-            aNewLaunchRate *= 0.75f; // 25% faster
+            aNewLaunchRate *= 0.75f;
         }
         mLaunchCounter = aNewLaunchRate - Sexy::Rand(15);
 
-
-        // --- Firing Logic ---
-        if (mSeedType == SeedType::SEED_THREEPEATER || mSeedType == SeedType::SEED_BLACK_THREEPEATER)
+        // Check if any target exists before starting burst
+        bool hasTarget = false;
+        if (aWeaponDef.mPattern == PATTERN_THREE_ROW)
         {
-            LaunchThreepeater();
+            hasTarget = (FindTargetZombie(mRow - 1, WEAPON_PRIMARY) || FindTargetZombie(mRow, WEAPON_PRIMARY) || FindTargetZombie(mRow + 1, WEAPON_PRIMARY));
         }
-        else if (mSeedType == SeedType::SEED_STARFRUIT)
+        else if (aWeaponDef.mPattern == PATTERN_SPLIT_BACK)
         {
-            LaunchStarFruit();
-        }
-        else if (mSeedType == SeedType::SEED_SOUR_STARFRUIT)
-        {
-            LaunchSourStarfruit();
-        }
-        else if (mSeedType == SeedType::SEED_SPLITPEA)
-        {
-            FindTargetAndFire(mRow, PlantWeapon::WEAPON_SECONDARY);
+            hasTarget = (FindTargetZombie(mRow, WEAPON_PRIMARY) || FindTargetZombie(mRow, WEAPON_SECONDARY));
         }
         else if (mSeedType == SeedType::SEED_CACTUS || mSeedType == SeedType::SEED_MAD_CACTUS)
         {
-            if (mState == PlantState::STATE_CACTUS_HIGH)
-            {
-                FindTargetAndFire(mRow, PlantWeapon::WEAPON_PRIMARY);
-            }
-            else if (mState == PlantState::STATE_CACTUS_LOW)
-            {
-                FindTargetAndFire(mRow, PlantWeapon::WEAPON_SECONDARY);
-            }
+            hasTarget = (FindTargetZombie(mRow, WEAPON_PRIMARY) || FindTargetZombie(mRow, WEAPON_SECONDARY));
         }
         else
         {
-            if (mSeedType != SeedType::SEED_COMMANDOPEA && mSeedType != SeedType::SEED_HATTREMWITCH && mSeedType != SeedType::SEED_NIGHTCAP &&
-                mSeedType != SeedType::SEED_GENERALPEA && mSeedType != SeedType::SEED_HATTREMSAGE && mSeedType != SeedType::SEED_DARKCAP)
+            hasTarget = (FindTargetZombie(mRow, WEAPON_PRIMARY) != nullptr);
+        }
+
+        if (hasTarget)
+        {
+            if (mSeedType == SeedType::SEED_SNOWPEA)
             {
-                bool firedFront = FindTargetAndFire(mRow, PlantWeapon::WEAPON_PRIMARY);
-
-                // Special check for Split Pea's back head
-                if (mSeedType == SeedType::SEED_SPLITPEA)
-                {
-                    if (FindTargetZombie(mRow, PlantWeapon::WEAPON_SECONDARY))
-                    {
-                        // If the front head already started the animation, just Fire().
-                        // Otherwise, call FindTargetAndFire() so the back head can start it.
-                        if (firedFront)
-                        {
-                            Fire(nullptr, mRow, PlantWeapon::WEAPON_SECONDARY);
-                        }
-                        else
-                        {
-                            FindTargetAndFire(mRow, PlantWeapon::WEAPON_SECONDARY);
-                        }
-                    }
-                }
+                int aChance = Rand(100);
+                if (aChance < 10)       mShootingBurstCount = 3; // 10% chance for 3 shots
+                else if (aChance < 60)  mShootingBurstCount = 2; // 50% chance for 2 shots
+                else                    mShootingBurstCount = 1; // 40% chance for 1 shot
             }
-        }
-    }
-
-    if (mLaunchCounter == 50 && mSeedType == SeedType::SEED_CATTAIL)
-    {
-        FindTargetAndFire(mRow, PlantWeapon::WEAPON_PRIMARY);
-    }
-    if (mLaunchCounter == 25)
-    {
-        if (mSeedType == SeedType::SEED_REPEATER || mSeedType == SeedType::SEED_LEFTPEATER)
-        {
-            FindTargetAndFire(mRow, PlantWeapon::WEAPON_PRIMARY);
-        }
-        else if (mSeedType == SeedType::SEED_SPLITPEA)
-        {
-            FindTargetAndFire(mRow, PlantWeapon::WEAPON_PRIMARY);
-            FindTargetAndFire(mRow, PlantWeapon::WEAPON_SECONDARY);
+            else
+            {
+                mShootingBurstCount = aWeaponDef.mShotCount;
+            }
+            if (mShootingBurstCount < 1) mShootingBurstCount = 1;
+            mShootingBurstTimer = 0;
         }
     }
 }
@@ -6349,7 +6345,15 @@ void Plant::Fire(Zombie* theTargetZombie, int theRow, PlantWeapon thePlantWeapon
         aProjectileType = ProjectileType::PROJECTILE_GRAPESHOT;
         break;
     case SeedType::SEED_SNOWPEA:
-        aProjectileType = ProjectileType::PROJECTILE_SNOWPEA;
+        if (Rand(100) < 15)
+        {
+            aProjectileType = ProjectileType::PROJECTILE_ICEPEA;
+            mApp->PlayFoley(FoleyType::FOLEY_FROZEN);
+        }
+        else
+        {
+            aProjectileType = ProjectileType::PROJECTILE_SNOWPEA;
+        }
         break;
     case SeedType::SEED_ICEPEA:
         aProjectileType = ProjectileType::PROJECTILE_ICEPEA;
@@ -6655,21 +6659,7 @@ void Plant::Fire(Zombie* theTargetZombie, int theRow, PlantWeapon thePlantWeapon
     }
 
     const PlantDefinition& aPlantDef = GetPlantDefinition(mSeedType);
-    int aNumProjectiles = aPlantDef.mProjectilesPerShot;
-
-    if (mSeedType == SeedType::SEED_SNOWPEA || mSeedType == SeedType::SEED_WINTERMELON || mSeedType == SeedType::SEED_ICEPEA)
-    {
-        int aChance = Rand(100); // Generate a random number from 0 to 99
-        if (aChance < 5) // 5% chance
-        {
-            aNumProjectiles = 3;
-        }
-        else if (aChance < 40) // 35% chance
-        {
-            aNumProjectiles = 2;
-        }
-        // The remaining 50% of the time, it will fire the default 1 projectile
-    }
+    int aNumProjectiles = 1; // Each burst tick fires 1 projectile matching 1 animation frame
 
     if (aProjectileType == PROJECTILE_BIG_FIREPEA)
     {
@@ -7252,6 +7242,41 @@ void Plant::Die()
             Reanimation* aPotReanim = mApp->ReanimationGet(aFlowerPot->mBodyReanimID);
             aPotReanim->mAnimRate = RandRangeFloat(10.0f, 15.0f);
         }
+    }
+}
+
+PlantWeaponDef GetPlantWeaponDef(SeedType theSeedType)
+{
+    switch (theSeedType)
+    {
+    case SeedType::SEED_PEASHOOTER:
+        return { 1, 25, 26, 45.0f, PATTERN_STRAIGHT, PROJECTILE_PEA };
+    case SeedType::SEED_SNOWPEA:
+        return { 1, 25, 26, 45.0f, PATTERN_STRAIGHT, PROJECTILE_SNOWPEA };
+    case SeedType::SEED_CACTUS:
+    case SeedType::SEED_MAD_CACTUS:
+        return { 2, 25, 26, 45.0f, PATTERN_STRAIGHT, PROJECTILE_SPIKE };
+    case SeedType::SEED_REPEATER:
+        return { 2, 25, 26, 45.0f, PATTERN_STRAIGHT, PROJECTILE_PEA };
+    case SeedType::SEED_GATLINGPEA:
+        return { 4, 20, 20, 45.0f, PATTERN_STRAIGHT, PROJECTILE_PEA };
+    case SeedType::SEED_THREEPEATER:
+    case SeedType::SEED_BLACK_THREEPEATER:
+        return { 1, 25, 26, 45.0f, PATTERN_THREE_ROW, PROJECTILE_PEA };
+    case SeedType::SEED_PUFFSHROOM:
+    case SeedType::SEED_SCAREDYSHROOM:
+    case SeedType::SEED_SEASHROOM:
+        return { 1, 25, 25, 35.0f, PATTERN_STRAIGHT, PROJECTILE_PUFF };
+    case SeedType::SEED_STARFRUIT:
+        return { 1, 25, 25, 35.0f, PATTERN_STAR_5WAY, PROJECTILE_STAR };
+    case SeedType::SEED_SOUR_STARFRUIT:
+        return { 1, 25, 25, 35.0f, PATTERN_STAR_5WAY, PROJECTILE_RED_STAR };
+    case SeedType::SEED_SPLITPEA:
+        return { 2, 25, 26, 45.0f, PATTERN_SPLIT_BACK, PROJECTILE_PEA };
+    case SeedType::SEED_CATTAIL:
+        return { 2, 25, 25, 35.0f, PATTERN_HOMING, PROJECTILE_SPIKE };
+    default:
+        return { 1, 25, 26, 45.0f, PATTERN_STRAIGHT, PROJECTILE_PEA };
     }
 }
 
