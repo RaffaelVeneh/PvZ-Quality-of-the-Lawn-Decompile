@@ -314,7 +314,10 @@ void DrawSeedPacket(Graphics* g, float x, float y, SeedType theSeedType, SeedTyp
 	}
 	else
 	{
+		bool aLinear = g->mLinearBlend;
+		g->SetLinearBlend(false);
 		TodDrawImageCelScaledF(g, Sexy::IMAGE_SEEDS, x, y, aPacketBackground, 0, g->mScaleX, g->mScaleY);
+		g->SetLinearBlend(aLinear);
 	}
 
 	float aScale = 0.5f;

@@ -91,7 +91,7 @@
 <Image id="SEEDCHOOSER_BUTTON2" path="SeedChooser_Button2" />
 <Image id="SEEDCHOOSER_BUTTON2_GLOW" path="SeedChooser_Button2_Glow" />
 <Image id="SEEDCHOOSER_IMITATERADDON" path="SeedChooser_ImitaterAddOn" />  
-<Image id="SEEDS" path="seeds" cols="10" />
+<Image id="SEEDS" path="seeds" cols="9" />
 <Image id="SEEDPACKET_LARGER" path="SeedPacket_Larger" />
 <Image id="SEEDPACKETSILHOUETTE" path="SeedPacketSilhouette" />
 <Image id="FLAGMETER" path="FlagMeter" rows="2" minsubdivide="" />
@@ -133,7 +133,7 @@
 <Image id="SELECTORSCREEN_ALMANACHIGHLIGHT" path="SelectorScreen_AlmanacHighlight"  />
 <Image id="SELECTORSCREEN_STORE" path="SelectorScreen_Store"  />
 <Image id="SELECTORSCREEN_STOREHIGHLIGHT" path="SelectorScreen_StoreHighlight"  />
-<Image id="SELECTORSCREEN_LEVELNUMBERS" path="SelectorScreen_LevelNumbers" cols="10" />
+<Image id="SELECTORSCREEN_LEVELNUMBERS" path="SelectorScreen_LevelNumbers" cols="9" />
 <Image id="SELECTORSCREEN_ZENGARDEN" path="SelectorScreen_ZenGarden"  />
 <Image id="ACHIEVEMENT_BUTTON" path="Achievements_pedestal"  />
 <Image id="ACHIEVEMENT_HIGHLIGHT" path="Achievements_pedestal_press"  />

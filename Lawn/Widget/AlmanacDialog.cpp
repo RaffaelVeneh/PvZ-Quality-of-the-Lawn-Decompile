@@ -101,14 +101,14 @@ AlmanacDialog::AlmanacDialog(LawnApp* theApp) : LawnDialog(theApp, DIALOG_ALMANA
 	mPlantSlider = new Sexy::Slider(IMAGE_OPTIONS_SLIDERSLOT_PLANT, IMAGE_OPTIONS_SLIDERKNOB_PLANT, 0, this);
 	mPlantSlider->SetValue(max(0.0, min(mMaxScrollPosition, mScrollPosition)));
 	mPlantSlider->mHorizontal = false;
-	mPlantSlider->Resize(10, 85, 20, 470);
+	mPlantSlider->Resize(10 + (int)(BOARD_OFFSET - 240), 85, 20, 470);
 	mPlantSlider->mThumbOffsetX = -5;
 	mPlantSlider->mVisible = false;
 
 	mZombieSlider = new Sexy::Slider(IMAGE_CHALLENGE_SLIDERSLOT, IMAGE_OPTIONS_SLIDERKNOB2, 0, this);
 	mZombieSlider->SetValue(max(0.0, min(mMaxScrollPosition, mScrollPosition)));
 	mZombieSlider->mHorizontal = false;
-	mZombieSlider->Resize(10, 85, 20, 470);
+	mZombieSlider->Resize(10 + (int)(BOARD_OFFSET - 240), 85, 20, 470);
 	mZombieSlider->mThumbOffsetX = -1;
 	mZombieSlider->mVisible = false;
 
@@ -697,15 +697,18 @@ void AlmanacDialog::Draw(Graphics* g)
 
 void AlmanacDialog::GetSeedPosition(SeedType theSeedType, int& x, int& y)
 {
-	SeedType aPlantIndex = theSeedType;
-	if (aPlantIndex > SeedType::SEED_IMITATER)
-		aPlantIndex = (SeedType)(aPlantIndex - 1);
+	int aPad = (int)(BOARD_OFFSET - 220);
+	if (theSeedType == SeedType::SEED_IMITATER)
+	{
+		x = 28 + aPad;
+		y = 560 - (int)mScrollPosition;
+		return;
+	}
 
-	int aFinalSeedType = (int)aPlantIndex;
-	int col = aFinalSeedType % seedPacketRows;
-	int row = aFinalSeedType / seedPacketRows;
-	x = 26 + col * 53 + (int)(BOARD_OFFSET - 220);
-	y = 82 + row * 78 - (int)mScrollPosition;
+	int col = (int)theSeedType % seedPacketRows;
+	int row = (int)theSeedType / seedPacketRows;
+	x = 28 + col * 52 + aPad;
+	y = 92 + row * 78 - (int)mScrollPosition;
 }
 
 SeedType AlmanacDialog::SeedHitTest(int x, int y)
