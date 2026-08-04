@@ -952,11 +952,8 @@ void SeedBank::Draw(Graphics* g)
 		return;
 	}
 
-	if (mApp->mGameScene != GameScenes::SCENE_PLAYING)
-	{
-		g->mTransX -= mBoard->mX;
-		g->mTransY -= mBoard->mY;
-	}
+	g->mTransX -= mBoard->mX;
+	g->mTransY -= mBoard->mY;
 
 	if (mApp->IsSlotMachineLevel())
 	{
@@ -1004,11 +1001,8 @@ void SeedBank::Draw(Graphics* g)
 		TodDrawString(g, aMoneyLabel, 34, 78, FONT_CONTINUUMBOLD14, aMoneyColor, DrawStringJustification::DS_ALIGN_CENTER);
 	}
 
-	if (mApp->mGameScene != GameScenes::SCENE_PLAYING)
-	{
-		g->mTransX += mBoard->mX;
-		g->mTransY += mBoard->mY;
-	}
+	g->mTransX += mBoard->mX;
+	g->mTransY += mBoard->mY;
 }
 
 bool SeedBank::MouseHitTest(int x, int y, HitResult* theHitResult)

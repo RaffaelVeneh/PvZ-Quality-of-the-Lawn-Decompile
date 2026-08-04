@@ -16,8 +16,8 @@ const int           LAWN_YMIN = 80;
 const int           HIGH_GROUND_HEIGHT = 30;
 
 const int           SEEDBANK_MAX = 10;
-const int           SEED_BANK_OFFSET_X = 133;
-const int           SEED_BANK_OFFSET_X_END = 10;
+const int           SEED_BANK_OFFSET_X = 0;
+const int           SEED_BANK_OFFSET_X_END = 0;
 const int           SEED_CHOOSER_OFFSET_Y = 516;
 const int           SEED_PACKET_WIDTH = 50;
 const int           SEED_PACKET_HEIGHT = 70;

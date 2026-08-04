@@ -1371,10 +1371,10 @@ void Board::InitSurvivalStage()
 
 Rect Board::GetShovelButtonRect()
 {
-	Rect aRect(GetSeedBankExtraWidth() + 456, 0, Sexy::IMAGE_SHOVELBANK->GetWidth(), Sexy::IMAGE_SEEDBANK->GetHeight());
+	Rect aRect(GetSeedBankExtraWidth() + 456 - (BOARD_OFFSET - 220), 0, Sexy::IMAGE_SHOVELBANK->GetWidth(), Sexy::IMAGE_SEEDBANK->GetHeight());
 	if (mApp->IsSlotMachineLevel() || mApp->IsSquirrelLevel())
 	{
-		aRect.mX = 600;
+		aRect.mX = 600 - (BOARD_OFFSET - 220);
 	}
 	return aRect;
 }
