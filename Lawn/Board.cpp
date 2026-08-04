@@ -152,6 +152,7 @@ Board::Board(LawnApp* theApp)
 	mDaisyMode = mApp->mDaisyMode;
 	mSukhbirMode = mApp->mSukhbirMode;
 	mShowShovel = false;
+	mShowBushes = true;
 	mToolTip = new ToolTipWidget();
 	mDebugFont = new SysFont("Arial Unicode MS", 10, true, false, false);
 	mAdvice = new MessageWidget(mApp);
@@ -6712,7 +6713,147 @@ void Board::DrawGameObjects(Graphics* g)
 	{
 		AddUIRenderItem(aRenderList, aRenderItemCount, RenderObjectType::RENDER_ITEM_STORM, MakeRenderOrder(RenderLayer::RENDER_LAYER_FOG, 0, 3));
 	}
-	AddGameObjectRenderItemCursorPreview(aRenderList, aRenderItemCount, RenderObjectType::RENDER_ITEM_CURSOR_PREVIEW, mCursorPreview);
+	// Add Bushes to Render Queue
+	if (mShowBushes)
+	{
+		static Image* sB_base = nullptr;
+		static Image* sBN_base = nullptr;
+		static Image* sBD[5] = { nullptr };
+		static Image* sBN[5] = { nullptr };
+		static Image* sBP[6] = { nullptr };
+		static Image* sBF[6] = { nullptr };
+		static Image* sPole = nullptr;
+		static Image* sPoleNight = nullptr;
+
+		static bool sBushesLoaded = false;
+		if (!sBushesLoaded)
+		{
+			sBushesLoaded = true;
+			sB_base = (Image*)mApp->GetImage("images/B_base.png");
+			sBN_base = (Image*)mApp->GetImage("images/BN_base.png");
+			for (int i = 0; i < 5; i++)
+			{
+				char aBuf[64];
+				sprintf(aBuf, "images/BD%d.png", i);
+				sBD[i] = (Image*)mApp->GetImage(aBuf);
+				sprintf(aBuf, "images/BN%d.png", i);
+				sBN[i] = (Image*)mApp->GetImage(aBuf);
+			}
+			for (int i = 0; i < 6; i++)
+			{
+				char aBuf[64];
+				sprintf(aBuf, "images/BP%d.png", i);
+				sBP[i] = (Image*)mApp->GetImage(aBuf);
+				sprintf(aBuf, "images/BF%d.png", i);
+				sBF[i] = (Image*)mApp->GetImage(aBuf);
+			}
+			sPole = (Image*)mApp->GetImage("images/pole.png");
+			sPoleNight = (Image*)mApp->GetImage("images/pole_night.png");
+		}
+
+		if (mBackground == BackgroundType::BACKGROUND_1_DAY)
+		{
+			if (sB_base && aRenderItemCount < MAX_RENDER_ITEMS)
+			{
+				RenderItem& item = aRenderList[aRenderItemCount++];
+				item.mRenderObjectType = RENDER_ITEM_BUSH;
+				item.mZPos = MakeRenderOrder(RenderLayer::RENDER_LAYER_GROUND, 0, 0);
+				item.mImage = sB_base;
+			}
+			for (int i = 0; i < 5; i++)
+			{
+				if (sBD[i] && aRenderItemCount < MAX_RENDER_ITEMS)
+				{
+					RenderItem& item = aRenderList[aRenderItemCount++];
+					item.mRenderObjectType = RENDER_ITEM_BUSH;
+					item.mZPos = MakeRenderOrder(RenderLayer::RENDER_LAYER_ZOMBIE, i, 9999);
+					item.mImage = sBD[i];
+				}
+			}
+		}
+		else if (mBackground == BackgroundType::BACKGROUND_2_NIGHT)
+		{
+			if (sBN_base && aRenderItemCount < MAX_RENDER_ITEMS)
+			{
+				RenderItem& item = aRenderList[aRenderItemCount++];
+				item.mRenderObjectType = RENDER_ITEM_BUSH;
+				item.mZPos = MakeRenderOrder(RenderLayer::RENDER_LAYER_GROUND, 0, 0);
+				item.mImage = sBN_base;
+			}
+			for (int i = 0; i < 5; i++)
+			{
+				if (sBN[i] && aRenderItemCount < MAX_RENDER_ITEMS)
+				{
+					RenderItem& item = aRenderList[aRenderItemCount++];
+					item.mRenderObjectType = RENDER_ITEM_BUSH;
+					item.mZPos = MakeRenderOrder(RenderLayer::RENDER_LAYER_ZOMBIE, i, 9999);
+					item.mImage = sBN[i];
+				}
+			}
+		}
+		else if (mBackground == BackgroundType::BACKGROUND_3_POOL)
+		{
+			if (sB_base && aRenderItemCount < MAX_RENDER_ITEMS)
+			{
+				RenderItem& item = aRenderList[aRenderItemCount++];
+				item.mRenderObjectType = RENDER_ITEM_BUSH;
+				item.mZPos = MakeRenderOrder(RenderLayer::RENDER_LAYER_GROUND, 0, 0);
+				item.mImage = sB_base;
+			}
+			for (int i = 0; i < 6; i++)
+			{
+				if (sBP[i] && aRenderItemCount < MAX_RENDER_ITEMS)
+				{
+					RenderItem& item = aRenderList[aRenderItemCount++];
+					item.mRenderObjectType = RENDER_ITEM_BUSH;
+					int row = ClampInt(i, 0, 5);
+					item.mZPos = MakeRenderOrder(RenderLayer::RENDER_LAYER_ZOMBIE, row, 9999);
+					item.mImage = sBP[i];
+				}
+			}
+		}
+		else if (mBackground == BackgroundType::BACKGROUND_4_FOG)
+		{
+			if (sBN_base && aRenderItemCount < MAX_RENDER_ITEMS)
+			{
+				RenderItem& item = aRenderList[aRenderItemCount++];
+				item.mRenderObjectType = RENDER_ITEM_BUSH;
+				item.mZPos = MakeRenderOrder(RenderLayer::RENDER_LAYER_GROUND, 0, 0);
+				item.mImage = sBN_base;
+			}
+			for (int i = 0; i < 6; i++)
+			{
+				if (sBF[i] && aRenderItemCount < MAX_RENDER_ITEMS)
+				{
+					RenderItem& item = aRenderList[aRenderItemCount++];
+					item.mRenderObjectType = RENDER_ITEM_BUSH;
+					int row = ClampInt(i, 0, 5);
+					item.mZPos = MakeRenderOrder(RenderLayer::RENDER_LAYER_ZOMBIE, row, 9999);
+					item.mImage = sBF[i];
+				}
+			}
+		}
+		else if (mBackground == BackgroundType::BACKGROUND_5_ROOF)
+		{
+			if (sPole && aRenderItemCount < MAX_RENDER_ITEMS)
+			{
+				RenderItem& item = aRenderList[aRenderItemCount++];
+				item.mRenderObjectType = RENDER_ITEM_BUSH;
+				item.mZPos = MakeRenderOrder(RenderLayer::RENDER_LAYER_ZOMBIE, 5, 9999);
+				item.mImage = sPole;
+			}
+		}
+		else if (mBackground == BackgroundType::BACKGROUND_6_BOSS)
+		{
+			if (sPoleNight && aRenderItemCount < MAX_RENDER_ITEMS)
+			{
+				RenderItem& item = aRenderList[aRenderItemCount++];
+				item.mRenderObjectType = RENDER_ITEM_BUSH;
+				item.mZPos = MakeRenderOrder(RenderLayer::RENDER_LAYER_ZOMBIE, 5, 9999);
+				item.mImage = sPoleNight;
+			}
+		}
+	}
 
 	TodHesitationTrace("start sort");
 	std::sort(aRenderList, aRenderList + aRenderItemCount, RenderItemSortFunc);
@@ -6723,6 +6864,14 @@ void Board::DrawGameObjects(Graphics* g)
 		RenderItem& aRenderItem = aRenderList[i];
 		switch (aRenderItem.mRenderObjectType)
 		{
+		case RenderObjectType::RENDER_ITEM_BUSH:
+		{
+			if (aRenderItem.mImage)
+			{
+				g->DrawImage(aRenderItem.mImage, 773 - 133, 0);
+			}
+			break;
+		}
 		case RenderObjectType::RENDER_ITEM_PLANT:
 		{
 			Plant* aPlant = aRenderItem.mPlant;
@@ -8234,6 +8383,16 @@ void Board::DoTypingCheck(KeyCode theKey)
 void Board::KeyDown(KeyCode theKey)
 {
 	DoTypingCheck(theKey);
+
+	if ((theKey == 'B' || theKey == 'b') && 
+		mApp->mWidgetManager && 
+		mApp->mWidgetManager->mKeyDown[KeyCode::KEYCODE_CONTROL] && 
+		mApp->mWidgetManager->mKeyDown[KeyCode::KEYCODE_SHIFT])
+	{
+		mShowBushes = !mShowBushes;
+		mApp->PlaySample(Sexy::SOUND_BUTTONCLICK);
+		return;
+	}
 
 	if (mApp->mGameScene == GameScenes::SCENE_LEVEL_INTRO && 
 		mApp->mGameMode != GameMode::GAMEMODE_CHALLENGE_ZEN_GARDEN && 

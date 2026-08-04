@@ -70,6 +70,7 @@ public:
 		GridItem*					mGridItem;
 		LawnMower*					mMower;
 		BossPart					mBossPart;
+		Image*						mImage;
 		int							mBoardGridY;
 	};
 };
@@ -173,6 +174,7 @@ public:
 	AdviceType						mHelpIndex;												
 	bool							mFinalBossKilled;										
 	bool							mShowShovel;											
+	bool							mShowBushes;											
 	int								mCoinBankFadeCount;										
 	DebugTextMode					mDebugTextMode;											
 	bool							mLevelComplete;											
@@ -325,6 +327,7 @@ public:
 	/*inline*/ void					ShowCoinBank(int theDuration = 1000);
 	void							FadeOutLevel();
 	void							DrawFadeOut(Graphics* g);
+	void							DrawBushes(Graphics* g);
 	void							DrawIce(Graphics* g, int theGridY);
 	bool							IsIceAt(int theGridX, int theGridY);
 	/*inline*/ ZombieID				ZombieGetID(Zombie* theZombie);

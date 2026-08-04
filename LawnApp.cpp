@@ -674,6 +674,7 @@ StoreScreen* LawnApp::ShowStoreScreen()
 	TOD_ASSERT(!GetDialog((int)Dialogs::DIALOG_STORE));
 
 	StoreScreen* aStoreScreen = new StoreScreen(this);
+	aStoreScreen->Move(BOARD_OFFSET - 220, 0);
 	AddDialog(aStoreScreen);
 	mWidgetManager->SetFocus(aStoreScreen);
 
