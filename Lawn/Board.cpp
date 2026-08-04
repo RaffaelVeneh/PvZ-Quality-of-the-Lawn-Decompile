@@ -165,8 +165,10 @@ Board::Board(LawnApp* theApp)
 	mDebugTextMode = DebugTextMode::DEBUG_TEXT_NONE;
 	mMenuButton = new GameButton(0);
 	mMenuButton->mDrawStoneButton = true;
+	mMenuButton->mParentWidget = this;
 	mFastButton = new GameButton(2);
-	mFastButton->Resize(740, 30, IMAGE_FASTBUTTON->mWidth, 46);
+	mFastButton->mParentWidget = this;
+	mFastButton->Resize(870, 32, IMAGE_FASTBUTTON->mWidth, 46);
 	mStoreButton = nullptr;
 	mIgnoreMouseUp = false;
 	mPeashootersUsed = false;
@@ -181,19 +183,19 @@ Board::Board(LawnApp* theApp)
 	if (mApp->mGameMode == GameMode::GAMEMODE_CHALLENGE_ZEN_GARDEN || mApp->mGameMode == GameMode::GAMEMODE_TREE_OF_WISDOM)
 	{
 		mMenuButton->SetLabel(_S("[MAIN_MENU_BUTTON]"));
-		mMenuButton->Resize(628, -10, 163, 46);
+		mMenuButton->Resize(768, -10, 163, 46);
 
 		mStoreButton = new GameButton(1);
 		mStoreButton->mButtonImage = IMAGE_ZENSHOPBUTTON;
 		mStoreButton->mOverImage = IMAGE_ZENSHOPBUTTON_HIGHLIGHT;
 		mStoreButton->mDownImage = IMAGE_ZENSHOPBUTTON_HIGHLIGHT;
 		mStoreButton->mParentWidget = this;
-		mStoreButton->Resize(678, 33, IMAGE_ZENSHOPBUTTON->mWidth, 40);
+		mStoreButton->Resize(818, 33, IMAGE_ZENSHOPBUTTON->mWidth, 40);
 	}
 	else
 	{
 		mMenuButton->SetLabel(_S("[MENU_BUTTON]"));
-		mMenuButton->Resize(681, -10, 117, 46);
+		mMenuButton->Resize(814, -10, 117, 46);
 		mFastButton->mBtnNoDraw = false;
 	}
 
@@ -1424,6 +1426,7 @@ void Board::GetZenButtonRect(GameObjectType theObjectType, Rect& theRect)
 
 void Board::InitLevel()
 {
+	Move(BOARD_OFFSET - 220, 0);
 	mMainCounter = 0;
 	mEnableGraveStones = false;
 	mSodPosition = 0;
@@ -3391,8 +3394,10 @@ void Board::UpdateMousePosition()
 
 	if (aCursorSeedType == SeedType::SEED_INSTANT_COFFEE)
 	{
-		int aGridX = PlantingPixelToGridX(mApp->mWidgetManager->mLastMouseX, mApp->mWidgetManager->mLastMouseY, aCursorSeedType);
-		int aGridY = PlantingPixelToGridY(mApp->mWidgetManager->mLastMouseX, mApp->mWidgetManager->mLastMouseY, aCursorSeedType);
+		int aMouseX = mApp->mWidgetManager->mLastMouseX - mX;
+		int aMouseY = mApp->mWidgetManager->mLastMouseY - mY;
+		int aGridX = PlantingPixelToGridX(aMouseX, aMouseY, aCursorSeedType);
+		int aGridY = PlantingPixelToGridY(aMouseX, aMouseY, aCursorSeedType);
 
 		Plant* aPlant = GetTopPlantAt(aGridX, aGridY, PlantPriority::TOPPLANT_ONLY_NORMAL_POSITION);
 		if (aPlant && aPlant->mIsAsleep && CanPlantAt(aGridX, aGridY, SeedType::SEED_INSTANT_COFFEE) == PlantingReason::PLANTING_OK)
@@ -3403,8 +3408,10 @@ void Board::UpdateMousePosition()
 	else if (aCursorSeedType == SeedType::SEED_WALLNUT || aCursorSeedType == SeedType::SEED_TALLNUT || 
 			aCursorSeedType == SeedType::SEED_EXPLODE_O_NUT || aCursorSeedType == SeedType::SEED_DOOM_NUT)
 	{
-		int aGridX = PlantingPixelToGridX(mApp->mWidgetManager->mLastMouseX, mApp->mWidgetManager->mLastMouseY, aCursorSeedType);
-		int aGridY = PlantingPixelToGridY(mApp->mWidgetManager->mLastMouseX, mApp->mWidgetManager->mLastMouseY, aCursorSeedType);
+		int aMouseX = mApp->mWidgetManager->mLastMouseX - mX;
+		int aMouseY = mApp->mWidgetManager->mLastMouseY - mY;
+		int aGridX = PlantingPixelToGridX(aMouseX, aMouseY, aCursorSeedType);
+		int aGridY = PlantingPixelToGridY(aMouseX, aMouseY, aCursorSeedType);
 
 		Plant* aPlant = GetTopPlantAt(aGridX, aGridY, PlantPriority::TOPPLANT_ONLY_PUMPKIN);
 		if (aPlant && aPlant->mSeedType == aCursorSeedType && CanPlantAt(aGridX, aGridY, aCursorSeedType) == PlantingReason::PLANTING_OK)
@@ -3414,8 +3421,10 @@ void Board::UpdateMousePosition()
 	}
 	else if (aCursorSeedType == SeedType::SEED_PUMPKINSHELL)
 	{
-		int aGridX = PlantingPixelToGridX(mApp->mWidgetManager->mLastMouseX, mApp->mWidgetManager->mLastMouseY, aCursorSeedType);
-		int aGridY = PlantingPixelToGridY(mApp->mWidgetManager->mLastMouseX, mApp->mWidgetManager->mLastMouseY, aCursorSeedType);
+		int aMouseX = mApp->mWidgetManager->mLastMouseX - mX;
+		int aMouseY = mApp->mWidgetManager->mLastMouseY - mY;
+		int aGridX = PlantingPixelToGridX(aMouseX, aMouseY, aCursorSeedType);
+		int aGridY = PlantingPixelToGridY(aMouseX, aMouseY, aCursorSeedType);
 
 		Plant* aPlant = GetTopPlantAt(aGridX, aGridY, PlantPriority::TOPPLANT_ONLY_NORMAL_POSITION);
 		if (aPlant && aPlant->mSeedType == SeedType::SEED_PUMPKINSHELL && CanPlantAt(aGridX, aGridY, SeedType::SEED_PUMPKINSHELL) == PlantingReason::PLANTING_OK)
@@ -6149,7 +6158,7 @@ void Board::Update()
 		mShakeCounter--;
 		if (mShakeCounter == 0)
 		{
-			mX = 0;
+			mX = BOARD_OFFSET - 220;
 			mY = 0;
 		}
 		else
@@ -6158,7 +6167,7 @@ void Board::Update()
 			{
 				mShakeAmountX = -mShakeAmountX;
 			}
-			mX = TodAnimateCurve(12, 0, mShakeCounter, 0, mShakeAmountX, TodCurves::CURVE_BOUNCE);
+			mX = (BOARD_OFFSET - 220) + TodAnimateCurve(12, 0, mShakeCounter, 0, mShakeAmountX, TodCurves::CURVE_BOUNCE);
 			mY = TodAnimateCurve(12, 0, mShakeCounter, 0, mShakeAmountY, TodCurves::CURVE_BOUNCE);
 		}
 	}
@@ -6297,7 +6306,7 @@ void Board::DrawBackdrop(Graphics* g)
 	{
 		if (aBgImage == Sexy::IMAGE_BACKGROUND_MUSHROOMGARDEN || aBgImage == Sexy::IMAGE_BACKGROUND_GREENHOUSE || aBgImage == Sexy::IMAGE_AQUARIUM1)
 		{
-			g->DrawImage(aBgImage, 0, 0);
+			g->DrawImage(aBgImage, -(BOARD_OFFSET - 220), 0);
 		}
 		else
 		{
@@ -9561,10 +9570,11 @@ int Board::PixelToGridX(int theX, int theY)
 		}
 	}
 
-	if (theX < LAWN_XMIN)
+	int aLawnXMin = LAWN_XMIN - (BOARD_OFFSET - 220);
+	if (theX < aLawnXMin)
 		return -1;
 
-	return ClampInt((theX - LAWN_XMIN) / 80, 0, MAX_GRID_SIZE_X - 1);
+	return ClampInt((theX - aLawnXMin) / 80, 0, MAX_GRID_SIZE_X - 1);
 }
 
 int Board::PixelToGridXKeepOnBoard(int theX, int theY)
@@ -9627,7 +9637,7 @@ int Board::GridToPixelX(int theGridX, int theGridY)
 		}
 	}
 
-	return theGridX * 80 + LAWN_XMIN;
+	return theGridX * 80 + LAWN_XMIN - (BOARD_OFFSET - 220);
 }
 
 float Board::GetPosYBasedOnRow(float thePosX, int theRow)

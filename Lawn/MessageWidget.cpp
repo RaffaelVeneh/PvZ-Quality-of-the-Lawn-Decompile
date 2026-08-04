@@ -400,7 +400,7 @@ void MessageWidget::Draw(Graphics* g)
 		if (aRectHeight > 0)
 		{
 			aOutlineColor = Color(0, 0, 0, 128);
-			Rect aRect(0, aPosY, BOARD_WIDTH, aRectHeight);
+			Rect aRect(-(BOARD_OFFSET - 220), aPosY, WIDE_BOARD_WIDTH, aRectHeight);
 			g->SetColor(aOutlineColor);
 			g->FillRect(aRect);
 
@@ -409,7 +409,7 @@ void MessageWidget::Draw(Graphics* g)
 		}
 		else
 		{
-			Rect aRect(aPosX - mApp->mBoard->mX - BOARD_WIDTH / 2, aPosY - aFont->mAscent, BOARD_WIDTH, BOARD_HEIGHT);
+			Rect aRect(aPosX - mApp->mBoard->mX - WIDE_BOARD_WIDTH / 2, aPosY - aFont->mAscent, WIDE_BOARD_WIDTH, BOARD_HEIGHT);
 			if (aOutlineFont)
 			{
 				TodDrawStringWrapped(g, mLabel, aRect, aOutlineFont, aOutlineColor, DrawStringJustification::DS_ALIGN_CENTER);
@@ -424,7 +424,7 @@ void MessageWidget::Draw(Graphics* g)
 				int aFlags = mApp->mBoard->GetNumWavesPerSurvivalStage() * mApp->mBoard->mChallenge->mSurvivalStage / mApp->mBoard->GetNumWavesPerFlag();
 				SexyString aFlagStr = mApp->Pluralize(aFlags, _S("[ONE_FLAG]"), _S("[COUNT_FLAGS]"));
 				SexyString aSubStr = TodReplaceString(_S("[FLAGS_COMPLETED]"), _S("{FLAGS}"), aFlagStr);
-				TodDrawString(g, aSubStr, BOARD_WIDTH / 2 - mApp->mBoard->mX, aPosY + 26, Sexy::FONT_HOUSEOFTERROR16, Color(224, 187, 62, aColor.mAlpha), DrawStringJustification::DS_ALIGN_CENTER);
+				TodDrawString(g, aSubStr, WIDE_BOARD_WIDTH / 2 - mApp->mBoard->mX, aPosY + 26, Sexy::FONT_HOUSEOFTERROR16, Color(224, 187, 62, aColor.mAlpha), DrawStringJustification::DS_ALIGN_CENTER);
 			}
 		}
 	}

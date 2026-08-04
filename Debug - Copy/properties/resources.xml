@@ -133,7 +133,7 @@
 <Image id="SELECTORSCREEN_ALMANACHIGHLIGHT" path="SelectorScreen_AlmanacHighlight"  />
 <Image id="SELECTORSCREEN_STORE" path="SelectorScreen_Store"  />
 <Image id="SELECTORSCREEN_STOREHIGHLIGHT" path="SelectorScreen_StoreHighlight"  />
-<Image id="SELECTORSCREEN_LEVELNUMBERS" path="SelectorScreen_LevelNumbers" cols="9" />
+<Image id="SELECTORSCREEN_LEVELNUMBERS" path="SelectorScreen_LevelNumbers" cols="10" />
 <Image id="SELECTORSCREEN_ZENGARDEN" path="SelectorScreen_ZenGarden"  />
 <Image id="ACHIEVEMENT_BUTTON" path="Achievements_pedestal"  />
 <Image id="ACHIEVEMENT_HIGHLIGHT" path="Achievements_pedestal_press"  />

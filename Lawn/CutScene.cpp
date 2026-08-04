@@ -863,7 +863,7 @@ void CutScene::StartLevelIntro()
 
 	if (IsScrolledLeftAtStart())
 	{
-		mBoard->Move(220, 0);
+		mBoard->Move(BOARD_OFFSET, 0);
 	}
 	if (IsNonScrollingCutscene() && mCrazyDaveTime == 0)
 	{
@@ -1145,7 +1145,7 @@ void CutScene::AnimateBoard()
 
 	if (mCutsceneTime > aTimePanLeftStart)
 	{
-		int aPanOffset = CalcPosition(aTimePanLeftStart, aTimePanLeftEnd, BOARD_IMAGE_WIDTH_OFFSET - mApp->mWidth, 0);
+		int aPanOffset = CalcPosition(aTimePanLeftStart, aTimePanLeftEnd, BOARD_IMAGE_WIDTH_OFFSET - mApp->mWidth, -(BOARD_OFFSET - 220));
 		mBoard->Move(-aPanOffset, 0);
 	}
 

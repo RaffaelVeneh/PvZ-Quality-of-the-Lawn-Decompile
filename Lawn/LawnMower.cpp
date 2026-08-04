@@ -10,7 +10,7 @@ void LawnMower::LawnMowerInitialize(int theRow)
 {
     mApp = (LawnApp*)gSexyAppBase;
     mRow = theRow;
-    mPosX = -160.0f;
+    mPosX = -27.0f;
     mBoard = mApp->mBoard;
     mRenderOrder = Board::MakeRenderOrder(RenderLayer::RENDER_LAYER_LAWN_MOWER, theRow, 0);
     mPosY = mBoard->GetPosYBasedOnRow(mPosX + 40.0f, theRow) + 23.0f;
@@ -169,7 +169,7 @@ void LawnMower::Update()
     if (mMowerState == LawnMowerState::MOWER_ROLLING_IN)
     {
         mRollingInCounter++;
-        mPosX = TodAnimateCurveFloat(0, 100, mRollingInCounter, -160.0f, -21.0f, TodCurves::CURVE_EASE_IN_OUT);
+        mPosX = TodAnimateCurveFloat(0, 100, mRollingInCounter, -27.0f, 112.0f, TodCurves::CURVE_EASE_IN_OUT);
         if (mRollingInCounter == 100)
         {
             mMowerState = LawnMowerState::MOWER_READY;
