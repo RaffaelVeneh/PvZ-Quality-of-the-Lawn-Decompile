@@ -122,7 +122,7 @@ void Zombie::ZombieInitialize(int theRow, ZombieType theType, bool theVariant, Z
 
     mFromWave = theFromWave;
     mRow = theRow;
-    mPosX = 780 + Rand(ZOMBIE_START_RANDOM_OFFSET);
+    mPosX = 760 + Rand(ZOMBIE_START_RANDOM_OFFSET);
     mPosY = GetPosYBasedOnRow(theRow);
     mVelX = 0.0f;
     mVelZ = 0.0f;
@@ -213,10 +213,7 @@ void Zombie::ZombieInitialize(int theRow, ZombieType theType, bool theVariant, Z
     {
         mFollowerZombieID[i] = ZombieID::ZOMBIEID_NULL;
     }
-    if (mBoard && mBoard->IsFlagWave(mFromWave))
-    {
-        mPosX += 40.0f;
-    }
+
     PickRandomSpeed();
     mBodyHealth = 270;
 
@@ -436,7 +433,7 @@ void Zombie::ZombieInitialize(int theRow, ZombieType theType, bool theVariant, Z
         mZombiePhase = ZombiePhase::PHASE_POLEVAULTER_PRE_VAULT;
         mHasObject = true;
         mVariant = false;
-        mPosX = WIDE_BOARD_WIDTH + 70 + Rand(10);
+        mPosX = 760 + Rand(ZOMBIE_START_RANDOM_OFFSET);
         if (IsOnBoard())
         {
             PlayZombieReanim("anim_run", ReanimLoopType::REANIM_LOOP, 0, 0.0f);
@@ -474,7 +471,7 @@ void Zombie::ZombieInitialize(int theRow, ZombieType theType, bool theVariant, Z
         mBodyHealth = 3000;
         mAnimFrames = 24;
         mAnimTicksPerFrame = 8;
-        mPosX = WIDE_BOARD_WIDTH + 45 + Rand(10);
+        mPosX = 760 + Rand(ZOMBIE_START_RANDOM_OFFSET);
         mZombieRect = Rect(-17, -38, 125, 154);
         mZombieAttackRect = Rect(-30, -38, 89, 154);
         mVariant = false;
@@ -515,7 +512,7 @@ void Zombie::ZombieInitialize(int theRow, ZombieType theType, bool theVariant, Z
         mBodyHealth = 1350;
         mAnimFrames = 2;
         mAnimTicksPerFrame = 8;
-        mPosX = WIDE_BOARD_WIDTH + Rand(10);
+        mPosX = 760 + Rand(ZOMBIE_START_RANDOM_OFFSET);
         aRenderOffset = 8;
         PlayZombieReanim("anim_drive", ReanimLoopType::REANIM_LOOP, 0, 12.0f);
         mZombieRect = Rect(0, -13, 153, 140);
@@ -525,7 +522,7 @@ void Zombie::ZombieInitialize(int theRow, ZombieType theType, bool theVariant, Z
 
     case ZombieType::ZOMBIE_CATAPULT:  
         mBodyHealth = 1350;
-        mPosX = WIDE_BOARD_WIDTH + 25 + Rand(10);
+        mPosX = 760 + Rand(ZOMBIE_START_RANDOM_OFFSET);
         mSummonCounter = 20;
         if (IsOnBoard())
         {
@@ -634,7 +631,7 @@ void Zombie::ZombieInitialize(int theRow, ZombieType theType, bool theVariant, Z
         }
         else
         {
-            mPosX = WIDE_BOARD_WIDTH + 80;
+            mPosX = 760 + Rand(ZOMBIE_START_RANDOM_OFFSET);
             mZombieRect = Rect(-50, 0, 275, 115);
             mHelmType = HelmType::HELMTYPE_BOBSLED;
             mHelmHealth = 300;
@@ -662,6 +659,7 @@ void Zombie::ZombieInitialize(int theRow, ZombieType theType, bool theVariant, Z
 
     case ZombieType::ZOMBIE_FLAG:  
     {
+        mPosX = 760 + Rand(ZOMBIE_START_RANDOM_OFFSET);
         if (IsOnBoard())
         {
             mBoard->mGravesMayRise = true;
@@ -736,7 +734,6 @@ void Zombie::ZombieInitialize(int theRow, ZombieType theType, bool theVariant, Z
         mVelX = 0.8f;
         UpdateAnimSpeed();
 
-        mPosX = WIDE_BOARD_WIDTH;
         break;
     }
 
@@ -996,7 +993,7 @@ void Zombie::ZombieInitialize(int theRow, ZombieType theType, bool theVariant, Z
         mHelmType = HelmType::HELMTYPE_TALLNUT;
         mHelmHealth = 4400;
         mVariant = false;
-        mPosX += 30.0f;
+
         break;
     }
 

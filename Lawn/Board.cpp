@@ -162,6 +162,7 @@ Board::Board(LawnApp* theApp)
 	mTutorialTimer = -1;
 	mTutorialParticleID = ParticleSystemID::PARTICLESYSTEMID_NULL;
 	mChallenge = new Challenge();
+	mMouseInsets.mLeft = -(BOARD_OFFSET - 220);
 	mClip = false;
 	mDebugTextMode = DebugTextMode::DEBUG_TEXT_NONE;
 	mMenuButton = new GameButton(0);
@@ -691,11 +692,11 @@ void Board::PickZombieWaves()
 
 			if (mApp->mGameMode != GameMode::GAMEMODE_CHALLENGE_WAR_AND_PEAS && mApp->mGameMode != GameMode::GAMEMODE_CHALLENGE_WAR_AND_PEAS_2)
 			{
+				PutZombieInWave(ZombieType::ZOMBIE_FLAG, aWave, &aZombiePicker);
 				for (int _i = 0; _i < aPlainZombiesNum; _i++)
 				{
 					PutZombieInWave(ZombieType::ZOMBIE_NORMAL, aWave, &aZombiePicker);
 				}
-				PutZombieInWave(ZombieType::ZOMBIE_FLAG, aWave, &aZombiePicker);
 			}
 		}
 
@@ -3757,7 +3758,7 @@ void Board::UpdateToolTip()
 	}
 	*/
 
-	mToolTip->mX = (SEED_PACKET_WIDTH - mToolTip->mWidth) / 2 + mSeedBank->mX + aSeedPacket->mOffsetX + aSeedPacket->mX;
+	mToolTip->mX = (SEED_PACKET_WIDTH - mToolTip->mWidth) / 2 + mSeedBank->mX + aSeedPacket->mOffsetX + aSeedPacket->mX - (BOARD_OFFSET - 220);
 	mToolTip->mY = mSeedBank->mY + aSeedPacket->mY + 70;
 	mToolTip->mVisible = true;
 }
@@ -4210,7 +4211,7 @@ Plant* Board::ToolHitTest(int theX, int theY)
 void Board::TutorialArrowShow(int theX, int theY)
 {
 	TutorialArrowRemove();
-	TodParticleSystem* aParticle = mApp->AddTodParticle(theX, theY, MakeRenderOrder(RenderLayer::RENDER_LAYER_TOP, 0, 0), ParticleEffect::PARTICLE_SEED_PACKET_PICK);
+	TodParticleSystem* aParticle = mApp->AddTodParticle(theX, theY, MakeRenderOrder(RenderLayer::RENDER_LAYER_ABOVE_UI, 0, 0), ParticleEffect::PARTICLE_SEED_PACKET_PICK);
 	mTutorialParticleID = mApp->ParticleGetID(aParticle);
 }
 
@@ -4437,7 +4438,7 @@ bool Board::MouseHitTest(int x, int y, HitResult* theHitResult)
 	}
 
 	Rect aShovelButtonRect = GetShovelButtonRect();
-	if (mSeedBank->MouseHitTest(x, y, theHitResult))
+	if (mSeedBank->MouseHitTest(x + (BOARD_OFFSET - 220), y, theHitResult))
 	{
 		if (mCursorObject->mCursorType == CursorType::CURSOR_TYPE_NORMAL || 
 			mCursorObject->mCursorType == CursorType::CURSOR_TYPE_COBCANNON_TARGET || 
@@ -5825,7 +5826,7 @@ void Board::UpdateTutorial()
 	if (mTutorialState == TutorialState::TUTORIAL_LEVEL_1_PICK_UP_PEASHOOTER && mTutorialTimer == 0)
 	{
 		DisplayAdvice(_S("[ADVICE_CLICK_PEASHOOTER]"), MessageStyle::MESSAGE_STYLE_TUTORIAL_LEVEL1_STAY, AdviceType::ADVICE_NONE);
-		TutorialArrowShow(mSeedBank->mX + mSeedBank->mSeedPackets[0].mX, mSeedBank->mY + mSeedBank->mSeedPackets[0].mY);
+		TutorialArrowShow(mSeedBank->mX + mSeedBank->mSeedPackets[0].mX - (BOARD_OFFSET - 220), mSeedBank->mY + mSeedBank->mSeedPackets[0].mY);
 		mTutorialTimer = -1;
 	}
 	else if (mTutorialState == TutorialState::TUTORIAL_LEVEL_2_PICK_UP_SUNFLOWER || 
@@ -5871,7 +5872,7 @@ void Board::SetTutorialState(TutorialState theTutorialState)
 	case TutorialState::TUTORIAL_LEVEL_1_PICK_UP_PEASHOOTER:
 		if (mPlants.mSize == 0)
 		{
-			float aPosX = mSeedBank->mX + mSeedBank->mSeedPackets[0].mX;
+			float aPosX = mSeedBank->mX + mSeedBank->mSeedPackets[0].mX - (BOARD_OFFSET - 220);
 			float aPosY = mSeedBank->mY + mSeedBank->mSeedPackets[0].mY;
 			TutorialArrowShow(aPosX, aPosY);
 			DisplayAdvice(_S("[ADVICE_CLICK_SEED_PACKET]"), MessageStyle::MESSAGE_STYLE_TUTORIAL_LEVEL1_STAY, AdviceType::ADVICE_NONE);
@@ -5909,7 +5910,7 @@ void Board::SetTutorialState(TutorialState theTutorialState)
 
 	case TutorialState::TUTORIAL_LEVEL_2_PICK_UP_SUNFLOWER:
 	case TutorialState::TUTORIAL_MORESUN_PICK_UP_SUNFLOWER:
-		TutorialArrowShow(mSeedBank->mX + mSeedBank->mSeedPackets[1].mX, mSeedBank->mY + mSeedBank->mSeedPackets[1].mY);
+		TutorialArrowShow(mSeedBank->mX + mSeedBank->mSeedPackets[1].mX - (BOARD_OFFSET - 220), mSeedBank->mY + mSeedBank->mSeedPackets[1].mY);
 		break;
 
 	case TutorialState::TUTORIAL_LEVEL_2_PLANT_SUNFLOWER:
@@ -6285,23 +6286,23 @@ void Board::DrawBackdrop(Graphics* g)
 		g->DrawImage(Sexy::IMAGE_BACKGROUND1UNSODDED, -BOARD_OFFSET, 0);
 		int aWidth = TodAnimateCurve(0, 1000, mSodPosition, 0, Sexy::IMAGE_SOD1ROW->GetWidth(), TodCurves::CURVE_LINEAR);
 		Rect aSrcRect(0, 0, aWidth, Sexy::IMAGE_SOD1ROW->GetHeight());
-		g->DrawImage(Sexy::IMAGE_SOD1ROW, 239 - BOARD_OFFSET, 265, aSrcRect);
+		g->DrawImage(Sexy::IMAGE_SOD1ROW, 239 - 220, 265, aSrcRect);
 	}
 	else if (((mLevel == 2 || mLevel == 3) && mApp->IsFirstTimeAdventureMode()) || mApp->mGameMode == GameMode::GAMEMODE_CHALLENGE_RESODDED)
 	{
 		g->DrawImage(Sexy::IMAGE_BACKGROUND1UNSODDED, -BOARD_OFFSET, 0);
-		g->DrawImage(Sexy::IMAGE_SOD1ROW, 239 - BOARD_OFFSET, 265);
+		g->DrawImage(Sexy::IMAGE_SOD1ROW, 239 - 220, 265);
 		int aWidth = TodAnimateCurve(0, 1000, mSodPosition, 0, Sexy::IMAGE_SOD3ROW->GetWidth(), TodCurves::CURVE_LINEAR);
 		Rect aSrcRect(0, 0, aWidth, Sexy::IMAGE_SOD3ROW->GetHeight());
-		g->DrawImage(Sexy::IMAGE_SOD3ROW, 235 - BOARD_OFFSET, 149, aSrcRect);
+		g->DrawImage(Sexy::IMAGE_SOD3ROW, 235 - 220, 149, aSrcRect);
 	}
 	else if (mLevel == 4 && mApp->IsFirstTimeAdventureMode())
 	{
 		g->DrawImage(Sexy::IMAGE_BACKGROUND1UNSODDED, -BOARD_OFFSET, 0);
-		g->DrawImage(Sexy::IMAGE_SOD3ROW, 235 - BOARD_OFFSET, 149);
+		g->DrawImage(Sexy::IMAGE_SOD3ROW, 235 - 220, 149);
 		int aWidth = TodAnimateCurve(0, 1000, mSodPosition, 0, 773, TodCurves::CURVE_LINEAR);
-		Rect aSrcRect(232, 0, aWidth, Sexy::IMAGE_BACKGROUND1->GetHeight());
-		g->DrawImage(Sexy::IMAGE_BACKGROUND1, 232 - BOARD_OFFSET, 0, aSrcRect);
+		Rect aSrcRect(232 + (BOARD_OFFSET - 220), 0, aWidth, Sexy::IMAGE_BACKGROUND1->GetHeight());
+		g->DrawImage(Sexy::IMAGE_BACKGROUND1, 232 - 220, 0, aSrcRect);
 	}
 	else if (aBgImage)
 	{
@@ -6328,7 +6329,7 @@ void Board::DrawBackdrop(Graphics* g)
 		Graphics aClipG(*g);
 		aClipG.SetColorizeImages(true);
 		aClipG.SetColor(GetFlashingColor(mMainCounter, 75));
-		aClipG.DrawImage(Sexy::IMAGE_SOD1ROW, 239 - BOARD_OFFSET, 265);
+		aClipG.DrawImage(Sexy::IMAGE_SOD1ROW, 239 - 220, 265);
 		aClipG.SetColorizeImages(false);
 	}
 	mChallenge->DrawBackdrop(g);
@@ -6667,6 +6668,10 @@ void Board::DrawGameObjects(Graphics* g)
 			aRenderItemCount++;
 		}
 	}
+	if (mCursorPreview && mCursorPreview->mVisible)
+	{
+		AddGameObjectRenderItemCursorPreview(aRenderList, aRenderItemCount, RenderObjectType::RENDER_ITEM_CURSOR_PREVIEW, mCursorPreview);
+	}
 	{
 		int aZPos;
 		if (mTimeStopCounter > 0 || (mApp->mGameScene == GameScenes::SCENE_LEVEL_INTRO && mCutScene->IsPanningLeft()))
@@ -6675,11 +6680,11 @@ void Board::DrawGameObjects(Graphics* g)
 		}
 		else if (mApp->mGameScene == GameScenes::SCENE_PLAYING || mApp->mGameScene == GameScenes::SCENE_ZOMBIES_WON)
 		{
-			aZPos = MakeRenderOrder(RenderLayer::RENDER_LAYER_UI_BOTTOM, 0, 1);
+			aZPos = MakeRenderOrder(RenderLayer::RENDER_LAYER_UI_TOP, 0, 1);
 		}
 		else if (mCutScene->IsAfterSeedChooser() || mCutScene->IsInShovelTutorial() || mHelpIndex == AdviceType::ADVICE_CLICK_TO_CONTINUE)
 		{
-			aZPos = MakeRenderOrder(RenderLayer::RENDER_LAYER_UI_BOTTOM, 0, 1);
+			aZPos = MakeRenderOrder(RenderLayer::RENDER_LAYER_UI_TOP, 0, 1);
 		}
 		else
 		{
@@ -6689,7 +6694,7 @@ void Board::DrawGameObjects(Graphics* g)
 		AddUIRenderItem(aRenderList, aRenderItemCount, RenderObjectType::RENDER_ITEM_BACKDROP, MakeRenderOrder(RenderLayer::RENDER_LAYER_UI_BOTTOM, 0, 0));
 		AddUIRenderItem(aRenderList, aRenderItemCount, RenderObjectType::RENDER_ITEM_BOTTOM_UI, aZPos);
 		AddUIRenderItem(aRenderList, aRenderItemCount, RenderObjectType::RENDER_ITEM_COIN_BANK, MakeRenderOrder(RenderLayer::RENDER_LAYER_COIN_BANK, 0, 0));
-		AddUIRenderItem(aRenderList, aRenderItemCount, RenderObjectType::RENDER_ITEM_TOP_UI, MakeRenderOrder(RenderLayer::RENDER_LAYER_UI_TOP, 0, 0));
+		AddUIRenderItem(aRenderList, aRenderItemCount, RenderObjectType::RENDER_ITEM_TOP_UI, MakeRenderOrder(RenderLayer::RENDER_LAYER_ABOVE_UI, 0, 10));
 		AddUIRenderItem(aRenderList, aRenderItemCount, RenderObjectType::RENDER_ITEM_SCREEN_FADE, MakeRenderOrder(RenderLayer::RENDER_LAYER_SCREEN_FADE, 0, 0));
 	}
 	if (mApp->mGameScene == GameScenes::SCENE_ZOMBIES_WON)
@@ -9643,18 +9648,24 @@ int Board::LeftFogColumn()
 int Board::GetSeedPacketPositionX(int theIndex)
 {
 	if (mApp->IsSlotMachineLevel())			return theIndex * 59 + 247;
-	if (HasConveyorBeltSeedBank())			return theIndex * 50 + 91;
+	if (HasConveyorBeltSeedBank())		return theIndex * 50 + 91;
 	
 	if (mSeedBank->mNumPackets <= 7)		return theIndex * 59 + 85;
 	else if (mSeedBank->mNumPackets == 8)	return theIndex * 54 + 81;
 	else if (mSeedBank->mNumPackets == 9)	return theIndex * 52 + 80;
-	else									return theIndex * 51 + 79;
+	else									return theIndex * 54 + 80;
 }
 
 int Board::GetSeedBankExtraWidth()
 {
 	int aNumPackets = mSeedBank->mNumPackets;
-	return aNumPackets <= 6 ? 0 : aNumPackets == 7 ? 60 : aNumPackets == 8 ? 76 : aNumPackets == 9 ? 112 : 153;
+	if (aNumPackets <= 6) return 0;
+	if (aNumPackets == 7) return 60;
+	if (aNumPackets == 8) return 76;
+	if (aNumPackets == 9) return 112;
+	if (aNumPackets == 10) return 174;
+	if (aNumPackets == 11) return 228;
+	return 288;
 }
 
 void Board::OffsetYForPlanting(int& theY, SeedType theSeedType)

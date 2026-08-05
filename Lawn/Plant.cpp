@@ -201,6 +201,10 @@ void Plant::PlantInitialize(int theGridX, int theGridY, SeedType theSeedType, Se
         mShieldHealth = 4000;
         GrantPlacementShieldPulse();
     }
+    else if (mBoard && mSeedType != SeedType::SEED_PUMPKINSHELL && mSeedType != SeedType::SEED_FLOWERPOT && mImitaterType != SeedType::SEED_FLOWERPOT)
+    {
+        CheckAndReceiveNearbyPlanternShield();
+    }
 
     Reanimation* aBodyReanim = nullptr;
     if (aPlantDef.mReanimationType != ReanimationType::REANIM_NONE)
@@ -7559,7 +7563,7 @@ Rect Plant::GetPlantAttackRect(PlantWeapon thePlantWeapon)
             aRect = Rect(mX - 80, mY - 80, 240, 240); // 3x3 Tile Range
         break;
 
-    default:                            aRect = Rect(mX + 60,       mY,             BOARD_WIDTH,        mHeight);               break;
+    default:                            aRect = Rect(mX + 60,       mY,             max(770 - (mX + 60), 0), mHeight);          break;
     }
 
     return aRect;
@@ -7868,6 +7872,52 @@ void Plant::GrantPlacementShieldPulse()
                     aPlantToBuff->mRenderOrder + 1, ParticleEffect::PARTICLE_STARBURST)
                     ->OverrideColor(nullptr, isIcePlantern ? Color(143, 143, 255) : Color(143, 255, 143));
             }
+        }
+    }
+}
+
+void Plant::CheckAndReceiveNearbyPlanternShield()
+{
+    if (!mBoard) return;
+
+    int aBestShield = 0;
+    bool isIcePlantern = false;
+
+    Plant* aOtherPlant = nullptr;
+    while (mBoard->IteratePlants(aOtherPlant))
+    {
+        if (aOtherPlant == this || aOtherPlant->mDead || aOtherPlant->mSquished) continue;
+
+        if (abs(aOtherPlant->mPlantCol - mPlantCol) <= 1 && abs(aOtherPlant->mRow - mRow) <= 1)
+        {
+            if (aOtherPlant->mSeedType == SeedType::SEED_ICE_PLANTERN || aOtherPlant->mImitaterType == SeedType::SEED_ICE_PLANTERN)
+            {
+                if (4000 > aBestShield)
+                {
+                    aBestShield = 4000;
+                    isIcePlantern = true;
+                }
+            }
+            else if (aOtherPlant->mSeedType == SeedType::SEED_PLANTERN || aOtherPlant->mImitaterType == SeedType::SEED_PLANTERN)
+            {
+                if (2000 > aBestShield)
+                {
+                    aBestShield = 2000;
+                    if (aBestShield == 2000 && !isIcePlantern) isIcePlantern = false;
+                }
+            }
+        }
+    }
+
+    if (aBestShield > 0)
+    {
+        mShieldMaxHealth = (mShieldMaxHealth > aBestShield) ? mShieldMaxHealth : aBestShield;
+        mShieldHealth = aBestShield;
+
+        if (mApp)
+        {
+            mApp->AddTodParticle(mX + 40, mY + 40, mRenderOrder + 1, ParticleEffect::PARTICLE_STARBURST)
+                ->OverrideColor(nullptr, isIcePlantern ? Color(143, 143, 255) : Color(143, 255, 143));
         }
     }
 }

@@ -184,7 +184,7 @@ bool StoreScreen::IsItemSoldOut(StoreItem theStoreItem)
     if (theStoreItem == STORE_ITEM_INVALID)
         return false;
     else if (theStoreItem == STORE_ITEM_PACKET_UPGRADE)
-        return aPlayer->mPurchases[STORE_ITEM_PACKET_UPGRADE] >= 4;
+        return aPlayer->mPurchases[STORE_ITEM_PACKET_UPGRADE] >= 6;
     else if (theStoreItem == STORE_ITEM_BUG_SPRAY)
         return aPlayer->mPurchases[theStoreItem] - PURCHASE_COUNT_OFFSET > 15;
     else if (theStoreItem == STORE_ITEM_FERTILIZER)
@@ -573,7 +573,7 @@ void StoreScreen::UpdateMouse()
                 case STORE_ITEM_WHEEL_BARROW:           aMessageIndex = 2024;                           break;
                 case STORE_ITEM_STINKY_THE_SNAIL:       aMessageIndex = 2025;                           break;
                 case STORE_ITEM_PACKET_UPGRADE:
-                    if (mApp->mPlayerInfo->mPurchases[STORE_ITEM_PACKET_UPGRADE] < 4)
+                    if (mApp->mPlayerInfo->mPurchases[STORE_ITEM_PACKET_UPGRADE] < 6)
                         aMessageIndex = mApp->mPlayerInfo->mPurchases[STORE_ITEM_PACKET_UPGRADE] + 2011;
                     else
                         aMessageIndex = 2014;                                                           break;
@@ -896,7 +896,7 @@ int StoreScreen::GetItemCost(StoreItem theStoreItem)
     case STORE_ITEM_PACKET_UPGRADE:
     {
         int aPurchase = gLawnApp->mPlayerInfo->mPurchases[STORE_ITEM_PACKET_UPGRADE];
-        return aPurchase == 0 ? 75 : aPurchase == 1 ? 500 : aPurchase == 2 ? 1000 : 5000;
+        return aPurchase == 0 ? 75 : aPurchase == 1 ? 500 : aPurchase == 2 ? 1000 : aPurchase == 3 ? 5000 : aPurchase == 4 ? 10000 : 25000;
     }
     case STORE_ITEM_POOL_CLEANER:                       return 100;
     case STORE_ITEM_ROOF_CLEANER:                       return 300;

@@ -89,7 +89,7 @@ void SeedPacket::FlashIfReady()
 	if (!mBoard->HasConveyorBeltSeedBank())
 	{
 		int aRenderPosition = Board::MakeRenderOrder(RenderLayer::RENDER_LAYER_UI_BOTTOM, 0, 2);
-		mApp->AddTodParticle(mX + mBoard->mSeedBank->mX, mY + mBoard->mSeedBank->mY, aRenderPosition, ParticleEffect::PARTICLE_SEED_PACKET_FLASH);
+		mApp->AddTodParticle(mX + mBoard->mSeedBank->mX - (BOARD_OFFSET - 220), mY + mBoard->mSeedBank->mY, aRenderPosition, ParticleEffect::PARTICLE_SEED_PACKET_FLASH);
 	}
 	
 	if (mBoard->mTutorialState == TutorialState::TUTORIAL_LEVEL_1_REFRESH_PEASHOOTER)
@@ -596,7 +596,7 @@ void DrawSeedPacket(Graphics* g, float x, float y, SeedType theSeedType, SeedTyp
 		else
 		{
 			SexyMatrix3 aMatrix;
-			TodScaleTransformMatrix(aMatrix, aTextOffsetX * g->mScaleX + x, aTextOffsetY * g->mScaleY + y, g->mScaleX, g->mScaleY);
+			TodScaleTransformMatrix(aMatrix, aTextOffsetX * g->mScaleX + x + g->mTransX, aTextOffsetY * g->mScaleY + y + g->mTransY, g->mScaleX, g->mScaleY);
 			if (g->mScaleX > 1.8f)
 			{
 				g->SetLinearBlend(false);
@@ -968,9 +968,30 @@ void SeedBank::Draw(Graphics* g)
 	else
 	{
 		int aExtraWidth = mBoard->GetSeedBankExtraWidth();
-		Rect theSrcRect(IMAGE_SEEDBANK->mWidth - aExtraWidth - 12, 0, aExtraWidth + 12, IMAGE_SEEDBANK->mHeight);
-		g->DrawImage(IMAGE_SEEDBANK, 0, 0);
-		g->DrawImage(IMAGE_SEEDBANK, IMAGE_SEEDBANK->mWidth - 12, 0, theSrcRect);
+		if (aExtraWidth > 0)
+		{
+			Rect aMainSrc(0, 0, IMAGE_SEEDBANK->mWidth - 16, IMAGE_SEEDBANK->mHeight);
+			g->DrawImage(IMAGE_SEEDBANK, 0, 0, aMainSrc);
+
+			Rect aMiddleSrc(IMAGE_SEEDBANK->mWidth - 56, 0, 40, IMAGE_SEEDBANK->mHeight);
+			int aDrawX = IMAGE_SEEDBANK->mWidth - 16;
+			int aRemainingExtra = aExtraWidth;
+			while (aRemainingExtra > 0)
+			{
+				int aChunkWidth = min(aRemainingExtra, 40);
+				Rect aChunkSrc(aMiddleSrc.mX, 0, aChunkWidth, IMAGE_SEEDBANK->mHeight);
+				g->DrawImage(IMAGE_SEEDBANK, aDrawX, 0, aChunkSrc);
+				aDrawX += aChunkWidth;
+				aRemainingExtra -= aChunkWidth;
+			}
+
+			Rect aCapSrc(IMAGE_SEEDBANK->mWidth - 16, 0, 16, IMAGE_SEEDBANK->mHeight);
+			g->DrawImage(IMAGE_SEEDBANK, aDrawX, 0, aCapSrc);
+		}
+		else
+		{
+			g->DrawImage(IMAGE_SEEDBANK, 0, 0);
+		}
 	}
 
 	for (int i = 0; i < mNumPackets; i++)

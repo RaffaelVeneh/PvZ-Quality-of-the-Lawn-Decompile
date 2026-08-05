@@ -90,7 +90,7 @@ AwardScreen::AwardScreen(LawnApp* theApp, AwardType theAwardType, bool hasAchiev
     mStartButton->SetFont(Sexy::FONT_DWARVENTODCRAFT15);
     mStartButton->mColors[ButtonWidget::COLOR_LABEL] = Color(213, 159, 43);
     mStartButton->mColors[ButtonWidget::COLOR_LABEL_HILITE] = Color(213, 159, 43);
-    mStartButton->Resize(324, 500, 156, 42);
+    mStartButton->Resize(324 + (BOARD_OFFSET - 220), 500, 156, 42);
     mStartButton->mTextOffsetY = -1;
 
     mMenuButton = new GameButton(AwardScreen::AwardScreen_Menu);
@@ -102,7 +102,7 @@ AwardScreen::AwardScreen(LawnApp* theApp, AwardType theAwardType, bool hasAchiev
     mMenuButton->mColors[ButtonWidget::COLOR_LABEL] = Color(42, 42, 90);
     mMenuButton->mColors[ButtonWidget::COLOR_LABEL_HILITE] = Color(42, 42, 90);
     mMenuButton->mParentWidget = this;
-    mMenuButton->Resize(677, 16, 111, 26);
+    mMenuButton->Resize(718 + (111 / 2) + (BOARD_OFFSET - 220), 38, 111, 26);
     mMenuButton->mTextOffsetY = 1;
     if (!mApp->HasFinishedAdventure() && aLevel <= 3)
     {
@@ -234,7 +234,7 @@ void AwardScreen::DrawBottom(Graphics* g, SexyString theTitle, SexyString theAwa
     g->DrawImage(Sexy::IMAGE_AWARDSCREEN_BACK, 0, 0);
     TodDrawString(g, theTitle, BOARD_WIDTH / 2, 58, Sexy::FONT_DWARVENTODCRAFT24, Color(213, 159, 43), DS_ALIGN_CENTER);
     TodDrawString(g, theAward, BOARD_WIDTH / 2, 326, Sexy::FONT_DWARVENTODCRAFT18YELLOW, Color::White, DS_ALIGN_CENTER);
-    TodDrawStringWrapped(g, theMessage, Rect(285, 360, 230, 90), Sexy::FONT_BRIANNETOD16, Color(40, 50, 90), DS_ALIGN_CENTER_VERTICAL_MIDDLE);
+    TodDrawStringWrapped(g, theMessage, Rect(285 + (BOARD_OFFSET - 220), 360, 230, 90), Sexy::FONT_BRIANNETOD16, Color(40, 50, 90), DS_ALIGN_CENTER_VERTICAL_MIDDLE);
     mState = TodStringTranslate(theAward);
 }
 
@@ -249,8 +249,8 @@ void AwardScreen::DrawAwardSeed(Graphics* g)
         aMessage = Plant::GetToolTip(aSeedType);
     DrawBottom(g, _S("[NEW_PLANT]"), aAward, aMessage);
 
-    g->SetScale(2, 2, 350, 129);
-    DrawSeedPacket(g, 350, 129, aSeedType, SEED_NONE, 0, 255, true, false);
+    g->SetScale(2, 2, 350 + (BOARD_OFFSET - 220), 129);
+    DrawSeedPacket(g, 350 + (BOARD_OFFSET - 220), 129, aSeedType, SEED_NONE, 0, 255, true, false);
     g->SetScale(1, 1, 0, 0);
 }
 
@@ -285,7 +285,7 @@ void AwardScreen::Draw(Graphics* g)
             if (mApp->EarnedGoldTrophy())
             {
                 DrawBottom(g, _S("[BEAT_GAME_MESSAGE1]"), _S("[GOLD_SUNFLOWER_TROPHY]"), _S("[BEAT_GAME_MESSAGE2]"));
-                TodDrawImageCelCenterScaledF(g, Sexy::IMAGE_SUNFLOWER_TROPHY, 325, 65, 1, 0.6f, 0.6f);
+                TodDrawImageCelCenterScaledF(g, Sexy::IMAGE_SUNFLOWER_TROPHY, 325 + (BOARD_OFFSET - 220), 65, 1, 0.6f, 0.6f);
             }
             else
             {
@@ -390,7 +390,7 @@ void AwardScreen::Draw(Graphics* g)
         else if ((aLevel == 1 && mApp->HasFinishedAdventure()) || aLevel > 60)
         {
             DrawBottom(g, _S("[WIN_MESSAGE1]"), _S("[SILVER_SUNFLOWER_TROPHY]"), _S("[WIN_MESSAGE2]"));
-            TodDrawImageCelCenterScaledF(g, Sexy::IMAGE_SUNFLOWER_TROPHY, 325, 65, 0, 0.6f, 0.6f);
+            TodDrawImageCelCenterScaledF(g, Sexy::IMAGE_SUNFLOWER_TROPHY, 325 + (BOARD_OFFSET - 220), 65, 0, 0.6f, 0.6f);
         }
         else
         {

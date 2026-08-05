@@ -44,7 +44,7 @@ void Coin::CoinInitialize(int theX, int theY, CoinType theCoinType, CoinMotion t
 	mCoinMotion = theCoinMotion;
 	mCoinAge = 0;
 	mAttachmentID = AttachmentID::ATTACHMENTID_NULL;
-	mRenderOrder = Board::MakeRenderOrder(RenderLayer::RENDER_LAYER_COIN_BANK, 0, 1);
+	mRenderOrder = Board::MakeRenderOrder(RenderLayer::RENDER_LAYER_ABOVE_UI, 0, 1);
     mScale = 1.0f;
 	mUsableSeedType = SeedType::SEED_NONE;
 	mNeedsBouncyArrow = false;
@@ -646,7 +646,7 @@ void Coin::UpdateCollected()
     int aDestX, aDestY;
     if (IsSun())
     {
-        aDestX = 15;
+        aDestX = 15 - (BOARD_OFFSET - 220);
         aDestY = 0;
     }
     else if (IsMoney())
@@ -823,8 +823,8 @@ void Coin::Update()
 
     if ((mApp->mAutoCollectSuns && IsSun()) || (mApp->mAutoCollectCoins && IsMoney()))
     {
-        int aMouseX = mApp->mWidgetManager->mLastMouseX - mX;
-        int aMouseY = mApp->mWidgetManager->mLastMouseY - mY;
+        int aMouseX = mApp->mWidgetManager->mLastMouseX - (BOARD_OFFSET - 220);
+        int aMouseY = mApp->mWidgetManager->mLastMouseY;
         HitResult aHitResultCoin;
         if (MouseHitTest(aMouseX, aMouseY, &aHitResultCoin))
             MouseDown(aMouseX, aMouseY, 0);
@@ -1136,6 +1136,7 @@ void Coin::Collect()
     mCollectX = mPosX;
     mCollectY = mPosY;
     mIsBeingCollected = true;
+    mRenderOrder = Board::MakeRenderOrder(RenderLayer::RENDER_LAYER_ABOVE_UI, 0, 0);
 
     bool aIsEndlessAward = false;
     if ((mApp->IsEndlessIZombie(mApp->mGameMode) || mApp->IsEndlessScaryPotter(mApp->mGameMode)) && IsLevelAward())

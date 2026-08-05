@@ -56,8 +56,8 @@ void CursorObject::Update()
     }
 
     mVisible = true;
-    mX = mApp->mWidgetManager->mLastMouseX - 25 - (BOARD_OFFSET - 220);
-    mY = mApp->mWidgetManager->mLastMouseY - 35;
+    mX = mApp->mWidgetManager->mLastMouseX - mBoard->mX - 25;
+    mY = mApp->mWidgetManager->mLastMouseY - mBoard->mY - 35;
 }
 
 void CursorObject::Die()
@@ -253,6 +253,7 @@ void CursorPreview::Update()
         {
             mX = mBoard->GridToPixelX(mGridX, mGridY);
             mY = mBoard->GridToPixelY(mGridX, mGridY);
+            mRenderOrder = mBoard->MakeRenderOrder(RenderLayer::RENDER_LAYER_PLANT, mGridY, 2);
             mVisible = true;
             return;
         }

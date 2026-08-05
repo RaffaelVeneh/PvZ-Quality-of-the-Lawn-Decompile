@@ -306,6 +306,7 @@ public:
     void                    UpdateBombSquash();
     void                    UpdateDoomnut();
     void                    GrantPlacementShieldPulse();
+    void                    CheckAndReceiveNearbyPlanternShield();
     void                    UpdatePlanternEffects(float healthMultiplier, int healAmount);
     /*inline*/ bool         NotOnGround();
     void                    DoSquashDamage();

@@ -2807,10 +2807,10 @@ Reanimation* LawnApp::ReanimationGet(ReanimationID theReanimationID)
 {
 	return mEffectSystem->mReanimationHolder->mReanimations.DataArrayGet((unsigned int)theReanimationID);
 }
-
+ 
 Reanimation* LawnApp::ReanimationTryToGet(ReanimationID theReanimationID)
 {
-	return mEffectSystem->mReanimationHolder->mReanimations.DataArrayTryToGet((unsigned int)theReanimationID);
+		return mEffectSystem->mReanimationHolder->mReanimations.DataArrayTryToGet((unsigned int)theReanimationID);
 }
 
 void LawnApp::RemoveReanimation(ReanimationID theReanimationID)
