@@ -448,7 +448,7 @@ void StoreScreen::Draw(Graphics* g)
 
     if (mApp->mBoard != nullptr && mApp->mBoard->StageIsNight())
     {
-        g->DrawImage(Sexy::IMAGE_STORE_CAR_NIGHT, mShakeX + 668, mShakeY + 193);
+        g->DrawImage(Sexy::IMAGE_STORE_CAR_NIGHT, mShakeX + 196, mShakeY + 138);
     }
     else
     {
@@ -464,7 +464,7 @@ void StoreScreen::Draw(Graphics* g)
         g->DrawImage(Sexy::IMAGE_STORE_CARCLOSED, mShakeX + 196, mShakeY + 138);
         if (mApp->mBoard != nullptr && mApp->mBoard->StageIsNight())
         {
-            g->DrawImage(Sexy::IMAGE_STORE_CARCLOSED_NIGHT, mShakeX + 337, mShakeY + 187);
+            g->DrawImage(Sexy::IMAGE_STORE_CARCLOSED_NIGHT, mShakeX + 196, mShakeY + 138);
         }
     }
     g->DrawImage(Sexy::IMAGE_STORE_SIGN, 285, aStoreSignPosY);

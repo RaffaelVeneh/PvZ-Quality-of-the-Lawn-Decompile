@@ -93,6 +93,7 @@ struct PlantsOnLawn
 	Plant*							mPumpkinPlant;
 	Plant*							mFlyingPlant;
 	Plant*							mNormalPlant;
+	Plant*							mGraveBusterPlant;
 };
 
 struct BungeeDropGrid
@@ -175,6 +176,10 @@ public:
 	bool							mFinalBossKilled;										
 	bool							mShowShovel;											
 	bool							mShowBushes;											
+	bool							mSunshroomTutorialShowing;
+	bool							mSunshroomStackTutorialCompleted;
+	bool							mScaredyShroomTutorialShowing;
+	bool							mScaredyShroomTutorialCompleted;
 	int								mCoinBankFadeCount;										
 	DebugTextMode					mDebugTextMode;											
 	bool							mLevelComplete;											
@@ -307,6 +312,7 @@ public:
 	void							DrawProgressMeter(Graphics* g);
 	void							UpdateToolTip();
 	Plant*							GetTopPlantAt(int theGridX, int theGridY, PlantPriority thePriority);
+	Plant*							GetShieldTargetPlantAt(int theGridX, int theGridY);
 	void							GetPlantsOnLawn(int theGridX, int theGridY, PlantsOnLawn* thePlantOnLawn);
 	/*inline*/ int					CountSunFlowers();
 	int								GetSeedPacketPositionX(int theIndex);
@@ -437,6 +443,7 @@ public:
 	bool							IsFinalSurvivalStage();
 	void							SurvivalSaveScore();
 	int								CountZombiesOnScreen();
+	Plant*							GetFirstPlantByType(SeedType theSeedType);
 	/*inline*/ int					GetNumWavesPerSurvivalStage();
 	int								GetLevelRandSeed();
 	void							AddBossRenderItem(RenderItem* theRenderList, int& theCurRenderItem, Zombie* theBossZombie);

@@ -267,15 +267,15 @@ void AwardScreen::Draw(Graphics* g)
         g->SetColorizeImages(false);
         g->SetColor(Color(0, 0, 0, 64));
         g->FillRect(0, 525, BOARD_WIDTH, BOARD_HEIGHT);
-        g->DrawImage(Sexy::IMAGE_ZOMBIE_NOTE, 75, 60);
-        g->DrawImage(Sexy::IMAGE_CREDITS_ZOMBIENOTE, 149, 103, 475, 325);
+        g->DrawImage(Sexy::IMAGE_ZOMBIE_NOTE, 75 + (BOARD_OFFSET - 220), 60);
+        g->DrawImage(Sexy::IMAGE_CREDITS_ZOMBIENOTE, 149 + (BOARD_OFFSET - 220), 103, 475, 325);
         mState = "Credits Note";
     }
     else if (mAwardType == AWARD_HELP_ZOMBIENOTE)
     {
         g->DrawImage(Sexy::IMAGE_BACKGROUND1, -700, -300, 2800, 1200);
-        g->DrawImage(Sexy::IMAGE_ZOMBIE_NOTE, 80, 80);
-        g->DrawImage(Sexy::IMAGE_ZOMBIE_NOTE_HELP, 131, 132);
+        g->DrawImage(Sexy::IMAGE_ZOMBIE_NOTE, 80 + (BOARD_OFFSET - 220), 80);
+        g->DrawImage(Sexy::IMAGE_ZOMBIE_NOTE_HELP, 131 + (BOARD_OFFSET - 220), 132);
         mState = "Help Note";
     }
     else
@@ -317,8 +317,8 @@ void AwardScreen::Draw(Graphics* g)
         else if (aLevel == 10)
         {
             g->DrawImage(Sexy::IMAGE_BACKGROUND1, -700, -300, 2800, 1200);
-            g->DrawImage(Sexy::IMAGE_ZOMBIE_NOTE, 80, 80);
-            g->DrawImage(Sexy::IMAGE_ZOMBIE_NOTE1, 131, 132);
+            g->DrawImage(Sexy::IMAGE_ZOMBIE_NOTE, 80 + (BOARD_OFFSET - 220), 80);
+            g->DrawImage(Sexy::IMAGE_ZOMBIE_NOTE1, 131 + (BOARD_OFFSET - 220), 132);
             TodDrawString(g, _S("[FOUND_NOTE]"), BOARD_WIDTH / 2, 70, Sexy::FONT_DWARVENTODCRAFT24, Color(255, 200, 0, 255), DS_ALIGN_CENTER);
             mState = "Zombie Note (" + mApp->GetStageString(aLevel).erase(0, 1) + ")";
         }
@@ -330,8 +330,8 @@ void AwardScreen::Draw(Graphics* g)
         else if (aLevel == 20)
         {
             g->DrawImage(Sexy::IMAGE_BACKGROUND2, -700, -300, 2800, 1200);
-            g->DrawImage(Sexy::IMAGE_ZOMBIE_NOTE, 80, 80);
-            g->DrawImage(Sexy::IMAGE_ZOMBIE_NOTE2, 133, 127);
+            g->DrawImage(Sexy::IMAGE_ZOMBIE_NOTE, 80 + (BOARD_OFFSET - 220), 80);
+            g->DrawImage(Sexy::IMAGE_ZOMBIE_NOTE2, 133 + (BOARD_OFFSET - 220), 127);
             TodDrawString(g, _S("[FOUND_NOTE]"), BOARD_WIDTH / 2, 70, Sexy::FONT_DWARVENTODCRAFT24, Color(255, 200, 0, 255), DS_ALIGN_CENTER);
             mState = "Zombie Note (" + mApp->GetStageString(aLevel).erase(0, 1) + ")";
         }
@@ -343,8 +343,8 @@ void AwardScreen::Draw(Graphics* g)
         else if (aLevel == 30)
         {
             g->DrawImage(Sexy::IMAGE_BACKGROUND1, -700, -300, 2800, 1200);
-            g->DrawImage(Sexy::IMAGE_ZOMBIE_NOTE, 80, 80);
-            g->DrawImage(Sexy::IMAGE_ZOMBIE_NOTE3, 120, 117);
+            g->DrawImage(Sexy::IMAGE_ZOMBIE_NOTE, 80 + (BOARD_OFFSET - 220), 80);
+            g->DrawImage(Sexy::IMAGE_ZOMBIE_NOTE3, 120 + (BOARD_OFFSET - 220), 117);
             TodDrawString(g, _S("[FOUND_NOTE]"), BOARD_WIDTH / 2, 70, Sexy::FONT_DWARVENTODCRAFT24, Color(255, 200, 0, 255), DS_ALIGN_CENTER);
             mState = "Zombie Note (" + mApp->GetStageString(aLevel).erase(0, 1) + ")";
         }
@@ -356,8 +356,8 @@ void AwardScreen::Draw(Graphics* g)
         else if (aLevel == 40)
         {
             g->DrawImage(Sexy::IMAGE_BACKGROUND2, -700, -300, 2800, 1200);
-            g->DrawImage(Sexy::IMAGE_ZOMBIE_NOTE, 80, 80);
-            g->DrawImage(Sexy::IMAGE_ZOMBIE_NOTE4, 102, 117);
+            g->DrawImage(Sexy::IMAGE_ZOMBIE_NOTE, 80 + (BOARD_OFFSET - 220), 80);
+            g->DrawImage(Sexy::IMAGE_ZOMBIE_NOTE4, 102 + (BOARD_OFFSET - 220), 117);
             TodDrawString(g, _S("[FOUND_NOTE]"), BOARD_WIDTH / 2, 70, Sexy::FONT_DWARVENTODCRAFT24, Color(255, 200, 0, 255), DS_ALIGN_CENTER);
             mState = "Zombie Note (" + mApp->GetStageString(aLevel).erase(0, 1) + ")";
         }
@@ -369,8 +369,8 @@ void AwardScreen::Draw(Graphics* g)
         else if (aLevel == 50)
         {
             g->DrawImage(Sexy::IMAGE_BACKGROUND1, -700, -300, 2800, 1200);
-            g->DrawImage(Sexy::IMAGE_ZOMBIE_NOTE, 80, 80);
-            g->DrawImage(Sexy::IMAGE_ZOMBIE_FINAL_NOTE, 114, 138);
+            g->DrawImage(Sexy::IMAGE_ZOMBIE_NOTE, 80 + (BOARD_OFFSET - 220), 80);
+            g->DrawImage(Sexy::IMAGE_ZOMBIE_FINAL_NOTE, 114 + (BOARD_OFFSET - 220), 138);
             TodDrawString(g, _S("[FOUND_NOTE]"), BOARD_WIDTH / 2, 70, Sexy::FONT_DWARVENTODCRAFT24, Color(255, 200, 0, 255), DS_ALIGN_CENTER);
             mState = "Zombie Note (" + mApp->GetStageString(aLevel).erase(0, 1) + ")";
         }

@@ -746,7 +746,10 @@ void TodDrawImageCelCenterScaledF(Graphics* g, Image* theImageStrip, float thePo
 
 void TodDrawImageCelScaledF(Graphics* g, Image* theImageStrip, float thePosX, float thePosY, int theCelCol, int theCelRow, float theScaleX, float theScaleY)
 {
-	TOD_ASSERT(theCelCol >= 0 && theCelCol < theImageStrip->mNumCols);
+	if (theImageStrip->mNumCols > 0)
+	{
+		theCelCol = ClampInt(theCelCol, 0, theImageStrip->mNumCols - 1);
+	}
 
 	int aCelWidth = theImageStrip->GetCelWidth();
 	int aCelHeight = theImageStrip->GetCelHeight();

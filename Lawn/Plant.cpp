@@ -53,7 +53,7 @@ PlantDefinition gPlantDefs[SeedType::NUM_SEED_TYPES] = {
     { SeedType::SEED_PLANTERN,          nullptr, ReanimationType::REANIM_PLANTERN,      38, 25,     3000,   PlantSubClass::SUBCLASS_NORMAL,     2500,   _S("PLANTERN"),         0 },
     { SeedType::SEED_CACTUS,            nullptr, ReanimationType::REANIM_CACTUS,        15, 125,    750,    PlantSubClass::SUBCLASS_SHOOTER,    150,    _S("CACTUS"),           2 },
     { SeedType::SEED_BLOVER,            nullptr, ReanimationType::REANIM_BLOVER,        18, 150,    750,    PlantSubClass::SUBCLASS_NORMAL,     0,      _S("BLOVER"),           0 },
-    { SeedType::SEED_SPLITPEA,          nullptr, ReanimationType::REANIM_SPLITPEA,      32, 125,    750,    PlantSubClass::SUBCLASS_SHOOTER,    150,    _S("SPLIT_PEA"),        1 },
+    { SeedType::SEED_SPLITPEA,          nullptr, ReanimationType::REANIM_SPLITPEA,      32, 100,    750,    PlantSubClass::SUBCLASS_SHOOTER,    150,    _S("SPLIT_PEA"),        1 },
     { SeedType::SEED_STARFRUIT,         nullptr, ReanimationType::REANIM_STARFRUIT,     30, 125,    750,    PlantSubClass::SUBCLASS_SHOOTER,    150,    _S("STARFRUIT"),        1 },
     { SeedType::SEED_PUMPKINSHELL,      nullptr, ReanimationType::REANIM_PUMPKIN,       25, 100,    1500,   PlantSubClass::SUBCLASS_NORMAL,     0,      _S("PUMPKIN"),          0 },
     { SeedType::SEED_MAGNETSHROOM,      nullptr, ReanimationType::REANIM_MAGNETSHROOM,  35, 100,    750,    PlantSubClass::SUBCLASS_NORMAL,     0,      _S("MAGNET_SHROOM"),    0 },
@@ -619,6 +619,11 @@ void Plant::PlantInitialize(int theGridX, int theGridY, SeedType theSeedType, Se
         break;
     case SeedType::SEED_SCAREDYSHROOM:
         mState = PlantState::STATE_READY;
+        if (mPlantCol >= 6 && !mIsAsleep)
+        {
+            mPlantHealth = 1000;
+            mPlantMaxHealth = 1000;
+        }
         break;
     case SeedType::SEED_COBCANNON:
         if (IsInPlay())
@@ -984,6 +989,16 @@ void Plant::DoRowAreaDamage(int theDamage, unsigned int theDamageFlags)
             if (GetRectOverlap(aAttackRect, aZombieRect) > 0)
             {
                 int aDamage = theDamage;
+                if (mSeedType == SEED_SPIKEWEED)
+                {
+                    int aTotalMaxPoints = aZombie->mBodyMaxHealth + aZombie->mHelmMaxHealth + aZombie->mShieldMaxHealth + aZombie->mFlyingMaxHealth;
+                    aDamage += FloatRoundToInt((float)aTotalMaxPoints * 0.01f);
+                }
+                else if (mSeedType == SEED_SPIKEROCK)
+                {
+                    int aTotalMaxPoints = aZombie->mBodyMaxHealth + aZombie->mHelmMaxHealth + aZombie->mShieldMaxHealth + aZombie->mFlyingMaxHealth;
+                    aDamage += FloatRoundToInt((float)aTotalMaxPoints * 0.02f);
+                }
                 if (mSeedType == SEED_GLOOMSHROOM && mGloomMode == GLOOM_RAPID_RANGER)
                 {
                     aDamage *= 2;
@@ -1734,11 +1749,49 @@ void Plant::UpdatePotato()
     }
 }
 
+Zombie* Plant::FindSmartTangleKelpTarget()
+{
+    Rect aAttackRect = GetPlantAttackRect(PlantWeapon::WEAPON_PRIMARY);
+    Zombie* aBestZombie = nullptr;
+    int aHighestPoints = -1;
+
+    Zombie* aZombie = nullptr;
+    while (mBoard->IterateZombies(aZombie))
+    {
+        if (aZombie->mRow != mRow)
+            continue;
+
+        if (aZombie->IsDeadOrDying() || !aZombie->mHasHead || aZombie->IsTangleKelpTarget())
+            continue;
+
+        if (!aZombie->EffectedByDamage(GetDamageRangeFlags(PlantWeapon::WEAPON_PRIMARY)))
+            continue;
+
+        Rect aZombieRect = aZombie->GetZombieRect();
+        if (GetRectOverlap(aAttackRect, aZombieRect) <= 0)
+            continue;
+
+        int aTotalPoints = aZombie->mBodyHealth + aZombie->mHelmHealth + aZombie->mShieldHealth + aZombie->mFlyingHealth;
+        if (aZombie->mZombieType == ZombieType::ZOMBIE_GARGANTUAR || aZombie->mZombieType == ZombieType::ZOMBIE_REDEYE_GARGANTUAR)
+        {
+            aTotalPoints += 3000;
+        }
+
+        if (aBestZombie == nullptr || aTotalPoints > aHighestPoints)
+        {
+            aBestZombie = aZombie;
+            aHighestPoints = aTotalPoints;
+        }
+    }
+
+    return aBestZombie;
+}
+
 void Plant::UpdateTanglekelp()
 {
     if (mState != PlantState::STATE_TANGLEKELP_GRABBING)
     {
-        Zombie* aZombie = FindTargetZombie(mRow, PlantWeapon::WEAPON_PRIMARY);
+        Zombie* aZombie = FindSmartTangleKelpTarget();
         if (aZombie)
         {
             mApp->PlayFoley(FoleyType::FOLEY_FLOOP);
@@ -1852,6 +1905,17 @@ void Plant::UpdateSpikeweed()
 
 void Plant::UpdateScaredyShroom()
 {
+    if (mPlantCol >= 6)
+    {
+        if (mState != PlantState::STATE_SCAREDYSHROOM_SCARED)
+        {
+            mState = PlantState::STATE_SCAREDYSHROOM_SCARED;
+            PlayBodyReanim("anim_scaredidle", ReanimLoopType::REANIM_LOOP, 10, 0.0f);
+        }
+        mLaunchCounter = mLaunchRate;
+        return;
+    }
+
     if (mShootingCounter > 0)
         return;
 
@@ -3231,6 +3295,13 @@ void Plant::RemoveEffects()
 
 void Plant::Squish()
 {
+    if (mShieldHealth > 0)
+    {
+        mShieldHealth = 0;
+        mApp->PlayFoley(FoleyType::FOLEY_SPLAT);
+        return; // Shield absorbs the smash/crush! Plant is saved!
+    }
+
     if (mSeedType == SeedType::SEED_TORCHWOOD || mSeedType == SeedType::SEED_BLUE_TORCHWOOD)
     {
         mApp->PlayFoley(FoleyType::FOLEY_JALAPENO_IGNITE);
@@ -3556,7 +3627,29 @@ void Plant::UpdateAbilities()
     else if (mSeedType == SeedType::SEED_POTATOMINE || mSeedType == SeedType::SEED_RED_POTATO_MINE) UpdatePotato();
     else if (mSeedType == SeedType::SEED_SPIKEWEED || mSeedType == SeedType::SEED_SPIKEROCK)    UpdateSpikeweed();
     else if (mSeedType == SeedType::SEED_TANGLEKELP)                                            UpdateTanglekelp();
-    else if (mSeedType == SeedType::SEED_SCAREDYSHROOM)                                         UpdateScaredyShroom();
+    else if (mSeedType == SeedType::SEED_SCAREDYSHROOM)
+    {
+        if (mPlantCol >= 6)
+        {
+            if (!mIsAsleep)
+            {
+                if (mPlantMaxHealth != 1000)
+                {
+                    mPlantMaxHealth = 1000;
+                    mPlantHealth = 1000;
+                }
+            }
+            else
+            {
+                if (mPlantMaxHealth != 300)
+                {
+                    mPlantMaxHealth = 300;
+                    if (mPlantHealth > 300) mPlantHealth = 300;
+                }
+            }
+        }
+        UpdateScaredyShroom();
+    }
     else if (mSeedType == SeedType::SEED_SUPER_CHOMPER)                                         UpdateSuperChomper();
     else if (mSeedType == SeedType::SEED_BOMBSQUASH)                                            UpdateBombSquash();
     else if (mSeedType == SeedType::SEED_DOOM_NUT)                                              UpdateDoomnut();
@@ -3705,6 +3798,14 @@ void Plant::UpdateReanimColor()
     // 2. Allow other states, like being targeted for an upgrade, to temporarily overwrite the base color
     SeedType aSeedType = mBoard->GetSeedTypeInCursor();
     if (IsPartOfUpgradableTo(aSeedType) && mBoard->CanPlantAt(mPlantCol, mRow, aSeedType) == PLANTING_OK)
+    {
+        aColorOverride = GetFlashingColor(mBoard->mMainCounter, 90);
+    }
+    else if (mSeedType == SeedType::SEED_SUNSHROOM && aSeedType == SeedType::SEED_SUNSHROOM && mBoard->CanPlantAt(mPlantCol, mRow, SeedType::SEED_SUNSHROOM) == PlantingReason::PLANTING_OK)
+    {
+        aColorOverride = GetFlashingColor(mBoard->mMainCounter, 90);
+    }
+    else if (mSeedType == SeedType::SEED_SCAREDYSHROOM && mBoard && mBoard->mApp->IsAdventureMode() && mBoard->mLevel == 17 && !mBoard->mScaredyShroomTutorialCompleted && this == mBoard->GetFirstPlantByType(SeedType::SEED_SCAREDYSHROOM))
     {
         aColorOverride = GetFlashingColor(mBoard->mMainCounter, 90);
     }
@@ -4565,12 +4666,14 @@ void Plant::UpdateShooting()
         {
             Reanimation* aHeadBackReanim = mApp->ReanimationTryToGet(mHeadReanimID2);
             Reanimation* aHeadFrontReanim = mApp->ReanimationTryToGet(mHeadReanimID);
-            if (aHeadFrontReanim->mLoopType == ReanimLoopType::REANIM_PLAY_ONCE_AND_HOLD && mLaunchCounter <= 1)
+            if (aHeadFrontReanim->mLoopType == ReanimLoopType::REANIM_PLAY_ONCE_AND_HOLD)
             {
+                Fire(nullptr, mRow, PlantWeapon::WEAPON_PRIMARY);
                 Fire(nullptr, mRow, PlantWeapon::WEAPON_PRIMARY);
             }
             if (aHeadBackReanim->mLoopType == ReanimLoopType::REANIM_PLAY_ONCE_AND_HOLD)
             {
+                Fire(nullptr, mRow, PlantWeapon::WEAPON_SECONDARY);
                 Fire(nullptr, mRow, PlantWeapon::WEAPON_SECONDARY);
             }
         }
@@ -5530,6 +5633,16 @@ void Plant::Draw(Graphics* g)
                 g->SetColorizeImages(true);
                 g->SetColor(GetFlashingColor(mBoard->mMainCounter, 90));
             }
+            else if (mSeedType == SeedType::SEED_SUNSHROOM && aSeedType == SeedType::SEED_SUNSHROOM && mBoard->CanPlantAt(mPlantCol, mRow, SeedType::SEED_SUNSHROOM) == PlantingReason::PLANTING_OK)
+            {
+                g->SetColorizeImages(true);
+                g->SetColor(GetFlashingColor(mBoard->mMainCounter, 90));
+            }
+            else if (mSeedType == SeedType::SEED_SCAREDYSHROOM && mBoard && mBoard->mApp->IsAdventureMode() && mBoard->mLevel == 17 && !mBoard->mScaredyShroomTutorialCompleted && this == mBoard->GetFirstPlantByType(SeedType::SEED_SCAREDYSHROOM))
+            {
+                g->SetColorizeImages(true);
+                g->SetColor(GetFlashingColor(mBoard->mMainCounter, 90));
+            }
             else if (aSeedType == SeedType::SEED_COBCANNON && mBoard->CanPlantAt(mPlantCol - 1, mRow, aSeedType) == PlantingReason::PLANTING_OK)
             {
                 g->SetColorizeImages(true);
@@ -5741,6 +5854,13 @@ void Plant::MouseDown(int x, int y, int theClickCount)
     {
         mIsRandom = !mIsRandom; // Toggle the random mode on/off
         mApp->PlayFoley(FOLEY_BLEEP);
+        if (mBoard && mBoard->mScaredyShroomTutorialShowing)
+        {
+            mBoard->mScaredyShroomTutorialShowing = false;
+            mBoard->mScaredyShroomTutorialCompleted = true;
+            mBoard->TutorialArrowRemove();
+            mBoard->ClearAdviceImmediately();
+        }
         return;
     }
 
@@ -6315,11 +6435,21 @@ void Plant::Fire(Zombie* theTargetZombie, int theRow, PlantWeapon thePlantWeapon
     case SeedType::SEED_SPLITPEA:
         if (thePlantWeapon == PlantWeapon::WEAPON_SECONDARY)
         {
-            aProjectileType = PROJECTILE_BOUNCING_PEA;
+            int aChance = Rand(100);
+            if (aChance < 15)
+                aProjectileType = ProjectileType::PROJECTILE_FIREBALL;
+            else
+                aProjectileType = ProjectileType::PROJECTILE_BOUNCING_PEA;
         }
         else
         {
-            aProjectileType = PROJECTILE_PEA;
+            int aChance = Rand(100);
+            if (aChance < 5)
+                aProjectileType = ProjectileType::PROJECTILE_RED_FIRE_PEA;
+            else if (aChance < 25)
+                aProjectileType = ProjectileType::PROJECTILE_FIREBALL;
+            else
+                aProjectileType = ProjectileType::PROJECTILE_PEA;
         }
         break;
     case SeedType::SEED_REPEATER:
@@ -7097,6 +7227,13 @@ int Plant::DistanceToClosestZombie()
 
 void Plant::Die()
 {
+    if (mShieldHealth > 0 && !mWasShoveled)
+    {
+        mShieldHealth = 0;
+        mApp->PlayFoley(FoleyType::FOLEY_SPLAT);
+        return; // Shield absorbs the lethal blow! Base plant survives!
+    }
+
     if (mSeedType == SEED_SUNBEAN_BOMB && !mIsBlowing)
     {
         mIsBlowing = true; // Prevents the explosion from happening more than once
@@ -7229,6 +7366,11 @@ void Plant::Die()
                 return; // This is crucial: we exit here to perform the jump instead of dying.
             }
         }
+    }
+
+    if (mSeedType == SeedType::SEED_SCAREDYSHROOM && mPlantCol >= 6 && mBoard)
+    {
+        mBoard->DisplayAdvice(_S("WHY? JUST WHY?"), MessageStyle::MESSAGE_STYLE_HINT_FAST, AdviceType::ADVICE_NONE);
     }
 
     if ((mSeedType == SEED_EXPLODE_O_NUT || mImitaterType == SEED_EXPLODE_O_NUT) && !mWasShoveled)

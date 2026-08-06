@@ -175,6 +175,12 @@ SeedChooserScreen::SeedChooserScreen()
 	if ((mApp->mCrazySeeds && mApp->mPlayedQuickplay) || (mApp->IsAdventureMode() && !mApp->IsFirstTimeAdventureMode() && !mApp->mPlayedQuickplay))
 		CrazyDavePickSeeds();
 
+	SeedType aMustPickSeed = GetMustPickSeedForCurrentLevel();
+	if (aMustPickSeed != SEED_NONE)
+	{
+		MustPickSeed(aMustPickSeed);
+	}
+
 	mSlider = new Sexy::Slider(IMAGE_OPTIONS_SLIDERSLOT_PLANT, IMAGE_OPTIONS_SLIDERKNOB_PLANT, 0, this);
 	mSlider->SetValue(max(0.0, min(mMaxScrollPosition, mScrollPosition)));
 	mSlider->mHorizontal = false;
@@ -251,6 +257,67 @@ void SeedChooserScreen::CrazyDavePickSeeds()
 		aChosenSeed.mCrazyDavePicked = true;
 		mSeedsInBank++;
 	}
+}
+
+SeedType SeedChooserScreen::GetMustPickSeedForCurrentLevel()
+{
+	if (!mApp->IsAdventureMode())
+		return SEED_NONE;
+
+	if (mApp->IsSurvivalMode() || mApp->IsPuzzleMode() || mApp->IsChallengeMode())
+		return SEED_NONE;
+
+	if (!mApp->IsFirstTimeAdventureMode() || mApp->HasFinishedAdventure())
+		return SEED_NONE;
+
+	int aCurrentLevel = mBoard->mLevel;
+	if (aCurrentLevel < 7) // Starts at level 1-7 (level 7)
+		return SEED_NONE;
+
+	int aCompletedLevel = aCurrentLevel - 1;
+	if (aCompletedLevel < 6)
+		return SEED_NONE;
+
+	// Skip non-seed reward levels (Level 1-5 Shovel)
+	if (aCompletedLevel == 5)
+		return SEED_NONE;
+
+	SeedType aMustPickSeed = mApp->GetAwardSeedForLevel(aCompletedLevel);
+	if (aMustPickSeed < SEED_PEASHOOTER || aMustPickSeed >= NUM_SEEDS_IN_CHOOSER)
+		return SEED_NONE;
+
+	if (!mApp->SeedTypeAvailable(aMustPickSeed))
+		return SEED_NONE;
+
+	return aMustPickSeed;
+}
+
+void SeedChooserScreen::MustPickSeed(SeedType theSeedType)
+{
+	if (theSeedType == SEED_NONE)
+		return;
+
+	ChosenSeed& aChosenSeed = mChosenSeeds[theSeedType];
+	if (aChosenSeed.mSeedState == SEED_IN_BANK)
+	{
+		aChosenSeed.mCrazyDavePicked = true;
+		return;
+	}
+
+	if (mSeedsInBank >= mBoard->GetNumSeedsInBank())
+		return;
+
+	int aPosX = mBoard->GetSeedPacketPositionX(mSeedsInBank);
+	aChosenSeed.mX = aPosX;
+	aChosenSeed.mY = 8;
+	aChosenSeed.mStartX = aPosX;
+	aChosenSeed.mStartY = 8;
+	aChosenSeed.mEndX = aPosX;
+	aChosenSeed.mEndY = 8;
+	aChosenSeed.mSeedState = SEED_IN_BANK;
+	aChosenSeed.mSeedIndexInBank = mSeedsInBank;
+	aChosenSeed.mCrazyDavePicked = true;
+	mSeedsInBank++;
 }
 
 bool SeedChooserScreen::Has7Rows()

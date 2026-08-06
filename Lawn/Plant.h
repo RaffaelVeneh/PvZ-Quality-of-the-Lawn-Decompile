@@ -276,6 +276,7 @@ public:
     void                    DoSpecial();
     void                    Fire(Zombie* theTargetZombie, int theRow, PlantWeapon thePlantWeapon = PlantWeapon::WEAPON_PRIMARY);
     Zombie*                 FindTargetZombie(int theRow, PlantWeapon thePlantWeapon = PlantWeapon::WEAPON_PRIMARY);
+    Zombie*                 FindSmartTangleKelpTarget();
     Zombie*                 FindSuperChomperTarget();
     Zombie*                 FindClosestZombieInRow(int theRow);
     void                    Die();

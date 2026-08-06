@@ -192,7 +192,7 @@ Board::Board(LawnApp* theApp)
 		mStoreButton->mOverImage = IMAGE_ZENSHOPBUTTON_HIGHLIGHT;
 		mStoreButton->mDownImage = IMAGE_ZENSHOPBUTTON_HIGHLIGHT;
 		mStoreButton->mParentWidget = this;
-		mStoreButton->Resize(818, 33, IMAGE_ZENSHOPBUTTON->mWidth, 40);
+		mStoreButton->Resize(678 + (BOARD_OFFSET - 220), 33, IMAGE_ZENSHOPBUTTON->mWidth, 40);
 	}
 	else
 	{
@@ -1484,6 +1484,10 @@ void Board::InitLevel()
 		mSunCountDown = RandRangeInt(425, 700);
 	}
 	memset(mHelpDisplayed, 0, sizeof(mHelpDisplayed));
+	mSunshroomTutorialShowing = false;
+	mSunshroomStackTutorialCompleted = false;
+	mScaredyShroomTutorialShowing = false;
+	mScaredyShroomTutorialCompleted = false;
 	mSeedBank->mNumPackets = GetNumSeedsInBank();
 	mSeedBank->UpdateWidth();
 	for (int i = 0; i < SEEDBANK_MAX; i++)
@@ -2055,6 +2059,8 @@ void Board::ClearAdviceImmediately()
 {
 	ClearAdvice(AdviceType::ADVICE_NONE);
 	mAdvice->mDuration = 0;
+	mAdvice->ClearReanim();
+	mAdvice->mLabel[0] = 0;
 }
 
 void Board::ClearAdvice(AdviceType theHelpIndex)
@@ -2062,6 +2068,8 @@ void Board::ClearAdvice(AdviceType theHelpIndex)
 	if (theHelpIndex == AdviceType::ADVICE_NONE || theHelpIndex == mHelpIndex)
 	{
 		mAdvice->ClearLabel();
+		mAdvice->ClearReanim();
+		mAdvice->mLabel[0] = 0;
 		mHelpIndex = AdviceType::ADVICE_NONE;
 	}
 }
@@ -2320,6 +2328,7 @@ void Board::GetPlantsOnLawn(int theGridX, int theGridY, PlantsOnLawn* thePlantOn
 	thePlantOnLawn->mPumpkinPlant = nullptr;
 	thePlantOnLawn->mFlyingPlant = nullptr;
 	thePlantOnLawn->mNormalPlant = nullptr;
+	thePlantOnLawn->mGraveBusterPlant = nullptr;
 
 	if (theGridX < 0 || theGridX >= MAX_GRID_SIZE_X || theGridY < 0 || theGridY >= MAX_GRID_SIZE_Y)
 		return;
@@ -2359,7 +2368,11 @@ void Board::GetPlantsOnLawn(int theGridX, int theGridY, PlantsOnLawn* thePlantOn
 			continue;
 		}
 
-		if (Plant::IsFlying(aPlant->mSeedType))
+		if (aSeedType == SeedType::SEED_GRAVEBUSTER)
+		{
+			thePlantOnLawn->mGraveBusterPlant = aPlant;
+		}
+		else if (Plant::IsFlying(aPlant->mSeedType))
 		{
 			TOD_ASSERT(!thePlantOnLawn->mFlyingPlant);
 			thePlantOnLawn->mFlyingPlant = aPlant;
@@ -2396,19 +2409,23 @@ Plant* Board::GetTopPlantAt(int theGridX, int theGridY, PlantPriority thePriorit
 	case PlantPriority::TOPPLANT_EATING_ORDER:
 		if (aPlantOnLawn.mPumpkinPlant)							return aPlantOnLawn.mPumpkinPlant;
 		else if (aPlantOnLawn.mNormalPlant)						return aPlantOnLawn.mNormalPlant;
-		else													return aPlantOnLawn.mUnderPlant;
+		else if (aPlantOnLawn.mUnderPlant)						return aPlantOnLawn.mUnderPlant;
+		else													return aPlantOnLawn.mGraveBusterPlant;
 	case PlantPriority::TOPPLANT_DIGGING_ORDER:
-		if (aPlantOnLawn.mNormalPlant)							return aPlantOnLawn.mNormalPlant;
+		if (aPlantOnLawn.mGraveBusterPlant)						return aPlantOnLawn.mGraveBusterPlant;
+		else if (aPlantOnLawn.mNormalPlant)						return aPlantOnLawn.mNormalPlant;
 		else													return aPlantOnLawn.mUnderPlant;
 	case PlantPriority::TOPPLANT_BUNGEE_ORDER:
 	case PlantPriority::TOPPLANT_CATAPULT_ORDER:
 	case PlantPriority::TOPPLANT_ANY:
-		if (aPlantOnLawn.mFlyingPlant)							return aPlantOnLawn.mFlyingPlant;
+		if (aPlantOnLawn.mGraveBusterPlant)						return aPlantOnLawn.mGraveBusterPlant;
+		else if (aPlantOnLawn.mFlyingPlant)						return aPlantOnLawn.mFlyingPlant;
 		else if (aPlantOnLawn.mPumpkinPlant)					return aPlantOnLawn.mPumpkinPlant;
 		else if (aPlantOnLawn.mNormalPlant)						return aPlantOnLawn.mNormalPlant;
 		else													return aPlantOnLawn.mUnderPlant;
 	case PlantPriority::TOPPLANT_ZEN_TOOL_ORDER:
-		if (aPlantOnLawn.mFlyingPlant)							return aPlantOnLawn.mFlyingPlant;
+		if (aPlantOnLawn.mGraveBusterPlant)						return aPlantOnLawn.mGraveBusterPlant;
+		else if (aPlantOnLawn.mFlyingPlant)						return aPlantOnLawn.mFlyingPlant;
 		else if (aPlantOnLawn.mPumpkinPlant)					return aPlantOnLawn.mPumpkinPlant;
 		else if (aPlantOnLawn.mNormalPlant)						return aPlantOnLawn.mNormalPlant;
 		else													return aPlantOnLawn.mUnderPlant;
@@ -2418,6 +2435,17 @@ Plant* Board::GetTopPlantAt(int theGridX, int theGridY, PlantPriority thePriorit
 	case PlantPriority::TOPPLANT_ONLY_UNDER_PLANT:				return aPlantOnLawn.mUnderPlant;
 	default:													TOD_ASSERT();
 	}
+}
+
+Plant* Board::GetShieldTargetPlantAt(int theGridX, int theGridY)
+{
+	PlantsOnLawn aPlantOnLawn;
+	GetPlantsOnLawn(theGridX, theGridY, &aPlantOnLawn);
+	if (aPlantOnLawn.mGraveBusterPlant) return aPlantOnLawn.mGraveBusterPlant;
+	if (aPlantOnLawn.mPumpkinPlant)     return aPlantOnLawn.mPumpkinPlant;
+	if (aPlantOnLawn.mNormalPlant)      return aPlantOnLawn.mNormalPlant;
+	if (aPlantOnLawn.mFlyingPlant)      return aPlantOnLawn.mFlyingPlant;
+	return aPlantOnLawn.mUnderPlant;
 }
 
 int Board::CountSunFlowers()
@@ -2446,6 +2474,19 @@ int Board::CountPlantByType(SeedType theSeedType)
 		}
 	}
 	return aCount;
+}
+
+Plant* Board::GetFirstPlantByType(SeedType theSeedType)
+{
+	Plant* aPlant = nullptr;
+	while (IteratePlants(aPlant))
+	{
+		if (aPlant->mSeedType == theSeedType && !aPlant->mDead)
+		{
+			return aPlant;
+		}
+	}
+	return nullptr;
 }
 
 int Board::CountEmptyPotsOrLilies(SeedType theSeedType)
@@ -3007,7 +3048,7 @@ PlantingReason Board::CanPlantAt(int theGridX, int theGridY, SeedType theSeedTyp
 	}
 	if (theSeedType == SeedType::SEED_SPIKEWEED || theSeedType == SeedType::SEED_SPIKEROCK)
 	{
-		if (aGridSquare == GridSquareType::GRIDSQUARE_POOL || StageHasRoof() || aUnderPlant)
+		if (aGridSquare == GridSquareType::GRIDSQUARE_POOL)
 		{
 			return PlantingReason::PLANTING_NEEDS_GROUND;
 		}
@@ -3035,7 +3076,7 @@ PlantingReason Board::CanPlantAt(int theGridX, int theGridY, SeedType theSeedTyp
 		*/
 		return PlantingReason::PLANTING_OK;
 	}
-	if (StageHasRoof() && !aHasFlowerPot)
+	if (StageHasRoof() && !aHasFlowerPot && theSeedType != SeedType::SEED_SPIKEWEED && theSeedType != SeedType::SEED_SPIKEROCK)
 	{
 		return PlantingReason::PLANTING_NEEDS_POT;
 	}
@@ -3484,6 +3525,10 @@ void Board::UpdateToolTip()
 			mToolTip->SetWarningText(_S("[EMPTY]"));
 		}
 		Rect aFertilizerRect = GetFertilizerButtonRect();
+		if (mApp->mGameMode == GameMode::GAMEMODE_CHALLENGE_ZEN_GARDEN || mApp->mGameMode == GameMode::GAMEMODE_TREE_OF_WISDOM)
+		{
+			GetZenButtonRect(GameObjectType::OBJECT_TYPE_FERTILIZER, aFertilizerRect);
+		}
 		mToolTip->mX = aFertilizerRect.mX + 35;
 		mToolTip->mY = aFertilizerRect.mY + 72;
 		mToolTip->mCenter = true;
@@ -5179,7 +5224,6 @@ void Board::SpawnZombiesFromGraves()
 	else if (StageHasPool())
 	{
 		SpawnZombiesFromPool();
-		return;
 	}
 	
 	int aZombiePoints = GetGraveStonesCount();
@@ -5863,6 +5907,68 @@ void Board::UpdateTutorial()
 		SetTutorialState(TutorialState::TUTORIAL_MORESUN_PICK_UP_SUNFLOWER);
 		mTutorialTimer = 500;
 	}
+
+	if (mApp->IsAdventureMode() && mLevel == 12 && !mSunshroomStackTutorialCompleted)
+	{
+		int aSunshroomCount = CountPlantByType(SeedType::SEED_SUNSHROOM);
+		bool aHoldingSunshroom = (mCursorObject->mCursorType == CursorType::CURSOR_TYPE_PLANT_FROM_BANK && mCursorObject->mType == SeedType::SEED_SUNSHROOM);
+
+		if (aSunshroomCount == 1 && aHoldingSunshroom)
+		{
+			if (!mSunshroomTutorialShowing)
+			{
+				Plant* aSunshroom = GetFirstPlantByType(SeedType::SEED_SUNSHROOM);
+				if (aSunshroom != nullptr)
+				{
+					mSunshroomTutorialShowing = true;
+					int aArrowX = aSunshroom->mX + 15;
+					int aArrowY = aSunshroom->mY + 20;
+					TutorialArrowShow(aArrowX, aArrowY);
+					DisplayAdvice(_S("you can stack sun shroom to boost it production"), MessageStyle::MESSAGE_STYLE_HINT_STAY, AdviceType::ADVICE_NONE);
+				}
+			}
+		}
+		else if (mSunshroomTutorialShowing)
+		{
+			mSunshroomTutorialShowing = false;
+			mSunshroomStackTutorialCompleted = true;
+			TutorialArrowRemove();
+			ClearAdviceImmediately();
+			if (mAdvice)
+			{
+				mAdvice->mDuration = 0;
+				mAdvice->mLabel[0] = 0;
+			}
+		}
+	}
+
+	if (mApp->IsAdventureMode() && mLevel == 17 && !mScaredyShroomTutorialCompleted)
+	{
+		Plant* aScaredyShroom = GetFirstPlantByType(SeedType::SEED_SCAREDYSHROOM);
+
+		if (aScaredyShroom != nullptr)
+		{
+			if (!mScaredyShroomTutorialShowing)
+			{
+				mScaredyShroomTutorialShowing = true;
+				int aArrowX = aScaredyShroom->mX + 15;
+				int aArrowY = aScaredyShroom->mY + 20;
+				TutorialArrowShow(aArrowX, aArrowY);
+				DisplayAdvice(_S("Right Click for change mode"), MessageStyle::MESSAGE_STYLE_HINT_STAY, AdviceType::ADVICE_NONE);
+			}
+		}
+		else if (mScaredyShroomTutorialShowing)
+		{
+			mScaredyShroomTutorialShowing = false;
+			TutorialArrowRemove();
+			ClearAdviceImmediately();
+			if (mAdvice)
+			{
+				mAdvice->mDuration = 0;
+				mAdvice->mLabel[0] = 0;
+			}
+		}
+	}
 }
 
 void Board::SetTutorialState(TutorialState theTutorialState)
@@ -6349,6 +6455,17 @@ bool RenderItemSortFunc(const RenderItem& theItem1, const RenderItem& theItem2)
 	return theItem1.mZPos < theItem2.mZPos;
 }
 
+static int RenderItemQSortFunc(const void* a, const void* b)
+{
+	const RenderItem* item1 = (const RenderItem*)a;
+	const RenderItem* item2 = (const RenderItem*)b;
+	if (item1->mZPos != item2->mZPos)
+		return (item1->mZPos < item2->mZPos) ? -1 : 1;
+	if (item1->mGameObject != item2->mGameObject)
+		return (item1->mGameObject < item2->mGameObject) ? -1 : 1;
+	return 0;
+}
+
 void Board::AddBossRenderItem(RenderItem* theRenderList, int& theCurRenderItem, Zombie* theBossZombie)
 {
 	if (theCurRenderItem >= MAX_RENDER_ITEMS - 10) return;
@@ -6680,11 +6797,11 @@ void Board::DrawGameObjects(Graphics* g)
 		}
 		else if (mApp->mGameScene == GameScenes::SCENE_PLAYING || mApp->mGameScene == GameScenes::SCENE_ZOMBIES_WON)
 		{
-			aZPos = MakeRenderOrder(RenderLayer::RENDER_LAYER_UI_TOP, 0, 1);
+			aZPos = MakeRenderOrder(RenderLayer::RENDER_LAYER_UI_BOTTOM, 0, 1);
 		}
 		else if (mCutScene->IsAfterSeedChooser() || mCutScene->IsInShovelTutorial() || mHelpIndex == AdviceType::ADVICE_CLICK_TO_CONTINUE)
 		{
-			aZPos = MakeRenderOrder(RenderLayer::RENDER_LAYER_UI_TOP, 0, 1);
+			aZPos = MakeRenderOrder(RenderLayer::RENDER_LAYER_UI_BOTTOM, 0, 1);
 		}
 		else
 		{
@@ -6861,7 +6978,7 @@ void Board::DrawGameObjects(Graphics* g)
 	}
 
 	TodHesitationTrace("start sort");
-	std::sort(aRenderList, aRenderList + aRenderItemCount, RenderItemSortFunc);
+	qsort(aRenderList, aRenderItemCount, sizeof(RenderItem), RenderItemQSortFunc);
 
 	TodHesitationTrace("end sort, start draw");
 	for (int i = 0; i < aRenderItemCount; i++)
@@ -7832,7 +7949,7 @@ void Board::DrawFadeOut(Graphics* g)
 	{
 		g->SetColor(Color(255, 255, 255, anAlpha));
 	}
-	g->FillRect(0, 0, mWidth, mHeight);
+	g->FillRect(-(BOARD_OFFSET - 220), 0, WIDE_BOARD_WIDTH, mHeight);
 }
 
 void Board::DrawTopRightUI(Graphics* g)
@@ -7842,12 +7959,12 @@ void Board::DrawTopRightUI(Graphics* g)
 		if (mChallenge->mChallengeState == STATECHALLENGE_ZEN_FADING)
 		{
 			mMenuButton->mY = TodAnimateCurve(50, 0, mChallenge->mChallengeStateCounter, -10, -50, TodCurves::CURVE_EASE_IN_OUT);
-			mStoreButton->mX = TodAnimateCurve(50, 0, mChallenge->mChallengeStateCounter, 678, 800, TodCurves::CURVE_EASE_IN_OUT);
+			mStoreButton->mX = TodAnimateCurve(50, 0, mChallenge->mChallengeStateCounter, 678 + (BOARD_OFFSET - 220), 800 + (BOARD_OFFSET - 220), TodCurves::CURVE_EASE_IN_OUT);
 		}
 		else
 		{
 			mMenuButton->mY = -10;
-			mStoreButton->mX = 678;
+			mStoreButton->mX = 678 + (BOARD_OFFSET - 220);
 		}
 	}
 
@@ -8137,7 +8254,7 @@ void Board::DrawUITop(Graphics* g)
 	if (mTimeStopCounter > 0)
 	{
 		g->SetColor(Color(200, 200, 200, 210));
-		g->FillRect(0, 0, BOARD_WIDTH, BOARD_HEIGHT);
+		g->FillRect(-(BOARD_OFFSET - 220), 0, WIDE_BOARD_WIDTH, BOARD_HEIGHT);
 	}
 
 	if (mApp->mGameScene == GameScenes::SCENE_PLAYING || mApp->mGameMode == GameMode::GAMEMODE_TREE_OF_WISDOM)
@@ -8153,7 +8270,7 @@ void Board::DrawUITop(Graphics* g)
 	if ((mApp->mGameMode == GameMode::GAMEMODE_UPSELL || mApp->mGameMode == GameMode::GAMEMODE_INTRO) && mCutScene->mUpsellHideBoard)
 	{
 		g->SetColor(Color(0, 0, 0));
-		g->FillRect(0, 0, BOARD_WIDTH, BOARD_HEIGHT);
+		g->FillRect(-(BOARD_OFFSET - 220), 0, WIDE_BOARD_WIDTH, BOARD_HEIGHT);
 	}
 
 	if (mApp->mGameMode == GameMode::GAMEMODE_UPSELL)
@@ -9269,6 +9386,26 @@ void Board::KeyChar(SexyChar theChar)
 		AddZombie(ZombieType::ZOMBIE_ZAMBONI, Zombie::ZOMBIE_WAVE_DEBUG);
 		return;
 	}
+	if (theChar == _S('w') || theChar == _S('W'))
+	{
+		AddZombie(ZombieType::ZOMBIE_RED_NEWSPAPER, Zombie::ZOMBIE_WAVE_DEBUG);
+		return;
+	}
+	if (theChar == _S('E'))
+	{
+		AddZombie(ZombieType::ZOMBIE_RED_EYE_NEWSPAPER, Zombie::ZOMBIE_WAVE_DEBUG);
+		return;
+	}
+	if (theChar == _S('j'))
+	{
+		AddZombie(ZombieType::ZOMBIE_ENRAGED_JACK, Zombie::ZOMBIE_WAVE_DEBUG);
+		return;
+	}
+	if (theChar == _S('J'))
+	{
+		AddZombie(ZombieType::ZOMBIE_JACK_IN_THE_BOX, Zombie::ZOMBIE_WAVE_DEBUG);
+		return;
+	}
 
 	if (theChar == _S('B'))
 	{
@@ -10071,42 +10208,50 @@ bool Board::IterateReanimations(Reanimation*& theReanimation)
 
 void Board::KillAllPlantsInRadius(int theX, int theY, int theRadius)
 {
+	bool aTreatedTile[MAX_GRID_SIZE_X][MAX_GRID_SIZE_Y] = { false };
 	Plant* aPlant = nullptr;
 	while (IteratePlants(aPlant))
 	{
 		if (GetCircleRectOverlap(theX, theY, theRadius, aPlant->GetPlantRect()))
 		{
-			Plant* aPumpkin = GetPumpkinAt(aPlant->mPlantCol, aPlant->mRow);
-			if (aPumpkin != nullptr && aPlant != aPumpkin)
+			int col = aPlant->mPlantCol;
+			int row = aPlant->mRow;
+			if (col >= 0 && col < MAX_GRID_SIZE_X && row >= 0 && row < MAX_GRID_SIZE_Y)
 			{
-				continue;
-			}
+				if (aTreatedTile[col][row]) continue;
+				aTreatedTile[col][row] = true;
 
-			mPlantsEaten++;
-			aPlant->Die();
+				Plant* aTarget = GetShieldTargetPlantAt(col, row);
+				if (aTarget != nullptr)
+				{
+					aTarget->TakeDamage(100000, 0U);
+				}
+			}
 		}
 	}
 }
 
 void Board::DamageAllPlantsInRadius(int theX, int theY, int theRadius, int theDamage)
 {
+	bool aTreatedTile[MAX_GRID_SIZE_X][MAX_GRID_SIZE_Y] = { false };
 	Plant* aPlant = nullptr;
 	while (IteratePlants(aPlant))
 	{
 		if (GetCircleRectOverlap(theX, theY, theRadius, aPlant->GetPlantRect()))
 		{
-			Plant* aPumpkin = GetPumpkinAt(aPlant->mPlantCol, aPlant->mRow);
-			if (aPumpkin != nullptr && aPlant != aPumpkin)
+			int col = aPlant->mPlantCol;
+			int row = aPlant->mRow;
+			if (col >= 0 && col < MAX_GRID_SIZE_X && row >= 0 && row < MAX_GRID_SIZE_Y)
 			{
-				continue; // Skip the inner plant, it's protected
-			}
+				if (aTreatedTile[col][row]) continue;
+				aTreatedTile[col][row] = true;
 
-			aPlant->mPlantHealth -= theDamage;
-			aPlant->mEatenFlashCountdown = 25; // Make the plant flash white
-			if (aPlant->mPlantHealth <= 0)
-			{
-				mPlantsEaten++;
-				aPlant->Die();
+				Plant* aTarget = GetShieldTargetPlantAt(col, row);
+				if (aTarget != nullptr)
+				{
+					aTarget->TakeDamage(theDamage, 0U);
+					aTarget->mEatenFlashCountdown = 25;
+				}
 			}
 		}
 	}
@@ -10123,10 +10268,7 @@ unsigned int Board::SeedNotRecommendedForLevel(SeedType theSeedType)
 	{
 		SetBit(aNotRec, NotRecommend::NOT_RECOMMENDED_NEEDS_GRAVES, true);
 	}
-	if (StageHasRoof() && (theSeedType == SeedType::SEED_SPIKEWEED || theSeedType == SeedType::SEED_SPIKEROCK))
-	{
-		SetBit(aNotRec, NotRecommend::NOT_RECOMMENDED_ON_ROOF, true);
-	}
+
 	if (!StageHasPool() && Plant::IsAquatic(theSeedType))
 	{
 		SetBit(aNotRec, NotRecommend::NOT_RECOMMENDED_NEEDS_POOL, true);

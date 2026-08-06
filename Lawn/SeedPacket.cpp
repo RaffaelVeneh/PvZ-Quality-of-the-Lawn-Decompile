@@ -308,6 +308,11 @@ void DrawSeedPacket(Graphics* g, float x, float y, SeedType theSeedType, SeedTyp
 		)
 		aPacketBackground = 9;
 
+	if (aPacketBackground >= Sexy::IMAGE_SEEDS->mNumCols)
+	{
+		aPacketBackground = 2;
+	}
+
 	if (g->mScaleX > 1)
 	{
 		TodDrawImageCelScaledF(g, Sexy::IMAGE_SEEDPACKET_LARGER, x, y, 0, 0, g->mScaleX * 0.5f, g->mScaleY * 0.5f);

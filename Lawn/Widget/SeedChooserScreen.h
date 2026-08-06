@@ -93,6 +93,8 @@ public:
 
     static /*inline*/ int   PickFromWeightedArrayUsingSpecialRandSeed(TodWeightedArray* theArray, int theCount, MTRand& theLevelRNG);
     void                    CrazyDavePickSeeds();
+    SeedType                GetMustPickSeedForCurrentLevel();
+    void                    MustPickSeed(SeedType theSeedType);
     bool                    Has7Rows();
     void                    GetSeedPositionInChooser(int theIndex, int& x, int& y);
     /*inline*/ void         GetSeedPositionInBank(int theIndex, int& x, int& y);

@@ -1773,6 +1773,7 @@ void Zombie::SetupDoorArms(Reanimation* aReanim, bool theShow)
     aReanim->AssignRenderGroupToPrefix("Zombie_outerarm_screendoor", aDoorGroup);
     aReanim->AssignRenderGroupToPrefix("Zombie_innerarm_screendoor", aDoorGroup);
     aReanim->AssignRenderGroupToPrefix("Zombie_innerarm_screendoor_hand", aDoorGroup);
+    aReanim->AssignRenderGroupToPrefix("anim_screendoor", aDoorGroup);
 }
 
 void Zombie::SetupReanimLayers(Reanimation* aReanim, ZombieType theZombieType)
@@ -1790,11 +1791,19 @@ void Zombie::SetupReanimLayers(Reanimation* aReanim, ZombieType theZombieType)
     {
         aReanim->AssignRenderGroupToPrefix("anim_cone", RENDER_GROUP_NORMAL);
         aReanim->AssignRenderGroupToPrefix("anim_hair", RENDER_GROUP_HIDDEN);
+        if (theZombieType == ZombieType::ZOMBIE_DOOR_CONEHEAD)
+        {
+            SetupDoorArms(aReanim, true);
+        }
     }
     else if (theZombieType == ZombieType::ZOMBIE_PAIL || theZombieType == ZombieType::ZOMBIE_BLACK_BUCKETHEAD || theZombieType == ZombieType::ZOMBIE_DOOR_BUCKETHEAD)
     {
         aReanim->AssignRenderGroupToPrefix("anim_bucket", RENDER_GROUP_NORMAL);
         aReanim->AssignRenderGroupToPrefix("anim_hair", RENDER_GROUP_HIDDEN);
+        if (theZombieType == ZombieType::ZOMBIE_DOOR_BUCKETHEAD)
+        {
+            SetupDoorArms(aReanim, true);
+        }
     }
     else if (theZombieType == ZombieType::ZOMBIE_DOOR || theZombieType == ZombieType::ZOMBIE_BLACK_DOOR)
     {
@@ -1877,6 +1886,13 @@ void Zombie::LoadPlainZombieReanim()
         ReanimIgnoreClipRect("Zombie_duckytube", true);
         ReanimIgnoreClipRect("Zombie_outerarm_hand", true);
         ReanimIgnoreClipRect("Zombie_innerarm3", true);
+        if (mShieldType == ShieldType::SHIELDTYPE_DOOR || mShieldType == ShieldType::SHIELDTYPE_BLACK_DOOR)
+        {
+            ReanimIgnoreClipRect("anim_screendoor", true);
+            ReanimIgnoreClipRect("Zombie_outerarm_screendoor", true);
+            ReanimIgnoreClipRect("Zombie_innerarm_screendoor", true);
+            ReanimIgnoreClipRect("Zombie_innerarm_screendoor_hand", true);
+        }
         SetupWaterTrack("Zombie_whitewater");
         SetupWaterTrack("Zombie_whitewater2");
     }
@@ -5133,6 +5149,13 @@ void Zombie::UpdateZombieRiseFromGrave()
             ReanimIgnoreClipRect("Zombie_whitewater", true);
             ReanimIgnoreClipRect("Zombie_outerarm_hand", true);
             ReanimIgnoreClipRect("Zombie_innerarm3", true);
+            if (mShieldType == ShieldType::SHIELDTYPE_DOOR || mShieldType == ShieldType::SHIELDTYPE_BLACK_DOOR)
+            {
+                ReanimIgnoreClipRect("anim_screendoor", true);
+                ReanimIgnoreClipRect("Zombie_outerarm_screendoor", true);
+                ReanimIgnoreClipRect("Zombie_innerarm_screendoor", true);
+                ReanimIgnoreClipRect("Zombie_innerarm_screendoor_hand", true);
+            }
         }
     }
 }
@@ -6160,6 +6183,20 @@ void Zombie::UpdateZombieWalking()
             }
         }
 
+        int aGridX = mBoard->PixelToGridX((int)mPosX + 75, (int)mPosY);
+        Plant* aSpikePlant = mBoard->GetTopPlantAt(aGridX, mRow, PlantPriority::TOPPLANT_ANY);
+        if (aSpikePlant != nullptr)
+        {
+            if (aSpikePlant->mSeedType == SeedType::SEED_SPIKEWEED)
+            {
+                aSpeed *= 0.60f; // 40% movement speed slow
+            }
+            else if (aSpikePlant->mSeedType == SeedType::SEED_SPIKEROCK)
+            {
+                aSpeed *= 0.35f; // 65% movement speed slow
+            }
+        }
+
         if (IsWalkingBackwards() || mZombiePhase == ZombiePhase::PHASE_DANCER_DANCING_IN)
         {
             mPosX += aSpeed;
@@ -6945,8 +6982,36 @@ void Zombie::UpdatePlaying()
             {
                 mBoard->AddAGraveStone(aGridX, mRow);
             }
+
+            // Immediately spawn 1 rising zombie on the exact tile and row Flag Zombie stepped on
+            ZombieType aTileZombieType = mBoard->PickGraveRisingZombieType(10);
+            Zombie* aTileZombie = mBoard->AddZombieInRow(aTileZombieType, mRow, mBoard->mCurrentWave);
+            if (aTileZombie != nullptr)
+            {
+                aTileZombie->RiseFromGrave(aGridX, mRow);
+            }
+
             // Remember this column so we don't spawn another one on the same tile
             mLastGraveX = aGridX;
+        }
+    }
+
+    if (mShieldHealth > 0 && 
+        (mZombieType == ZombieType::ZOMBIE_DOOR || mZombieType == ZombieType::ZOMBIE_DOOR_CONEHEAD ||
+         mZombieType == ZombieType::ZOMBIE_DOOR_BUCKETHEAD || mZombieType == ZombieType::ZOMBIE_BLACK_DOOR ||
+         mShieldType == ShieldType::SHIELDTYPE_DOOR || mShieldType == ShieldType::SHIELDTYPE_BLACK_DOOR))
+    {
+        ShowDoorArms(true);
+        ReanimShowPrefix("anim_screendoor", RENDER_GROUP_OVER_SHIELD);
+        ReanimShowPrefix("Zombie_outerarm_screendoor", RENDER_GROUP_OVER_SHIELD);
+        ReanimShowPrefix("Zombie_innerarm_screendoor", RENDER_GROUP_OVER_SHIELD);
+        ReanimShowPrefix("Zombie_innerarm_screendoor_hand", RENDER_GROUP_OVER_SHIELD);
+        if (mInPool)
+        {
+            ReanimIgnoreClipRect("anim_screendoor", true);
+            ReanimIgnoreClipRect("Zombie_outerarm_screendoor", true);
+            ReanimIgnoreClipRect("Zombie_innerarm_screendoor", true);
+            ReanimIgnoreClipRect("Zombie_innerarm_screendoor_hand", true);
         }
     }
 }
@@ -8459,12 +8524,21 @@ void Zombie::GetDrawPos(ZombieDrawPosition& theDrawPos)
     else if (mInPool)
     {
         theDrawPos.mBodyY = -mAltitude;
-        theDrawPos.mClipHeight = -mAltitude - 7.0f;
-        theDrawPos.mClipHeight += 10.0f - 10.0f * mScaleZombie;
-
-        if (mIsEating)
+        if (mShieldHealth > 0 && (mShieldType == ShieldType::SHIELDTYPE_DOOR || mShieldType == ShieldType::SHIELDTYPE_BLACK_DOOR ||
+            mZombieType == ZombieType::ZOMBIE_DOOR || mZombieType == ZombieType::ZOMBIE_DOOR_CONEHEAD ||
+            mZombieType == ZombieType::ZOMBIE_DOOR_BUCKETHEAD || mZombieType == ZombieType::ZOMBIE_BLACK_DOOR))
         {
-            theDrawPos.mClipHeight += 7.0f;
+            theDrawPos.mClipHeight = CLIP_HEIGHT_OFF;
+        }
+        else
+        {
+            theDrawPos.mClipHeight = -mAltitude - 7.0f;
+            theDrawPos.mClipHeight += 10.0f - 10.0f * mScaleZombie;
+
+            if (mIsEating)
+            {
+                theDrawPos.mClipHeight += 7.0f;
+            }
         }
     }
     else if (mZombiePhase == ZombiePhase::PHASE_DANCER_RISING)
@@ -8907,6 +8981,15 @@ Zombie* Zombie::FindGargantuarTargetZombie()
 
 void Zombie::SquishAllInSquare(int theX, int theY, ZombieAttackType theAttackType)
 {
+    PlantsOnLawn aPlantsOnLawn;
+    mBoard->GetPlantsOnLawn(theX, theY, &aPlantsOnLawn);
+    if (aPlantsOnLawn.mGraveBusterPlant)
+    {
+        mBoard->mPlantsEaten++;
+        aPlantsOnLawn.mGraveBusterPlant->Squish();
+        return; // Grave Buster acts as top shield, protecting the underlying plant!
+    }
+
     Plant* aPlant = nullptr;
     while (mBoard->IteratePlants(aPlant))
     {
@@ -9260,7 +9343,16 @@ void Zombie::StartWalkAnim(int theBlendTime)
     }
     else if (mInPool && mZombieHeight != ZombieHeight::HEIGHT_IN_TO_POOL && mZombieHeight != ZombieHeight::HEIGHT_OUT_OF_POOL && aBodyReanim->TrackExists("anim_swim"))
     {
-        PlayZombieReanim("anim_swim", ReanimLoopType::REANIM_LOOP, theBlendTime, 0.0f);
+        if (mShieldHealth > 0 && (mShieldType == ShieldType::SHIELDTYPE_DOOR || mShieldType == ShieldType::SHIELDTYPE_BLACK_DOOR ||
+            mZombieType == ZombieType::ZOMBIE_DOOR || mZombieType == ZombieType::ZOMBIE_DOOR_CONEHEAD ||
+            mZombieType == ZombieType::ZOMBIE_DOOR_BUCKETHEAD || mZombieType == ZombieType::ZOMBIE_BLACK_DOOR))
+        {
+            PlayZombieReanim("anim_walk", ReanimLoopType::REANIM_LOOP, theBlendTime, 0.0f);
+        }
+        else
+        {
+            PlayZombieReanim("anim_swim", ReanimLoopType::REANIM_LOOP, theBlendTime, 0.0f);
+        }
     }
     else if ((mZombieType == ZombieType::ZOMBIE_NORMAL || mZombieType == ZombieType::ZOMBIE_TRAFFIC_CONE || mZombieType == ZombieType::ZOMBIE_PAIL) && mBoard->mDanceMode)
     {
@@ -11058,7 +11150,7 @@ void Zombie::RiseFromGrave(int theCol, int theRow)
     mZombiePhase = ZombiePhase::PHASE_RISING_FROM_GRAVE;
     mPhaseCounter = 150;
     
-    if (mBoard->StageHasPool())
+    if (mBoard->IsPoolSquare(theCol, theRow))
     {
         mAltitude = -150.0f;
         mInPool = true;
