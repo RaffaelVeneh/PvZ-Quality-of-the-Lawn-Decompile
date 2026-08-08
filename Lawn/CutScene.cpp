@@ -133,6 +133,7 @@ void CutScene::PlaceAZombie(ZombieType theZombieType, int theGridX, int theGridY
 	{
 		aZombie->mPosY -= theGridY * 2 - theGridX * 7 + 30;  //7 * (5 - theGridX) - 2 * (5 - theGridY) + 5;
 		aZombie->mPosX -= 5.0f;
+		aZombie->mPosX -= 133.0f;
 	}
 	if (theZombieType == ZombieType::ZOMBIE_ZAMBONI)
 	{
@@ -1113,14 +1114,25 @@ void CutScene::AnimateBoard()
 	}
 
 	int aBoardOffset = IsScrolledLeftAtStart() ? BOARD_OFFSET : 0;
+	int aPanRightEndPos = BOARD_IMAGE_WIDTH_OFFSET - mApp->mWidth;
+	if (mBoard->mBackground == BackgroundType::BACKGROUND_5_ROOF || mBoard->mBackground == BackgroundType::BACKGROUND_6_BOSS)
+	{
+		aPanRightEndPos -= 133; // Shifts camera left by -133px, moving background RIGHT by +133px on screen for Roof Day/Night
+	}
+
 	if (mCutsceneTime <= aTimePanRightStart)
 	{
 		mBoard->Move(aBoardOffset, 0);
 	}
-	if (mCutsceneTime > aTimePanRightStart && mCutsceneTime <= aTimePanRightEnd)
+	else if (mCutsceneTime > aTimePanRightStart && mCutsceneTime <= aTimePanRightEnd)
 	{
-		int aPanOffset = CalcPosition(aTimePanRightStart, aTimePanRightEnd, -aBoardOffset, BOARD_IMAGE_WIDTH_OFFSET - mApp->mWidth);
+		int aPanOffset = CalcPosition(aTimePanRightStart, aTimePanRightEnd, -aBoardOffset, aPanRightEndPos);
 		mBoard->Move(-aPanOffset, 0);
+	}
+	else if (mCutsceneTime > aTimePanRightEnd && mCutsceneTime <= aTimePanLeftStart)
+	{
+		// Holds the camera at the exact shifted position while seed chooser is open!
+		mBoard->Move(-aPanRightEndPos, 0);
 	}
 	
 	if (mBoard->ChooseSeedsOnCurrentLevel())
@@ -1145,7 +1157,9 @@ void CutScene::AnimateBoard()
 
 	if (mCutsceneTime > aTimePanLeftStart)
 	{
-		int aPanOffset = CalcPosition(aTimePanLeftStart, aTimePanLeftEnd, BOARD_IMAGE_WIDTH_OFFSET - mApp->mWidth, -(BOARD_OFFSET - 220));
+		int aTargetLeftPos = -(BOARD_OFFSET - 220);
+
+		int aPanOffset = CalcPosition(aTimePanLeftStart, aTimePanLeftEnd, aPanRightEndPos, aTargetLeftPos);
 		mBoard->Move(-aPanOffset, 0);
 	}
 

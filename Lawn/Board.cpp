@@ -6835,6 +6835,9 @@ void Board::DrawGameObjects(Graphics* g)
 	{
 		AddUIRenderItem(aRenderList, aRenderItemCount, RenderObjectType::RENDER_ITEM_STORM, MakeRenderOrder(RenderLayer::RENDER_LAYER_FOG, 0, 3));
 	}
+	static Image* sPole = nullptr;
+	static Image* sPoleNight = nullptr;
+
 	// Add Bushes to Render Queue
 	if (mShowBushes)
 	{
@@ -6844,8 +6847,6 @@ void Board::DrawGameObjects(Graphics* g)
 		static Image* sBN[5] = { nullptr };
 		static Image* sBP[6] = { nullptr };
 		static Image* sBF[6] = { nullptr };
-		static Image* sPole = nullptr;
-		static Image* sPoleNight = nullptr;
 
 		static bool sBushesLoaded = false;
 		if (!sBushesLoaded)
@@ -6990,7 +6991,28 @@ void Board::DrawGameObjects(Graphics* g)
 		{
 			if (aRenderItem.mImage)
 			{
-				g->DrawImage(aRenderItem.mImage, 773 - 133, 0);
+				if (aRenderItem.mImage == sPole || aRenderItem.mImage == sPoleNight)
+				{
+					int aPoleX = 773;
+					if (mApp->mGameScene == GameScenes::SCENE_LEVEL_INTRO && mCutScene)
+					{
+						int aTimeStart = 4500 + mCutScene->mCrazyDaveTime;
+						int aTimeEnd = 6000 + mCutScene->mCrazyDaveTime;
+						if (mCutScene->mCutsceneTime <= aTimeStart)
+						{
+							aPoleX = 773 - 133;
+						}
+						else if (mCutScene->mCutsceneTime < aTimeEnd)
+						{
+							aPoleX = TodAnimateCurve(aTimeStart, aTimeEnd, mCutScene->mCutsceneTime, 773 - 133, 773, TodCurves::CURVE_EASE_IN_OUT);
+						}
+					}
+					g->DrawImage(aRenderItem.mImage, aPoleX, 0);
+				}
+				else
+				{
+					g->DrawImage(aRenderItem.mImage, 773 - 133, 0);
+				}
 			}
 			break;
 		}
@@ -7167,6 +7189,7 @@ void Board::DrawGameObjects(Graphics* g)
 			break;
 		
 		case RenderObjectType::RENDER_ITEM_TOP_UI:
+			DrawTacticalTargetMarks(g);
 			DrawUITop(g);
 			break;
 			
@@ -8031,6 +8054,18 @@ void Board::DrawUIBottom(Graphics* g)
 	{
 		DrawShovel(g);
 	}
+	if (!StageHasFog())
+	{
+		DrawTopRightUI(g);
+	}
+	if (mApp->mGameMode == GameMode::GAMEMODE_CHALLENGE_ZEN_GARDEN || mApp->mGameMode == GameMode::GAMEMODE_TREE_OF_WISDOM)
+	{
+		DrawZenButtons(g);
+	}
+}
+
+void Board::DrawFertilizerButton(Graphics* g)
+{
 	if (mShowShovel && mApp->CanShowZenGarden() && mApp->mPlayerInfo->mPurchases[(int)StoreItem::STORE_ITEM_FERTILIZER] >= PURCHASE_COUNT_OFFSET)
 	{
 		Rect aFertilizerRect = GetFertilizerButtonRect();
@@ -8053,14 +8088,6 @@ void Board::DrawUIBottom(Graphics* g)
 		int aCharges = mApp->mPlayerInfo->mPurchases[(int)StoreItem::STORE_ITEM_FERTILIZER] - PURCHASE_COUNT_OFFSET;
 		SexyString aChargeString = StrFormat(_S("x%d"), aCharges);
 		TodDrawString(g, aChargeString, aFertilizerRect.mX + 64, aFertilizerRect.mY + 65, FONT_HOUSEOFTERROR16, Color::White, DS_ALIGN_RIGHT);
-	}
-	if (!StageHasFog())
-	{
-		DrawTopRightUI(g);
-	}
-	if (mApp->mGameMode == GameMode::GAMEMODE_CHALLENGE_ZEN_GARDEN || mApp->mGameMode == GameMode::GAMEMODE_TREE_OF_WISDOM)
-	{
-		DrawZenButtons(g);
 	}
 }
 
@@ -8240,8 +8267,39 @@ bool Board::IsScaryPotterDaveTalking()
 	return mApp->IsScaryPotterLevel() && mNextSurvivalStageCounter > 0 && mApp->mCrazyDaveState != CrazyDaveState::CRAZY_DAVE_OFF;
 }
 
+void Board::DrawTacticalTargetMarks(Graphics* g)
+{
+	Plant* aPlant = nullptr;
+	while (IteratePlants(aPlant))
+	{
+		if (aPlant->mSeedType == SeedType::SEED_COMMANDOPEA || aPlant->mSeedType == SeedType::SEED_GENERALPEA)
+		{
+			Zombie* aTargetZombie = ZombieTryToGet(aPlant->mTargetZombieID);
+			if (aTargetZombie == nullptr || aTargetZombie->IsDeadOrDying())
+			{
+				aTargetZombie = aPlant->FindTargetZombie(aPlant->mRow, PlantWeapon::WEAPON_PRIMARY);
+				if (aTargetZombie != nullptr)
+				{
+					aPlant->mTargetZombieID = ZombieGetID(aTargetZombie);
+				}
+			}
+
+			if (aTargetZombie != nullptr && !aTargetZombie->IsDeadOrDying())
+			{
+				Rect aZombieRect = aTargetZombie->GetZombieRect();
+				float aTargetX = (float)(aZombieRect.mX + aZombieRect.mWidth / 2);
+				float aTargetY = (float)(aZombieRect.mY + aZombieRect.mHeight / 2);
+
+				aPlant->DrawTacticalTargetMark(g, aTargetX, aTargetY, aPlant->mSeedType);
+			}
+		}
+	}
+}
+
 void Board::DrawUITop(Graphics* g)
 {
+	DrawTacticalTargetMarks(g);
+	DrawFertilizerButton(g);
 	if (StageHasFog())
 	{
 		DrawTopRightUI(g);
@@ -9404,6 +9462,13 @@ void Board::KeyChar(SexyChar theChar)
 	if (theChar == _S('J'))
 	{
 		AddZombie(ZombieType::ZOMBIE_JACK_IN_THE_BOX, Zombie::ZOMBIE_WAVE_DEBUG);
+		return;
+	}
+
+	if (theChar == _S('v') || theChar == _S('V'))
+	{
+		mCursorObject->mCursorType = CursorType::CURSOR_TYPE_PLANT_FROM_BANK;
+		mCursorObject->mType = SeedType::SEED_SUPER_SPLITPEA;
 		return;
 	}
 
@@ -11091,6 +11156,10 @@ void Board::UpgradePlant(int theGridX, int theGridY)
 
 	case SeedType::SEED_NIGHTCAP:
 		aNewSeedType = SeedType::SEED_DARKCAP;
+		break;
+
+	case SeedType::SEED_SPLITPEA:
+		aNewSeedType = SeedType::SEED_SUPER_SPLITPEA;
 		break;
 
 	default:

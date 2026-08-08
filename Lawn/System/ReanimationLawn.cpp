@@ -115,7 +115,7 @@ void ReanimatorCache::GetPlantImageSize(SeedType theSeedType, int& theOffsetX, i
 	theWidth = 120;
 	theHeight = 120;
 
-	if (theSeedType == SeedType::SEED_TALLNUT)
+	if (theSeedType == SeedType::SEED_TALLNUT || theSeedType == SeedType::SEED_DOOM_NUT)
 	{
 		theOffsetY = -40;
 		theHeight += 40;
@@ -124,6 +124,13 @@ void ReanimatorCache::GetPlantImageSize(SeedType theSeedType, int& theOffsetX, i
 	{
 		theOffsetX = -40;
 		theWidth += 40;
+	}
+	else if (theSeedType == SeedType::SEED_CABBAGEPULT || theSeedType == SeedType::SEED_POISONPULT || theSeedType == SeedType::SEED_KERNELPULT)
+	{
+		theOffsetX = -30;
+		theWidth += 30;
+		theOffsetY = -30;
+		theHeight += 30;
 	}
 	else if (theSeedType == SeedType::SEED_COBCANNON)
 	{
@@ -196,7 +203,7 @@ MemoryImage* ReanimatorCache::MakeCachedPlantFrame(SeedType theSeedType, DrawVar
 	PlantDefinition& aPlantDef = GetPlantDefinition(theSeedType);
 	//TOD_ASSERT(aPlantDef.mReanimationType != ReanimationType::REANIM_NONE);
 
-	if (theSeedType == SeedType::SEED_POTATOMINE)
+	if (theSeedType == SeedType::SEED_POTATOMINE || theSeedType == SeedType::SEED_RED_POTATO_MINE)
 	{
 		aMemoryGraphics.mScaleX = 0.85f;
 		aMemoryGraphics.mScaleY = 0.85f;
@@ -207,6 +214,22 @@ MemoryImage* ReanimatorCache::MakeCachedPlantFrame(SeedType theSeedType, DrawVar
 		aMemoryGraphics.mScaleX = 0.8f;
 		aMemoryGraphics.mScaleY = 0.8f;
 		DrawReanimatorFrame(&aMemoryGraphics, -(int)(aOffsetX - 12.0f), -(int)(aOffsetY - 12.0f), aPlantDef.mReanimationType, "anim_idle", theDrawVariation);
+	}
+	else if (theSeedType == SeedType::SEED_NIGHTCAP || theSeedType == SeedType::SEED_DARKCAP)
+	{
+		aMemoryGraphics.mScaleX = 0.85f;
+		aMemoryGraphics.mScaleY = 0.85f;
+		DrawReanimatorFrame(&aMemoryGraphics, -(int)(aOffsetX - 8.0f), -(int)(aOffsetY - 10.0f), aPlantDef.mReanimationType, "anim_idle", theDrawVariation);
+	}
+	else if (theSeedType == SeedType::SEED_CACTUS || theSeedType == SeedType::SEED_MAD_CACTUS)
+	{
+		DrawReanimatorFrame(&aMemoryGraphics, -aOffsetX, -(aOffsetY - 15.0f), aPlantDef.mReanimationType, "anim_idle", theDrawVariation);
+	}
+	else if (theSeedType == SeedType::SEED_CABBAGEPULT || theSeedType == SeedType::SEED_POISONPULT)
+	{
+		aMemoryGraphics.mScaleX = 0.85f;
+		aMemoryGraphics.mScaleY = 0.85f;
+		DrawReanimatorFrame(&aMemoryGraphics, -(int)(aOffsetX - 8.0f), -(int)(aOffsetY - 10.0f), aPlantDef.mReanimationType, "anim_idle", theDrawVariation);
 	}
 	else if (theSeedType == SeedType::SEED_EXPLODE_O_NUT)
 	{
@@ -222,7 +245,7 @@ MemoryImage* ReanimatorCache::MakeCachedPlantFrame(SeedType theSeedType, DrawVar
 		{
 			DrawReanimatorFrame(&aMemoryGraphics, -aOffsetX, -aOffsetY, aPlantDef.mReanimationType, "anim_head_idle", theDrawVariation);
 		}
-		else if (theSeedType == SeedType::SEED_SPLITPEA)
+		else if (theSeedType == SeedType::SEED_SPLITPEA || theSeedType == SeedType::SEED_SUPER_SPLITPEA)
 		{
 			DrawReanimatorFrame(&aMemoryGraphics, -aOffsetX, -aOffsetY, aPlantDef.mReanimationType, "anim_head_idle", theDrawVariation);
 			DrawReanimatorFrame(&aMemoryGraphics, -aOffsetX, -aOffsetY, aPlantDef.mReanimationType, "anim_splitpea_idle", theDrawVariation);

@@ -1,0 +1,13 @@
+Started Sat Aug  8 08:35:48 2026
+
+session id: 1786152947
+3d recommended: 1
+3d supported: 1
+LOADED: 'Init' 82 ms on Game Loading
+missing resource compiled\reanim\LoadBar_sprout.reanim.compiled.Error
+Started Sat Aug  8 08:36:19 2026
+
+session id: 1786152978
+3d recommended: 1
+3d supported: 1
+missing resource compiled\reanim\LoadBar_sprout.reanim.compiled.Error

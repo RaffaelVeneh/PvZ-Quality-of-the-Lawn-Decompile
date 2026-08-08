@@ -253,7 +253,7 @@ void CursorPreview::Update()
         {
             mX = mBoard->GridToPixelX(mGridX, mGridY);
             mY = mBoard->GridToPixelY(mGridX, mGridY);
-            mRenderOrder = mBoard->MakeRenderOrder(RenderLayer::RENDER_LAYER_PLANT, mGridY, 2);
+            mRenderOrder = mBoard->MakeRenderOrder(RenderLayer::RENDER_LAYER_PLANT, mGridY, 3 * 5 + 800);
             mVisible = true;
             return;
         }

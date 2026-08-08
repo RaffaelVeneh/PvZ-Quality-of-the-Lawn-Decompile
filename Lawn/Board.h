@@ -321,6 +321,7 @@ public:
 	void							ZombiesWon(Zombie* theZombie = nullptr);
 	void							DrawLevel(Graphics* g);
 	void							DrawShovel(Graphics* g);
+	void							DrawFertilizerButton(Graphics* g);
 	void							UpdateZombieSpawning();
 	void							UpgradePlant(int theGridX, int theGridY);
 	void							UpdateSunSpawning();
@@ -361,6 +362,7 @@ public:
 	void							UpdateProgressMeter();
 	void							DrawUIBottom(Graphics* g);
 	void							DrawUITop(Graphics* g);
+	void							DrawTacticalTargetMarks(Graphics* g);
 	void							KillAllPlantsInRadius(int theX, int theY, int theRadius);
 	void							DamageAllPlantsInRadius(int theX, int theY, int theRadius, int theDamage);
 	Plant*							GetPumpkinAt(int theGridX, int theGridY);

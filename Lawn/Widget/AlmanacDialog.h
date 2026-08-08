@@ -33,7 +33,8 @@ private:
 		ALMANAC_BUTTON_ZOMBIE,
 		ALMANAC_BUTTON_INDEX,
 		ALMANAC_BUTTON_NEXT,
-		ALMANAC_BUTTON_LAST 
+		ALMANAC_BUTTON_LAST,
+		ALMANAC_BUTTON_PREMIUM
 	};
 
 public:
@@ -42,6 +43,8 @@ public:
 	GameButton*					mIndexButton;			
 	GameButton*					mPlantButton;			
 	GameButton*					mZombieButton;			
+	GameButton*					mPremiumButton;
+	bool						mShowPremium;
 	Sexy::Slider*				mPlantSlider;
 	Sexy::Slider*				mZombieSlider;
 	AlmanacPage					mOpenPage;				
@@ -88,6 +91,7 @@ public:
 	virtual void				Draw(Graphics* g);
 	void						GetSeedPosition(SeedType theSeedType, int& x, int& y);
 	SeedType					SeedHitTest(int x, int y);
+	SeedType					GetPremiumVersionOfSeed(SeedType theSeedType);
 	/*inline*/ int				ZombieHasSilhouette(ZombieType theZombieType);
 	int							ZombieIsShown(ZombieType theZombieType);
 	int							ZombieHasDescription(ZombieType theZombieType);

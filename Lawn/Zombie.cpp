@@ -4128,11 +4128,15 @@ void Zombie::UpdateZombieIceshroomHead()
         Plant* aPlant = nullptr;
         while (mBoard->IteratePlants(aPlant))
         {
+            SeedType aSeedType = (aPlant->mSeedType == SeedType::SEED_IMITATER) ? aPlant->mImitaterType : aPlant->mSeedType;
+
             // Immune plants
-            if (aPlant->mSeedType == SEED_SNOWPEA || aPlant->mSeedType == SEED_WINTERMELON ||
-                aPlant->mSeedType == SEED_TORCHWOOD || aPlant->mSeedType == SEED_JALAPENO ||
-                aPlant->mSeedType == SEED_ICESHROOM || aPlant->mSeedType == SEED_ICEPEA ||
-                aPlant->mSeedType == SEED_BLUE_TORCHWOOD || aPlant->mSeedType == SEED_ICE_PLANTERN)
+            if (aSeedType == SeedType::SEED_SNOWPEA || aSeedType == SeedType::SEED_WINTERMELON ||
+                aSeedType == SeedType::SEED_TORCHWOOD || aSeedType == SeedType::SEED_JALAPENO ||
+                aSeedType == SeedType::SEED_ICESHROOM || aSeedType == SeedType::SEED_ICEPEA ||
+                aSeedType == SeedType::SEED_BLUE_TORCHWOOD || aSeedType == SeedType::SEED_ICE_PLANTERN ||
+                aSeedType == SeedType::SEED_CHERRYBOMB || aSeedType == SeedType::SEED_DOOMSHROOM ||
+                aSeedType == SeedType::SEED_PICKLEDPEPPER)
             {
                 continue;
             }
@@ -9659,12 +9663,14 @@ void Zombie::StartMindControlled()
 
 void Zombie::EatPlant(Plant* thePlant)
 {
-    if (thePlant->mSeedType == SeedType::SEED_RED_POTATO_MINE)
+    SeedType aEffectiveSeed = (thePlant->mSeedType == SeedType::SEED_IMITATER) ? thePlant->mImitaterType : thePlant->mSeedType;
+
+    if (aEffectiveSeed == SeedType::SEED_RED_POTATO_MINE)
     {
         return;
     }
 
-    if (thePlant->mSeedType == SeedType::SEED_TORCHWOOD || thePlant->mSeedType == SeedType::SEED_BLUE_TORCHWOOD)
+    if (aEffectiveSeed == SeedType::SEED_TORCHWOOD || aEffectiveSeed == SeedType::SEED_BLUE_TORCHWOOD)
     {
         if (mChompedTorchwoodCooldown == 0)
         {
@@ -9705,11 +9711,12 @@ void Zombie::EatPlant(Plant* thePlant)
     }
 
     StartEating();
-    if (thePlant->mSeedType == SeedType::SEED_JALAPENO || 
-        thePlant->mSeedType == SeedType::SEED_CHERRYBOMB || 
-        thePlant->mSeedType == SeedType::SEED_DOOMSHROOM ||
-        thePlant->mSeedType == SeedType::SEED_ICESHROOM || 
-        thePlant->mSeedType == SeedType::SEED_HYPNOSHROOM || 
+    if (aEffectiveSeed == SeedType::SEED_JALAPENO || 
+        aEffectiveSeed == SeedType::SEED_CHERRYBOMB || 
+        aEffectiveSeed == SeedType::SEED_DOOMSHROOM ||
+        aEffectiveSeed == SeedType::SEED_ICESHROOM || 
+        aEffectiveSeed == SeedType::SEED_HYPNOSHROOM || 
+        aEffectiveSeed == SeedType::SEED_PICKLEDPEPPER ||
         thePlant->mState == PlantState::STATE_FLOWERPOT_INVULNERABLE ||
         thePlant->mState == PlantState::STATE_LILYPAD_INVULNERABLE || 
         thePlant->mState == PlantState::STATE_SQUASH_LOOK || 
@@ -9720,17 +9727,17 @@ void Zombie::EatPlant(Plant* thePlant)
             return;
         }
     }
-    if (thePlant->mSeedType == SeedType::SEED_POTATOMINE && thePlant->mState != PlantState::STATE_NOTREADY)
+    if (aEffectiveSeed == SeedType::SEED_POTATOMINE && thePlant->mState != PlantState::STATE_NOTREADY)
     {
         return;
     }
 
     bool triggered = false;
-    if (thePlant->mSeedType == SeedType::SEED_BLOVER)
+    if (aEffectiveSeed == SeedType::SEED_BLOVER)
     {
         triggered = true;
     }
-    if (thePlant->mSeedType == SeedType::SEED_ICESHROOM  && !thePlant->mIsAsleep)
+    if (aEffectiveSeed == SeedType::SEED_ICESHROOM && !thePlant->mIsAsleep)
     {
         triggered = true;
     }

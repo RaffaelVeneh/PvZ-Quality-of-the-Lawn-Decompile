@@ -427,15 +427,20 @@ void Projectile::CheckForCollision()
 			}
 			else if (mProjectileType == ProjectileType::PROJECTILE_ZOMBIE_SNOWPEA)
 			{
-				if (aPlant->mSeedType != SEED_SNOWPEA &&
-					aPlant->mSeedType != SEED_WINTERMELON &&
-					aPlant->mSeedType != SEED_ICEPEA &&
-					aPlant->mSeedType != SEED_ICESHROOM &&
-					aPlant->mSeedType != SEED_INSTANT_COFFEE &&
-					aPlant->mSeedType != SEED_FIRESHOOTER &&
-					aPlant->mSeedType != SEED_TORCHWOOD &&
-					aPlant->mSeedType != SEED_BLUE_TORCHWOOD &&
-					aPlant->mSeedType != SEED_ICE_PLANTERN)
+				SeedType aSeedType = (aPlant->mSeedType == SeedType::SEED_IMITATER) ? aPlant->mImitaterType : aPlant->mSeedType;
+				if (aSeedType != SeedType::SEED_SNOWPEA &&
+					aSeedType != SeedType::SEED_WINTERMELON &&
+					aSeedType != SeedType::SEED_ICEPEA &&
+					aSeedType != SeedType::SEED_ICESHROOM &&
+					aSeedType != SeedType::SEED_INSTANT_COFFEE &&
+					aSeedType != SeedType::SEED_FIRESHOOTER &&
+					aSeedType != SeedType::SEED_TORCHWOOD &&
+					aSeedType != SeedType::SEED_BLUE_TORCHWOOD &&
+					aSeedType != SeedType::SEED_ICE_PLANTERN &&
+					aSeedType != SeedType::SEED_JALAPENO &&
+					aSeedType != SeedType::SEED_CHERRYBOMB &&
+					aSeedType != SeedType::SEED_DOOMSHROOM &&
+					aSeedType != SeedType::SEED_PICKLEDPEPPER)
 				{
 					aPlant->mChilledCounter = 1000;
 				}

@@ -234,6 +234,7 @@ public:
     int                     mGreenFilterEffect;
     int                     mSquashJumpCount;
     int                     mHealCountdown;
+    int                     mSpecialAttackCount;
     int                     mPlantMaxHealthOriginal;
     bool                    mIsBoostedByPlantern;
     bool                    mIsOnPotAndLily;
@@ -307,6 +308,7 @@ public:
     void                    UpdateBombSquash();
     void                    UpdateDoomnut();
     void                    GrantPlacementShieldPulse();
+    void                    TriggerSuperSplitPeaSpecial();
     void                    CheckAndReceiveNearbyPlanternShield();
     void                    UpdatePlanternEffects(float healthMultiplier, int healAmount);
     /*inline*/ bool         NotOnGround();
@@ -393,6 +395,7 @@ public:
     void                    UpdateSprout();
     SeedType                PickRandomSeedType();
     void                    UpdateCommandoPea();
+    void                    DrawTacticalTargetMark(Graphics* g, float theCenterX, float theCenterY, SeedType thePlantType);
     void                    UpdateShrinkingViolet();
     void                    UpdateHattremWitch();
     Zombie*                 FindClosestValidHattremTarget();

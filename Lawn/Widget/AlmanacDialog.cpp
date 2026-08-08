@@ -38,7 +38,7 @@ AlmanacDialog::AlmanacDialog(LawnApp* theApp) : LawnDialog(theApp, DIALOG_ALMANA
 	mSelectedSeed = SEED_PEASHOOTER;
 	mSelectedZombie = ZOMBIE_NORMAL;
 	mZombie = nullptr;
-	mPlant = nullptr;
+	mPlant = nullptr;	mShowPremium = false;
 	mDrawStandardBack = false;
 	mScrollAmount = 0;
 	mScrollPosition = 0;
@@ -98,6 +98,23 @@ AlmanacDialog::AlmanacDialog(LawnApp* theApp) : LawnDialog(theApp, DIALOG_ALMANA
 	mZombieButton->mDrawStoneButton = true;
 	mZombieButton->mParentWidget = this;
 
+	mPremiumButton = new GameButton(AlmanacDialog::ALMANAC_BUTTON_PREMIUM);
+	mPremiumButton->SetLabel(_S("Normal Plant"));
+	mPremiumButton->mButtonImage = Sexy::IMAGE_SEEDCHOOSER_BUTTON2;
+	mPremiumButton->mOverImage = Sexy::IMAGE_SEEDCHOOSER_BUTTON2_GLOW;
+	mPremiumButton->mDownImage = nullptr;
+	mPremiumButton->mDisabledImage = nullptr;
+	mPremiumButton->mOverOverlayImage = nullptr;
+	mPremiumButton->SetFont(Sexy::FONT_BRIANNETOD12);
+	mPremiumButton->mLabelJustify = GameButton::BUTTON_LABEL_CENTER;
+	mPremiumButton->mColors[ButtonWidget::COLOR_LABEL] = aColor;
+	mPremiumButton->mColors[ButtonWidget::COLOR_LABEL_HILITE] = aColor;
+	mPremiumButton->Resize(541 + BOARD_OFFSET, 15, 111, 26);
+	mPremiumButton->mParentWidget = this;
+	mPremiumButton->mTextOffsetX = 0;
+	mPremiumButton->mTextOffsetY = 1;
+	mPremiumButton->mBtnNoDraw = true;
+
 	mPlantSlider = new Sexy::Slider(IMAGE_OPTIONS_SLIDERSLOT_PLANT, IMAGE_OPTIONS_SLIDERKNOB_PLANT, 0, this);
 	mPlantSlider->SetValue(max(0.0, min(mMaxScrollPosition, mScrollPosition)));
 	mPlantSlider->mHorizontal = false;
@@ -117,12 +134,51 @@ AlmanacDialog::AlmanacDialog(LawnApp* theApp) : LawnDialog(theApp, DIALOG_ALMANA
 		mApp->mMusic->MakeSureMusicIsPlaying(MUSIC_TUNE_CHOOSE_YOUR_SEEDS);
 }
 
+SeedType AlmanacDialog::GetPremiumVersionOfSeed(SeedType theSeedType)
+{
+	switch (theSeedType)
+	{
+	case SeedType::SEED_PEASHOOTER:       return SeedType::SEED_FIRESHOOTER;
+	case SeedType::SEED_SUNFLOWER:        return SeedType::SEED_TWINSUNFLOWER;
+	case SeedType::SEED_WALLNUT:          return SeedType::SEED_EXPLODE_O_NUT;
+	case SeedType::SEED_POTATOMINE:       return SeedType::SEED_RED_POTATO_MINE;
+	case SeedType::SEED_SNOWPEA:          return SeedType::SEED_ICEPEA;
+	case SeedType::SEED_CHOMPER:          return SeedType::SEED_SUPER_CHOMPER;
+	case SeedType::SEED_REPEATER:         return SeedType::SEED_GATLINGPEA;
+	case SeedType::SEED_FUMESHROOM:       return SeedType::SEED_GLOOMSHROOM;
+	case SeedType::SEED_HYPNOSHROOM:      return SeedType::SEED_HYPNOGIGA;
+	case SeedType::SEED_LILYPAD:          return SeedType::SEED_CATTAIL;
+	case SeedType::SEED_SQUASH:           return SeedType::SEED_BOMBSQUASH;
+	case SeedType::SEED_THREEPEATER:      return SeedType::SEED_BLACK_THREEPEATER;
+	case SeedType::SEED_SPIKEWEED:        return SeedType::SEED_SPIKEROCK;
+	case SeedType::SEED_TORCHWOOD:        return SeedType::SEED_BLUE_TORCHWOOD;
+	case SeedType::SEED_TALLNUT:          return SeedType::SEED_DOOM_NUT;
+	case SeedType::SEED_PLANTERN:         return SeedType::SEED_ICE_PLANTERN;
+	case SeedType::SEED_CACTUS:           return SeedType::SEED_MAD_CACTUS;
+	case SeedType::SEED_SPLITPEA:         return SeedType::SEED_SUPER_SPLITPEA;
+	case SeedType::SEED_STARFRUIT:        return SeedType::SEED_SOUR_STARFRUIT;
+	case SeedType::SEED_MAGNETSHROOM:     return SeedType::SEED_GOLD_MAGNET;
+	case SeedType::SEED_CABBAGEPULT:      return SeedType::SEED_POISONPULT;
+	case SeedType::SEED_KERNELPULT:       return SeedType::SEED_COBCANNON;
+	case SeedType::SEED_GARLIC:           return SeedType::SEED_CORROSION_GARLIC;
+	case SeedType::SEED_UMBRELLA:         return SeedType::SEED_ABSOLUTELEAF;
+	case SeedType::SEED_MELONPULT:        return SeedType::SEED_WINTERMELON;
+	case SeedType::SEED_COMMANDOPEA:      return SeedType::SEED_GENERALPEA;
+	case SeedType::SEED_SWEETPOTATO:      return SeedType::SEED_SWEETEST_POTATO;
+	case SeedType::SEED_HATTREMWITCH:     return SeedType::SEED_HATTREMSAGE;
+	case SeedType::SEED_NIGHTCAP:         return SeedType::SEED_DARKCAP;
+	case SeedType::SEED_SUNBEAN:          return SeedType::SEED_SUNBEAN_BOMB;
+	default:                              return theSeedType;
+	}
+}
+
 AlmanacDialog::~AlmanacDialog()
 {
-	if (mCloseButton)	delete mCloseButton;
-	if (mIndexButton)	delete mIndexButton;
-	if (mPlantButton)	delete mPlantButton;
-	if (mZombieButton)	delete mZombieButton;
+	delete mCloseButton;
+	delete mIndexButton;
+	delete mPlantButton;
+	delete mZombieButton;
+	delete mPremiumButton;
 	delete mPlantSlider;
 	delete mZombieSlider;
 	ClearObjects();
@@ -132,7 +188,6 @@ void AlmanacDialog::ClearObjects()
 {
 	if (mPlant)
 	{
-		mPlant->Die();
 		delete mPlant;
 		mPlant = nullptr;
 	}
@@ -173,18 +228,20 @@ void AlmanacDialog::SetupPlant()
 {
 	ClearObjects();
 
+	SeedType aDisplaySeed = mShowPremium ? GetPremiumVersionOfSeed(mSelectedSeed) : mSelectedSeed;
+
 	float aPosX = ALMANAC_PLANT_POSITION_X + (float)(BOARD_OFFSET - 220);
 	float aPosY = ALMANAC_PLANT_POSITION_Y;
-	if (mSelectedSeed == SEED_TALLNUT)				aPosY += 18;
-	else if (mSelectedSeed == SEED_COBCANNON)		aPosX -= 40;
-	else if (mSelectedSeed == SEED_FLOWERPOT)		aPosY -= 20;
-	else if (mSelectedSeed == SEED_INSTANT_COFFEE)	aPosY += 20;
-	else if (mSelectedSeed == SEED_GRAVEBUSTER)		aPosY += 55;
+	if (aDisplaySeed == SEED_TALLNUT || aDisplaySeed == SEED_DOOM_NUT)	aPosY += 18;
+	else if (aDisplaySeed == SEED_COBCANNON)							aPosX -= 40;
+	else if (aDisplaySeed == SEED_FLOWERPOT)							aPosY -= 20;
+	else if (aDisplaySeed == SEED_INSTANT_COFFEE)						aPosY += 20;
+	else if (aDisplaySeed == SEED_GRAVEBUSTER)							aPosY += 55;
 
 	mPlant = new Plant();
 	mPlant->mBoard = nullptr;
 	mPlant->mIsOnBoard = false;
-	mPlant->PlantInitialize(0, 0, mSelectedSeed, SEED_NONE);
+	mPlant->PlantInitialize(0, 0, aDisplaySeed, SEED_NONE);
 	mPlant->mX = aPosX;
 	mPlant->mY = aPosY;
 }
@@ -236,6 +293,7 @@ void AlmanacDialog::SetPage(AlmanacPage thePage)
 		mIndexButton->mBtnNoDraw = true;
 		mPlantButton->mBtnNoDraw = false;
 		mZombieButton->mBtnNoDraw = false;
+		mPremiumButton->mBtnNoDraw = true;
 	}
 	else
 	{
@@ -248,6 +306,7 @@ void AlmanacDialog::SetPage(AlmanacPage thePage)
 		mIndexButton->mBtnNoDraw = false;
 		mPlantButton->mBtnNoDraw = true;
 		mZombieButton->mBtnNoDraw = true;
+		mPremiumButton->mBtnNoDraw = (mOpenPage != AlmanacPage::ALMANAC_PAGE_PLANTS);
 	}
 }
 
@@ -271,6 +330,7 @@ void AlmanacDialog::Update()
 	mIndexButton->Update();
 	mPlantButton->Update();
 	mZombieButton->Update();
+	mPremiumButton->Update();
 	if (mPlant) mPlant->Update();
 	if (mZombie) mZombie->Update();
 
@@ -358,7 +418,8 @@ void AlmanacDialog::DrawPlants(Graphics* g)
 	{
 		int aPosX, aPosY;
 		GetSeedPosition(aSeedType, aPosX, aPosY);
-		PlantDefinition& aPlantDef = GetPlantDefinition(aSeedType);
+		SeedType aDisplaySeed = mShowPremium ? GetPremiumVersionOfSeed(aSeedType) : aSeedType;
+		PlantDefinition& aPlantDef = GetPlantDefinition(aDisplaySeed);
 		if (!mApp->SeedTypeAvailable(aSeedType))
 		{
 			if (aSeedType != SeedType::SEED_IMITATER){
@@ -378,19 +439,22 @@ void AlmanacDialog::DrawPlants(Graphics* g)
 			else
 			{
 				g->SetClipRect(cSeedClipRect);
-				DrawSeedPacket(g, aPosX, aPosY, aSeedType, SeedType::SEED_NONE, 0, 255, true, false);
+				DrawSeedPacket(g, aPosX, aPosY, aDisplaySeed, SeedType::SEED_NONE, 0, 255, true, false);
 				if (aSeedType == aSeedMouseOn)
 					g->DrawImage(Sexy::IMAGE_SEEDPACKETFLASH, aPosX, aPosY);
 			}
 		}
 	}
 	g->ClearClipRect();
-	if (mSelectedSeed == SeedType::SEED_LILYPAD || mSelectedSeed == SeedType::SEED_TANGLEKELP || 
-		mSelectedSeed == SeedType::SEED_CATTAIL || mSelectedSeed == SeedType::SEED_SEASHROOM)
+
+	SeedType aActiveDisplaySeed = mShowPremium ? GetPremiumVersionOfSeed(mSelectedSeed) : mSelectedSeed;
+
+	if (aActiveDisplaySeed == SeedType::SEED_LILYPAD || aActiveDisplaySeed == SeedType::SEED_TANGLEKELP || 
+		aActiveDisplaySeed == SeedType::SEED_CATTAIL || aActiveDisplaySeed == SeedType::SEED_SEASHROOM)
 	{
-		bool aNight = mSelectedSeed == SeedType::SEED_SEASHROOM;
+		bool aNight = aActiveDisplaySeed == SeedType::SEED_SEASHROOM;
 		int aPad = (int)(BOARD_OFFSET - 220);
-	g->DrawImage(aNight ? Sexy::IMAGE_ALMANAC_GROUNDNIGHTPOOL : Sexy::IMAGE_ALMANAC_GROUNDPOOL, 521 + aPad, 107);
+		g->DrawImage(aNight ? Sexy::IMAGE_ALMANAC_GROUNDNIGHTPOOL : Sexy::IMAGE_ALMANAC_GROUNDPOOL, 521 + aPad, 107);
 
 		if (mApp->Is3dAccel())
 		{
@@ -404,8 +468,8 @@ void AlmanacDialog::DrawPlants(Graphics* g)
 	else
 	{
 		g->DrawImage(
-			Plant::IsNocturnal(mSelectedSeed) || mSelectedSeed == SeedType::SEED_GRAVEBUSTER || mSelectedSeed == SeedType::SEED_PLANTERN ? Sexy::IMAGE_ALMANAC_GROUNDNIGHT :
-			mSelectedSeed == SeedType::SEED_FLOWERPOT ? Sexy::IMAGE_ALMANAC_GROUNDROOF : Sexy::IMAGE_ALMANAC_GROUNDDAY,
+			Plant::IsNocturnal(aActiveDisplaySeed) || aActiveDisplaySeed == SeedType::SEED_GRAVEBUSTER || aActiveDisplaySeed == SeedType::SEED_PLANTERN || aActiveDisplaySeed == SeedType::SEED_ICE_PLANTERN || aActiveDisplaySeed == SeedType::SEED_DARKCAP ? Sexy::IMAGE_ALMANAC_GROUNDNIGHT :
+			aActiveDisplaySeed == SeedType::SEED_FLOWERPOT ? Sexy::IMAGE_ALMANAC_GROUNDROOF : Sexy::IMAGE_ALMANAC_GROUNDDAY,
 			521 + aPad, 107
 		);
 	}
@@ -418,8 +482,8 @@ void AlmanacDialog::DrawPlants(Graphics* g)
 	}
 
 	g->DrawImage(Sexy::IMAGE_ALMANAC_PLANTCARD, 459 + aPad, 86);
-	PlantDefinition& aPlantDef = GetPlantDefinition(mSelectedSeed);
-	SexyString aName = Plant::GetNameString(mSelectedSeed, SEED_NONE);
+	PlantDefinition& aPlantDef = GetPlantDefinition(aActiveDisplaySeed);
+	SexyString aName = Plant::GetNameString(aActiveDisplaySeed, SEED_NONE);
 	//TodDrawString(g, to_string((int)mIncrement), 32, 32, Sexy::FONT_DWARVENTODCRAFT18YELLOW, Color::White, DS_ALIGN_CENTER);
 	TodDrawString(g, aName, 617 + aPad, 288, Sexy::FONT_DWARVENTODCRAFT18YELLOW, Color::White, DS_ALIGN_CENTER);
 	Font* descriptionFont = Sexy::FONT_BRIANNETOD12;
@@ -469,7 +533,7 @@ void AlmanacDialog::DrawPlants(Graphics* g)
 	g->SetClipRect(mDescriptionRect);
 	TodDrawStringWrapped(g, description, Rect(mDescriptionRect.mX, mDescriptionRect.mY - mDescriptionScroll, mDescriptionRect.mWidth, rectHeight), descriptionFont, descriptionColor, descriptionJustification);
 	g->ClearClipRect();
-	if (mSelectedSeed != SeedType::SEED_IMITATER)
+	if (aActiveDisplaySeed != SeedType::SEED_IMITATER)
 	{
 		SexyString aCostStr = TodReplaceString(StrFormat(_S("{KEYWORD}{COST}:{STAT} %d"), aPlantDef.mSeedCost), _S("{COST}"), _S("[COST]"));
 		TodDrawStringWrapped(g, aCostStr, Rect(485 + aPad, 520, 134, 50), Sexy::FONT_BRIANNETOD12, Color::White, DS_ALIGN_LEFT);
@@ -693,6 +757,7 @@ void AlmanacDialog::Draw(Graphics* g)
 	mIndexButton->Draw(g);
 	mPlantButton->Draw(g);
 	mZombieButton->Draw(g);
+	mPremiumButton->Draw(g);
 }
 
 void AlmanacDialog::GetSeedPosition(SeedType theSeedType, int& x, int& y)
@@ -831,6 +896,12 @@ void AlmanacDialog::MouseUp(int x, int y, int theClickCount)
 		mApp->KillAlmanacDialog();
 	else if (mIndexButton->IsMouseOver())	
 		SetPage(ALMANAC_PAGE_INDEX);
+	else if (mPremiumButton->IsMouseOver())
+	{
+		mShowPremium = !mShowPremium;
+		mPremiumButton->SetLabel(mShowPremium ? _S("Premium Plant") : _S("Normal Plant"));
+		SetupPlant();
+	}
 }
 
 void AlmanacDialog::MouseDown(int x, int y, int theClickCount)
@@ -842,7 +913,7 @@ void AlmanacDialog::MouseDown(int x, int y, int theClickCount)
 		mDescriptionSliderDragging = true;
 		return;
 	}
-	if (mPlantButton->IsMouseOver() || mCloseButton->IsMouseOver() || mIndexButton->IsMouseOver())
+	if (mPlantButton->IsMouseOver() || mCloseButton->IsMouseOver() || mIndexButton->IsMouseOver() || mPremiumButton->IsMouseOver())
 		mApp->PlaySample(Sexy::SOUND_TAP);
 	if (mZombieButton->IsMouseOver())
 		mApp->PlaySample(Sexy::SOUND_GRAVEBUTTON);
