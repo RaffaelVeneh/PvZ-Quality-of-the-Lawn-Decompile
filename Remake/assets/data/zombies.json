@@ -1,0 +1,25 @@
+{
+  "zombies": [
+    {
+      "id": "zombie_normal",
+      "name": "Zombie",
+      "health": 270,
+      "speed": 25.0,
+      "dps": 100
+    },
+    {
+      "id": "zombie_conehead",
+      "name": "Conehead Zombie",
+      "health": 640,
+      "speed": 25.0,
+      "dps": 100
+    },
+    {
+      "id": "zombie_buckethead",
+      "name": "Buckethead Zombie",
+      "health": 1370,
+      "speed": 25.0,
+      "dps": 100
+    }
+  ]
+}

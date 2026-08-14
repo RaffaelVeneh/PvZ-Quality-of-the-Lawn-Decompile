@@ -1,0 +1,42 @@
+{
+  "plants": [
+    {
+      "id": "peashooter",
+      "name": "Peashooter",
+      "cost": 100,
+      "cooldown": 7.5,
+      "health": 300,
+      "fire_rate": 1.4,
+      "damage": 20,
+      "type": "shooter"
+    },
+    {
+      "id": "sunflower",
+      "name": "Sunflower",
+      "cost": 50,
+      "cooldown": 7.5,
+      "health": 300,
+      "sun_interval": 24.0,
+      "sun_value": 25,
+      "type": "producer"
+    },
+    {
+      "id": "wallnut",
+      "name": "Wall-nut",
+      "cost": 50,
+      "cooldown": 30.0,
+      "health": 4000,
+      "type": "defender"
+    },
+    {
+      "id": "cherry_bomb",
+      "name": "Cherry Bomb",
+      "cost": 150,
+      "cooldown": 50.0,
+      "health": 300,
+      "damage": 1800,
+      "blast_radius": 1.5,
+      "type": "explosive"
+    }
+  ]
+}
