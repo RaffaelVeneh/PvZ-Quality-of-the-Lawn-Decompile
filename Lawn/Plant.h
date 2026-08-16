@@ -406,7 +406,6 @@ public:
     void                    UpdateGeneralPea();
     void                    UpdateSweetestPotato();
     void                    UpdateHattremSage();
-    bool                    IsHattremTargetException(ZombieType theZombieType);
     void                    UpdateDarkcap();
     Zombie*                 FindDarkCapTarget();
 };

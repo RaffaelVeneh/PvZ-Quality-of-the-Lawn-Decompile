@@ -8176,10 +8176,18 @@ void Plant::GrantPlacementShieldPulse()
                 continue;
             }
 
-            aPlantToBuff->mShieldMaxHealth = (aPlantToBuff->mShieldMaxHealth > targetShield) ? aPlantToBuff->mShieldMaxHealth : targetShield;
-            aPlantToBuff->mShieldHealth = targetShield;
+            bool shieldUpdated = false;
+            if (targetShield > aPlantToBuff->mShieldHealth)
+            {
+                aPlantToBuff->mShieldHealth = targetShield;
+                shieldUpdated = true;
+            }
+            if (targetShield > aPlantToBuff->mShieldMaxHealth)
+            {
+                aPlantToBuff->mShieldMaxHealth = targetShield;
+            }
 
-            if (aPlantToBuff != this && mApp)
+            if (shieldUpdated && aPlantToBuff != this && mApp)
             {
                 mApp->AddTodParticle(aPlantToBuff->mX + 40, aPlantToBuff->mY + 40,
                     aPlantToBuff->mRenderOrder + 1, ParticleEffect::PARTICLE_STARBURST)
@@ -8252,7 +8260,7 @@ void Plant::CheckAndReceiveNearbyPlanternShield()
                 if (2000 > aBestShield)
                 {
                     aBestShield = 2000;
-                    if (aBestShield == 2000 && !isIcePlantern) isIcePlantern = false;
+                    if (!isIcePlantern) isIcePlantern = false;
                 }
             }
         }
@@ -8260,10 +8268,18 @@ void Plant::CheckAndReceiveNearbyPlanternShield()
 
     if (aBestShield > 0)
     {
-        mShieldMaxHealth = (mShieldMaxHealth > aBestShield) ? mShieldMaxHealth : aBestShield;
-        mShieldHealth = aBestShield;
+        bool shieldUpdated = false;
+        if (aBestShield > mShieldHealth)
+        {
+            mShieldHealth = aBestShield;
+            shieldUpdated = true;
+        }
+        if (aBestShield > mShieldMaxHealth)
+        {
+            mShieldMaxHealth = aBestShield;
+        }
 
-        if (mApp)
+        if (shieldUpdated && mApp)
         {
             mApp->AddTodParticle(mX + 40, mY + 40, mRenderOrder + 1, ParticleEffect::PARTICLE_STARBURST)
                 ->OverrideColor(nullptr, isIcePlantern ? Color(143, 143, 255) : Color(143, 255, 143));
@@ -8827,18 +8843,6 @@ void Plant::UpdateShrinkingViolet()
     }
 }
 
-bool Plant::IsHattremTargetException(ZombieType theZombieType)
-{
-    return (theZombieType == ZombieType::ZOMBIE_FOOTBALL ||
-        theZombieType == ZombieType::ZOMBIE_BOSS ||
-        theZombieType == ZombieType::ZOMBIE_GARGANTUAR ||
-        theZombieType == ZombieType::ZOMBIE_REDEYE_GARGANTUAR ||
-        theZombieType == ZombieType::ZOMBIE_FLAG ||
-        theZombieType == ZombieType::ZOMBIE_GIGA_FOOTBALL ||
-        theZombieType == ZombieType::ZOMBIE_TALLNUT_HEAD ||
-        theZombieType == ZombieType::ZOMBIE_BUNGEE);
-}
-
 Zombie* Plant::FindClosestValidHattremTarget()
 {
     Zombie* aBestZombie = nullptr;
@@ -8904,16 +8908,16 @@ void Plant::UpdateHattremWitch()
             Zombie* aTarget = mBoard->ZombieTryToGet(mTargetZombieID);
             if (aTarget != nullptr && !aTarget->IsDeadOrDying())
             {
-                // Check if the target is an exception
-                if (IsHattremTargetException(aTarget->mZombieType))
+                int aZombieHP = aTarget->mBodyHealth + aTarget->mHelmHealth + aTarget->mShieldHealth + aTarget->mFlyingHealth;
+                if (aZombieHP > 300)
                 {
-                    // If it's an exception, deal 200 damage
+                    // Deal 300 damage if HP > 300
                     mApp->PlayFoley(FOLEY_SQUASH_HMM);
-                    aTarget->TakeDamage(200, (1U << DAMAGE_BYPASSES_SHIELD));
+                    aTarget->TakeDamage(300, (1U << DAMAGE_BYPASSES_SHIELD));
                 }
                 else
                 {
-                    // Otherwise, perform the original transformation logic
+                    // Otherwise, transform zombie (or deal kill damage if tile is occupied)
                     int aGridX = mBoard->PixelToGridX(aTarget->mX, aTarget->mY);
                     int aGridY = aTarget->mRow;
                     Plant* aPlantOnTile = mBoard->GetTopPlantAt(aGridX, aGridY, TOPPLANT_ANY);
@@ -9005,16 +9009,16 @@ void Plant::UpdateHattremSage()
             Zombie* aTarget = mBoard->ZombieTryToGet(mTargetZombieID);
             if (aTarget != nullptr && !aTarget->IsDeadOrDying())
             {
-                // Check if the target is an exception
-                if (IsHattremTargetException(aTarget->mZombieType))
+                int aZombieHP = aTarget->mBodyHealth + aTarget->mHelmHealth + aTarget->mShieldHealth + aTarget->mFlyingHealth;
+                if (aZombieHP > 400)
                 {
-                    // If it's an exception, deal 400 damage
+                    // Deal 400 damage if HP > 400
                     mApp->PlayFoley(FOLEY_SQUASH_HMM);
                     aTarget->TakeDamage(400, (1U << DAMAGE_BYPASSES_SHIELD));
                 }
                 else
                 {
-                    // Otherwise, perform the original random transformation logic
+                    // Otherwise, transform zombie (or deal kill damage if tile is occupied)
                     int aGridX = mBoard->PixelToGridX(aTarget->mX, aTarget->mY);
                     int aGridY = aTarget->mRow;
                     Plant* aPlantOnTile = mBoard->GetTopPlantAt(aGridX, aGridY, TOPPLANT_ANY);
@@ -9037,14 +9041,12 @@ void Plant::UpdateHattremSage()
                         SeedType aNewSeedType = SEED_FUMESHROOM;
                         int aRand = Rand(100);
 
-                        if (aRand < 30) { aNewSeedType = SEED_FUMESHROOM; }
-                        else if (aRand < 50) { aNewSeedType = SEED_SQUASH; }
-                        else if (aRand < 60) { aNewSeedType = SEED_PICKLEDPEPPER; }
-                        else if (aRand < 75) { aNewSeedType = SEED_CHERRYBOMB; }
-                        else if (aRand < 85) { aNewSeedType = SEED_JALAPENO; }
-                        else if (aRand < 90) { aNewSeedType = SEED_DOOMSHROOM; }
-                        else if (aRand < 95) { aNewSeedType = SEED_TALLNUT; }
-                        else { aNewSeedType = SEED_WALLNUT; }
+                        if (aRand < 40) { aNewSeedType = SEED_FUMESHROOM; }        // 40%
+                        else if (aRand < 60) { aNewSeedType = SEED_SQUASH; }       // 20%
+                        else if (aRand < 85) { aNewSeedType = SEED_WALLNUT; }      // 25%
+                        else if (aRand < 95) { aNewSeedType = SEED_TALLNUT; }      // 10%
+                        else if (aRand < 99) { aNewSeedType = SEED_CHERRYBOMB; }   // 4%
+                        else { aNewSeedType = SEED_DOOMSHROOM; }                   // 1%
 
                         Plant* aNewPlant = mBoard->AddPlant(aGridX, aGridY, aNewSeedType, SEED_NONE);
                         if (aNewPlant && aNewPlant->mIsAsleep)
