@@ -8924,9 +8924,9 @@ void Plant::UpdateHattremWitch()
 
                     if (aPlantOnTile != nullptr)
                     {
-                        // Tile is occupied, deal massive damage
+                        // Tile is occupied, deal regular 300 damage (no instant elimination)
                         mApp->PlayFoley(FOLEY_SQUASH_HMM);
-                        aTarget->TakeDamage(3000, (1U << DAMAGE_BYPASSES_SHIELD));
+                        aTarget->TakeDamage(300, (1U << DAMAGE_BYPASSES_SHIELD));
                     }
                     else
                     {
@@ -9018,15 +9018,16 @@ void Plant::UpdateHattremSage()
                 }
                 else
                 {
-                    // Otherwise, transform zombie (or deal kill damage if tile is occupied)
+                    // Otherwise, transform zombie (or deal normal 400 damage if tile is occupied)
                     int aGridX = mBoard->PixelToGridX(aTarget->mX, aTarget->mY);
                     int aGridY = aTarget->mRow;
                     Plant* aPlantOnTile = mBoard->GetTopPlantAt(aGridX, aGridY, TOPPLANT_ANY);
 
                     if (aPlantOnTile != nullptr)
                     {
+                        // Tile is occupied, deal regular 400 damage (no instant elimination)
                         mApp->PlayFoley(FOLEY_SQUASH_HMM);
-                        aTarget->TakeDamage(3000, (1U << DAMAGE_BYPASSES_SHIELD));
+                        aTarget->TakeDamage(400, (1U << DAMAGE_BYPASSES_SHIELD));
                     }
                     else
                     {
