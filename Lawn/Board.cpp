@@ -3342,6 +3342,25 @@ void Board::MouseDrag(int x, int y)
 {
 	Widget::MouseDrag(x, y);
 	mChallenge->MouseMove(x, y);
+
+	if (mBoardFadeOutCounter >= 0 || IsScaryPotterDaveTalking() || mPaused || mTimeStopCounter > 0 || mApp->mGameScene != GameScenes::SCENE_PLAYING)
+		return;
+
+	if (mCursorObject->mCursorType == CursorType::CURSOR_TYPE_NORMAL || mCursorObject->mCursorType == CursorType::CURSOR_TYPE_HAMMER)
+	{
+		Coin* aCoin = nullptr;
+		while (IterateCoins(aCoin))
+		{
+			HitResult aHitResultCoin;
+			if (aCoin->MouseHitTest(x, y, &aHitResultCoin))
+			{
+				if (aCoin->mBoard && !aCoin->mIsBeingCollected && !aCoin->mDead)
+				{
+					aCoin->MouseDown(x, y, 0);
+				}
+			}
+		}
+	}
 }
 
 bool Board::IsPlantInGoldWateringCanRange(int theMouseX, int theMouseY, Plant* thePlant)

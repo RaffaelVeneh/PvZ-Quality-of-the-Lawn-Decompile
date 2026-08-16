@@ -823,11 +823,10 @@ void Coin::Update()
 
     if ((mApp->mAutoCollectSuns && IsSun()) || (mApp->mAutoCollectCoins && IsMoney()))
     {
-        int aMouseX = mApp->mWidgetManager->mLastMouseX - (BOARD_OFFSET - 220);
-        int aMouseY = mApp->mWidgetManager->mLastMouseY;
-        HitResult aHitResultCoin;
-        if (MouseHitTest(aMouseX, aMouseY, &aHitResultCoin))
-            MouseDown(aMouseX, aMouseY, 0);
+        if (!mIsBeingCollected && !mDead && mBoard && !mBoard->mPaused && mApp->mGameScene == GameScenes::SCENE_PLAYING)
+        {
+            MouseDown(0, 0, 0);
+        }
     }
 }
 
