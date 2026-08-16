@@ -744,15 +744,6 @@ void Plant::PlantInitialize(int theGridX, int theGridY, SeedType theSeedType, Se
     case SeedType::SEED_DARKCAP:
         mState = STATE_READY;
         mIsHiding = false;
-        if (IsNocturnal(mSeedType) && mBoard && !mBoard->StageIsNight())
-        {
-            SetSleeping(true);
-            Reanimation* aBodyReanim = mApp->ReanimationTryToGet(mBodyReanimID);
-            if (aBodyReanim && aBodyReanim->TrackExists("anim_sleep"))
-            {
-                aBodyReanim->SetFramesForLayer("anim_sleep");
-            }
-        }
         break;
     case SeedType::SEED_SWEETPOTATO:
     case SeedType::SEED_SWEETEST_POTATO:
@@ -869,6 +860,8 @@ void Plant::SetSleeping(bool theIsAsleep)
             aPosY -= 20.0f;
         else if (mSeedType == SeedType::SEED_GLOOMSHROOM)
             aPosY -= 12.0f;
+        else if (mSeedType == SeedType::SEED_NIGHTCAP || mSeedType == SeedType::SEED_DARKCAP)
+            aPosY -= 15.0f;
 
         Reanimation* aSleepReanim = mApp->AddReanimation(aPosX, aPosY, mRenderOrder + 2, ReanimationType::REANIM_SLEEPING);
         aSleepReanim->mLoopType = ReanimLoopType::REANIM_LOOP;
@@ -3735,7 +3728,7 @@ void Plant::UpdateAbilities()
     else if (mSeedType == SeedType::SEED_HATTREMSAGE)                                           UpdateHattremSage();
     else if (mSeedType == SeedType::SEED_DARKCAP)                                               UpdateDarkcap();
 
-    if (mSubclass == PlantSubClass::SUBCLASS_SHOOTER && mSeedType != SeedType::SEED_COMMANDOPEA && mSeedType != SeedType::SEED_GENERALPEA)
+    if (mSubclass == PlantSubClass::SUBCLASS_SHOOTER && mSeedType != SeedType::SEED_COMMANDOPEA && mSeedType != SeedType::SEED_GENERALPEA && mSeedType != SeedType::SEED_NIGHTCAP && mSeedType != SeedType::SEED_DARKCAP)
     {
         UpdateShooter();
     }
@@ -4573,8 +4566,8 @@ void Plant::UpdateShooting()
     {
         if (mShootingCounter == 75 || mShootingCounter == 50 || mShootingCounter == 25)
         {
-            // Define the attack area, same as in FindNightcapTarget()
-            Rect aAttackRect(mX + 120, mY, 180, mHeight);
+            // Define the attack area, same as in FindNightcapTarget() (3 tiles in front)
+            Rect aAttackRect(mX, mY, 240, mHeight);
             bool aSoundPlayed = false;
 
             Zombie* aZombie = nullptr;
@@ -4609,14 +4602,19 @@ void Plant::UpdateShooting()
         {
             mState = STATE_READY;
             mLaunchCounter = mLaunchRate;
+            if (!mIsHiding && !mIsAsleep)
+            {
+                PlayBodyReanim("anim_idle", REANIM_LOOP, 10, 15.0f);
+            }
         }
+        return;
     }
     else if (mSeedType == SeedType::SEED_DARKCAP)
     {
         if (mShootingCounter == 100 || mShootingCounter == 75 || mShootingCounter == 50 || mShootingCounter == 25)
         {
-            // Define the attack area, same as in FindNightcapTarget()
-            Rect aAttackRect(mX + 160, mY, 220, mHeight);
+            // Define the attack area, same as in FindNightcapTarget() (4 tiles in front)
+            Rect aAttackRect(mX, mY, 320, mHeight);
             bool aSoundPlayed = false;
 
             Zombie* aZombie = nullptr;
@@ -4651,7 +4649,12 @@ void Plant::UpdateShooting()
         {
             mState = STATE_READY;
             mLaunchCounter = mLaunchRate;
+            if (!mIsHiding && !mIsAsleep)
+            {
+                PlayBodyReanim("anim_idle", REANIM_LOOP, 10, 15.0f);
+            }
         }
+        return;
     }
     else if (mSeedType == SeedType::SEED_CATTAIL)
     {
@@ -9074,14 +9077,14 @@ void Plant::UpdateHattremSage()
 
 Zombie* Plant::FindNightcapTarget()
 {
-    Rect aAttackRect(mX + 120, mY, 180, mHeight); // 2-tile range
+    Rect aAttackRect(mX, mY, 240, mHeight); // 3 tiles in front
     Zombie* aBestZombie = nullptr;
-    int aMinX = 0;
+    int aMinX = 999999;
 
     Zombie* aZombie = nullptr;
     while (mBoard->IterateZombies(aZombie))
     {
-        if (aZombie->mRow == mRow && aZombie->EffectedByDamage(1U << DAMAGES_GROUND))
+        if (aZombie->mRow == mRow && !aZombie->IsDeadOrDying() && aZombie->EffectedByDamage(1U << DAMAGES_GROUND))
         {
             Rect aZombieRect = aZombie->GetZombieRect();
             if (GetRectOverlap(aAttackRect, aZombieRect) > 0)
@@ -9099,14 +9102,14 @@ Zombie* Plant::FindNightcapTarget()
 
 Zombie* Plant::FindDarkCapTarget()
 {
-    Rect aAttackRect(mX + 160, mY, 220, mHeight); // 2-tile range
+    Rect aAttackRect(mX, mY, 320, mHeight); // 4 tiles in front
     Zombie* aBestZombie = nullptr;
-    int aMinX = 0;
+    int aMinX = 999999;
 
     Zombie* aZombie = nullptr;
     while (mBoard->IterateZombies(aZombie))
     {
-        if (aZombie->mRow == mRow && aZombie->EffectedByDamage(1U << DAMAGES_GROUND))
+        if (aZombie->mRow == mRow && !aZombie->IsDeadOrDying() && aZombie->EffectedByDamage(1U << DAMAGES_GROUND))
         {
             Rect aZombieRect = aZombie->GetZombieRect();
             if (GetRectOverlap(aAttackRect, aZombieRect) > 0)
@@ -9126,30 +9129,47 @@ void Plant::UpdateNightcap()
 {
     if (mIsAsleep) return;
 
+    bool aHasPumpkin = (mBoard && mBoard->GetPumpkinAt(mPlantCol, mRow) != nullptr);
     bool aZombieIsClose = false;
-    Rect aDangerRect(mX, mY, 60, mHeight);
-    Zombie* aZombie = nullptr;
-    while (mBoard->IterateZombies(aZombie))
+
+    if (!aHasPumpkin)
     {
-        if (aZombie->mRow == mRow && !aZombie->IsDeadOrDying() && GetRectOverlap(aDangerRect, aZombie->GetZombieRect()) > 0)
+        Zombie* aZombie = nullptr;
+        while (mBoard->IterateZombies(aZombie))
         {
-            aZombieIsClose = true;
-            break;
+            if (!aZombie->mMindControlled && !aZombie->IsDeadOrDying())
+            {
+                Rect aZombieRect = aZombie->GetZombieRect();
+                int aDiffY = (aZombie->mZombieType == ZombieType::ZOMBIE_BOSS) ? 0 : (aZombie->mRow - mRow);
+                if (aDiffY == 0 && GetCircleRectOverlap(mX + 40.0f, mY + 40.0f, 60, aZombieRect))
+                {
+                    aZombieIsClose = true;
+                    break;
+                }
+            }
         }
     }
 
-    if (aZombieIsClose && !mIsHiding)
+    if (aZombieIsClose)
     {
-        mIsHiding = true;
-        PlayBodyReanim("anim_sleep", REANIM_LOOP, 10, 15.0f);
+        if (!mIsHiding)
+        {
+            mIsHiding = true;
+            mState = STATE_READY;
+            mShootingCounter = 0;
+            PlayBodyReanim("anim_sleep", REANIM_LOOP, 10, 15.0f);
+        }
+        return;
     }
-    else if (!aZombieIsClose && mIsHiding)
+    else if (mIsHiding)
     {
         mIsHiding = false;
+        mState = STATE_READY;
+        mShootingCounter = 0;
         PlayBodyReanim("anim_idle", REANIM_LOOP, 10, 15.0f);
     }
 
-    if (mIsHiding || mState == STATE_NIGHTCAP_ATTACKING)
+    if (mState == STATE_NIGHTCAP_ATTACKING)
     {
         return;
     }
@@ -9159,13 +9179,11 @@ void Plant::UpdateNightcap()
 
     if (mLaunchCounter == 0)
     {
-        // ONLY check for a target when ready to fire
         Zombie* aTarget = FindNightcapTarget();
         if (aTarget != nullptr)
         {
-            // A target is in range, so start the attack
             mState = STATE_NIGHTCAP_ATTACKING;
-            mShootingCounter = 100; // This now becomes the animation timer
+            mShootingCounter = 100;
             PlayBodyReanim("anim_shooting", REANIM_PLAY_ONCE_AND_HOLD, 10, 36.0f);
         }
     }
@@ -9175,30 +9193,47 @@ void Plant::UpdateDarkcap()
 {
     if (mIsAsleep) return;
 
+    bool aHasPumpkin = (mBoard && mBoard->GetPumpkinAt(mPlantCol, mRow) != nullptr);
     bool aZombieIsClose = false;
-    Rect aDangerRect(mX, mY, 60, mHeight);
-    Zombie* aZombie = nullptr;
-    while (mBoard->IterateZombies(aZombie))
+
+    if (!aHasPumpkin)
     {
-        if (aZombie->mRow == mRow && !aZombie->IsDeadOrDying() && GetRectOverlap(aDangerRect, aZombie->GetZombieRect()) > 0)
+        Zombie* aZombie = nullptr;
+        while (mBoard->IterateZombies(aZombie))
         {
-            aZombieIsClose = true;
-            break;
+            if (!aZombie->mMindControlled && !aZombie->IsDeadOrDying())
+            {
+                Rect aZombieRect = aZombie->GetZombieRect();
+                int aDiffY = (aZombie->mZombieType == ZombieType::ZOMBIE_BOSS) ? 0 : (aZombie->mRow - mRow);
+                if (aDiffY == 0 && GetCircleRectOverlap(mX + 40.0f, mY + 40.0f, 60, aZombieRect))
+                {
+                    aZombieIsClose = true;
+                    break;
+                }
+            }
         }
     }
 
-    if (aZombieIsClose && !mIsHiding)
+    if (aZombieIsClose)
     {
-        mIsHiding = true;
-        PlayBodyReanim("anim_sleep", REANIM_LOOP, 10, 15.0f);
+        if (!mIsHiding)
+        {
+            mIsHiding = true;
+            mState = STATE_READY;
+            mShootingCounter = 0;
+            PlayBodyReanim("anim_sleep", REANIM_LOOP, 10, 15.0f);
+        }
+        return;
     }
-    else if (!aZombieIsClose && mIsHiding)
+    else if (mIsHiding)
     {
         mIsHiding = false;
+        mState = STATE_READY;
+        mShootingCounter = 0;
         PlayBodyReanim("anim_idle", REANIM_LOOP, 10, 15.0f);
     }
 
-    if (mIsHiding || mState == STATE_NIGHTCAP_ATTACKING)
+    if (mState == STATE_NIGHTCAP_ATTACKING)
     {
         return;
     }
@@ -9208,13 +9243,11 @@ void Plant::UpdateDarkcap()
 
     if (mLaunchCounter == 0)
     {
-        // ONLY check for a target when ready to fire
         Zombie* aTarget = FindDarkCapTarget();
         if (aTarget != nullptr)
         {
-            // A target is in range, so start the attack
             mState = STATE_NIGHTCAP_ATTACKING;
-            mShootingCounter = 125; // This now becomes the animation timer
+            mShootingCounter = 100;
             PlayBodyReanim("anim_shooting", REANIM_PLAY_ONCE_AND_HOLD, 10, 36.0f);
         }
     }

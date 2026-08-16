@@ -1245,7 +1245,14 @@ void Coin::Collect()
     else if (mType == CoinType::COIN_FERTILIZER)
     {
         TOD_ASSERT(mBoard);
-        mApp->mPlayerInfo->mPurchases[(int)StoreItem::STORE_ITEM_FERTILIZER]++;
+        if (mApp->IsSurvivalMode())
+        {
+            mBoard->mSurvivalFertilizer++;
+        }
+        else
+        {
+            mApp->mPlayerInfo->mPurchases[(int)StoreItem::STORE_ITEM_FERTILIZER]++;
+        }
         mApp->AddTodParticle(mPosX + 30.0f, mPosY + 30.0f, mRenderOrder + 1, ParticleEffect::PARTICLE_PRESENT_PICKUP);
         StartFade();
         return;

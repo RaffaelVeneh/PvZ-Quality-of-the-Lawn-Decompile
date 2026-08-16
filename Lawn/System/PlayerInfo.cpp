@@ -180,7 +180,7 @@ void PlayerInfo::AddCoins(int theAmount)
 
 void PlayerInfo::ResetChallengeRecord(GameMode theGameMode)
 {
-	int aGameMode = (int)theGameMode - (int)GameMode::GAMEMODE_SURVIVAL_NORMAL_STAGE_1;
+	int aGameMode = (int)theGameMode - (int)GameMode::GAMEMODE_SURVIVAL_EASY_STAGE_1;
 	TOD_ASSERT(aGameMode >= 0 && aGameMode <= NUM_CHALLENGE_MODES);
 	mChallengeRecords[aGameMode] = 0;
 }

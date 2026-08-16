@@ -237,6 +237,7 @@ public:
 	int								mAchievementCoinCount;
 	int								mGargantuarsKilled;
 	bool							mGravesMayRise;
+	int								mSurvivalFertilizer;
 
 public:
 	Board(LawnApp* theApp);
@@ -322,6 +323,7 @@ public:
 	void							DrawLevel(Graphics* g);
 	void							DrawShovel(Graphics* g);
 	void							DrawFertilizerButton(Graphics* g);
+	int								GetFertilizerCharges();
 	void							UpdateZombieSpawning();
 	void							UpgradePlant(int theGridX, int theGridY);
 	void							UpdateSunSpawning();

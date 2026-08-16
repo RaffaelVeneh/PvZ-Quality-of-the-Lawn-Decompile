@@ -181,6 +181,7 @@ Board::Board(LawnApp* theApp)
 	mCoinFaded = false;
 	mAchievementCoinCount = 0;
 	mGargantuarsKilled = 0;
+	mSurvivalFertilizer = 0;
 
 	if (mApp->mGameMode == GameMode::GAMEMODE_CHALLENGE_ZEN_GARDEN || mApp->mGameMode == GameMode::GAMEMODE_TREE_OF_WISDOM)
 	{
@@ -675,14 +676,22 @@ void Board::PickZombieWaves()
 				aZombiePoints = aWave + 4; // 4x multiplier (4.0) for the first playthrough
 		}
 
-		// Keep the special mode overrides separate
 		if (mApp->mGameMode == GameMode::GAMEMODE_CHALLENGE_LAST_STAND)
 		{
 			aZombiePoints = (mChallenge->mSurvivalStage * GetNumWavesPerSurvivalStage() + aWave + 10) * 2 / 5 + 1;
 		}
 		else if (mApp->IsSurvivalMode() && mChallenge->mSurvivalStage > 0)
 		{
-			aZombiePoints = (mChallenge->mSurvivalStage * GetNumWavesPerSurvivalStage() + aWave) * 2 / 5 + 1;
+			int aDifficultyMultiplier = 2;
+			if (mApp->IsSurvivalHard(mApp->mGameMode))
+			{
+				aDifficultyMultiplier = 3;
+			}
+			else if (mApp->IsSurvivalExtreme(mApp->mGameMode))
+			{
+				aDifficultyMultiplier = 4;
+			}
+			aZombiePoints = (mChallenge->mSurvivalStage * GetNumWavesPerSurvivalStage() + aWave) * aDifficultyMultiplier / 5 + 1;
 		}
 
 		if (aIsFlagWave)
@@ -916,8 +925,10 @@ void Board::PickBackground()
 		}
 		break;
 
+	case GameMode::GAMEMODE_SURVIVAL_EASY_STAGE_1:
 	case GameMode::GAMEMODE_SURVIVAL_NORMAL_STAGE_1:
 	case GameMode::GAMEMODE_SURVIVAL_HARD_STAGE_1:
+	case GameMode::GAMEMODE_SURVIVAL_EXTREME_STAGE_1:
 	case GameMode::GAMEMODE_SURVIVAL_ENDLESS_STAGE_1:
 	case GameMode::GAMEMODE_CHALLENGE_WAR_AND_PEAS:
 	case GameMode::GAMEMODE_CHALLENGE_WALLNUT_BOWLING:
@@ -935,8 +946,10 @@ void Board::PickBackground()
 		mBackground = BackgroundType::BACKGROUND_1_DAY;
 		break;
 
+	case GameMode::GAMEMODE_SURVIVAL_EASY_STAGE_2:
 	case GameMode::GAMEMODE_SURVIVAL_NORMAL_STAGE_2:
 	case GameMode::GAMEMODE_SURVIVAL_HARD_STAGE_2:
+	case GameMode::GAMEMODE_SURVIVAL_EXTREME_STAGE_2:
 	case GameMode::GAMEMODE_SURVIVAL_ENDLESS_STAGE_2:
 	case GameMode::GAMEMODE_CHALLENGE_BEGHOULED:
 	case GameMode::GAMEMODE_CHALLENGE_BEGHOULED_TWIST:
@@ -966,8 +979,10 @@ void Board::PickBackground()
 		mBackground = BackgroundType::BACKGROUND_2_NIGHT;
 		break;
 
+	case GameMode::GAMEMODE_SURVIVAL_EASY_STAGE_3:
 	case GameMode::GAMEMODE_SURVIVAL_NORMAL_STAGE_3:
 	case GameMode::GAMEMODE_SURVIVAL_HARD_STAGE_3:
+	case GameMode::GAMEMODE_SURVIVAL_EXTREME_STAGE_3:
 	case GameMode::GAMEMODE_SURVIVAL_ENDLESS_STAGE_3:
 	case GameMode::GAMEMODE_CHALLENGE_LITTLE_TROUBLE:
 	case GameMode::GAMEMODE_CHALLENGE_BOBSLED_BONANZA:
@@ -979,8 +994,10 @@ void Board::PickBackground()
 		mBackground = BackgroundType::BACKGROUND_3_POOL;
 		break;
 
+	case GameMode::GAMEMODE_SURVIVAL_EASY_STAGE_4:
 	case GameMode::GAMEMODE_SURVIVAL_NORMAL_STAGE_4:
 	case GameMode::GAMEMODE_SURVIVAL_HARD_STAGE_4:
+	case GameMode::GAMEMODE_SURVIVAL_EXTREME_STAGE_4:
 	case GameMode::GAMEMODE_SURVIVAL_ENDLESS_STAGE_4:
 	case GameMode::GAMEMODE_CHALLENGE_RAINING_SEEDS:
 	case GameMode::GAMEMODE_CHALLENGE_INVISIGHOUL:
@@ -989,8 +1006,10 @@ void Board::PickBackground()
 		mBackground = BackgroundType::BACKGROUND_4_FOG;
 		break;
 
+	case GameMode::GAMEMODE_SURVIVAL_EASY_STAGE_5:
 	case GameMode::GAMEMODE_SURVIVAL_NORMAL_STAGE_5:
 	case GameMode::GAMEMODE_SURVIVAL_HARD_STAGE_5:
+	case GameMode::GAMEMODE_SURVIVAL_EXTREME_STAGE_5:
 	case GameMode::GAMEMODE_SURVIVAL_ENDLESS_STAGE_5:
 	case GameMode::GAMEMODE_CHALLENGE_COLUMN:
 	case GameMode::GAMEMODE_CHALLENGE_POGO_PARTY:
@@ -999,6 +1018,11 @@ void Board::PickBackground()
 		mBackground = BackgroundType::BACKGROUND_5_ROOF;
 		break;
 
+	case GameMode::GAMEMODE_SURVIVAL_EASY_STAGE_6:
+	case GameMode::GAMEMODE_SURVIVAL_NORMAL_STAGE_6:
+	case GameMode::GAMEMODE_SURVIVAL_HARD_STAGE_6:
+	case GameMode::GAMEMODE_SURVIVAL_EXTREME_STAGE_6:
+	case GameMode::GAMEMODE_SURVIVAL_ENDLESS_STAGE_6:
 	case GameMode::GAMEMODE_CHALLENGE_FINAL_BOSS:
 		mBackground = BackgroundType::BACKGROUND_6_BOSS;
 		break;
@@ -1126,7 +1150,7 @@ void Board::PickBackground()
 		}
 		else if (mBackground == BackgroundType::BACKGROUND_2_NIGHT)
 		{
-			if (mApp->IsSurvivalNormal(mApp->mGameMode))
+			if (mApp->IsSurvivalEasy(mApp->mGameMode))
 			{
 				AddGraveStones(5, 1, aLevelRNG);
 				AddGraveStones(6, 1, aLevelRNG);
@@ -1178,7 +1202,7 @@ void Board::PickBackground()
 		}
 		else if (mBackground == BackgroundType::BACKGROUND_7_EVENING)
 		{
-			if (mApp->IsSurvivalNormal(mApp->mGameMode))
+			if (mApp->IsSurvivalEasy(mApp->mGameMode))
 			{
 				AddGraveStones(5, 1, aLevelRNG);
 				AddGraveStones(6, 1, aLevelRNG);
@@ -1446,6 +1470,10 @@ void Board::InitLevel()
 		mApp->mMusic->StopAllMusic();
 	}
 	PickBackground();
+	if (mApp->IsSurvivalMode() && mChallenge->mSurvivalStage == 0)
+	{
+		mSurvivalFertilizer = 0;
+	}
 	InitZombieWaves();
 	if (aGameMode == GameMode::GAMEMODE_CHALLENGE_BEGHOULED || aGameMode == GameMode::GAMEMODE_CHALLENGE_BEGHOULED_TWIST ||
 		mApp->IsScaryPotterLevel() || mApp->IsWhackAZombieLevel())
@@ -3520,7 +3548,7 @@ void Board::UpdateToolTip()
 	if (aHitResult.mObjectType == GameObjectType::OBJECT_TYPE_FERTILIZER)
 	{
 		mToolTip->SetLabel(_S("[FERTILIZER_TOOLTIP]"));
-		if (mApp->mPlayerInfo->mPurchases[(int)StoreItem::STORE_ITEM_FERTILIZER] - PURCHASE_COUNT_OFFSET == 0)
+		if (GetFertilizerCharges() == 0)
 		{
 			mToolTip->SetWarningText(_S("[EMPTY]"));
 		}
@@ -4320,7 +4348,14 @@ void Board::MouseDownWithTool(int x, int y, int theClickCount, CursorType theCur
 				if (aSecondPlant != nullptr && aSecondPlant->mSeedType == SEED_KERNELPULT)
 				{
 					// Both plants are present, proceed with upgrade
-					mApp->mPlayerInfo->mPurchases[(int)StoreItem::STORE_ITEM_FERTILIZER]--;
+					if (mApp->IsSurvivalMode())
+					{
+						if (mSurvivalFertilizer > 0) mSurvivalFertilizer--;
+					}
+					else
+					{
+						mApp->mPlayerInfo->mPurchases[(int)StoreItem::STORE_ITEM_FERTILIZER]--;
+					}
 					mApp->PlayFoley(FoleyType::FOLEY_FERTILIZER);
 
 					// Start the animation on the back plant
@@ -4344,7 +4379,14 @@ void Board::MouseDownWithTool(int x, int y, int theClickCount, CursorType theCur
 			}
 			else if (Plant::IsUpgradable(aPlant->mSeedType))
 			{
-				mApp->mPlayerInfo->mPurchases[(int)StoreItem::STORE_ITEM_FERTILIZER]--;
+				if (mApp->IsSurvivalMode())
+				{
+					if (mSurvivalFertilizer > 0) mSurvivalFertilizer--;
+				}
+				else
+				{
+					mApp->mPlayerInfo->mPurchases[(int)StoreItem::STORE_ITEM_FERTILIZER]--;
+				}
 				mApp->PlayFoley(FoleyType::FOLEY_FERTILIZER);
 
 				GridItem* aZenTool = mGridItems.DataArrayAlloc();
@@ -4495,7 +4537,7 @@ bool Board::MouseHitTest(int x, int y, HitResult* theHitResult)
 		theHitResult->mObjectType = GameObjectType::OBJECT_TYPE_SHOVEL;
 		return true;
 	}
-	if (mShowShovel && mApp->CanShowZenGarden() && mApp->mPlayerInfo->mPurchases[(int)StoreItem::STORE_ITEM_FERTILIZER] > PURCHASE_COUNT_OFFSET && CanInteractWithBoardButtons())
+	if (mShowShovel && (mApp->CanShowZenGarden() || mApp->IsSurvivalMode()) && GetFertilizerCharges() > 0 && CanInteractWithBoardButtons())
 	{
 		Rect aFertilizerRect = GetFertilizerButtonRect();
 		if (aFertilizerRect.Contains(x, y))
@@ -4646,7 +4688,7 @@ void Board::PickUpTool(GameObjectType theObjectType)
 		break;
 
 	case GameObjectType::OBJECT_TYPE_FERTILIZER:
-		if (mApp->mPlayerInfo->mPurchases[(int)StoreItem::STORE_ITEM_FERTILIZER] > PURCHASE_COUNT_OFFSET)
+		if (GetFertilizerCharges() > 0)
 		{
 			mCursorObject->mCursorType = CursorType::CURSOR_TYPE_FERTILIZER;
 			mApp->PlayFoley(FoleyType::FOLEY_DROP);
@@ -5529,13 +5571,21 @@ bool Board::IsFinalSurvivalStage()
 		return false;
 
 	int aFlags = GetNumWavesPerSurvivalStage() * (mChallenge->mSurvivalStage + 1) / GetNumWavesPerFlag();
+	if (mApp->IsSurvivalEasy(mApp->mGameMode))
+	{
+		return aFlags >= SURVIVAL_EASY_FLAGS;
+	}
 	if (mApp->IsSurvivalNormal(mApp->mGameMode))
 	{
-		return aFlags >= 5;
+		return aFlags >= SURVIVAL_NORMAL_FLAGS;
 	}
 	if (mApp->IsSurvivalHard(mApp->mGameMode))
 	{
-		return aFlags >= 10;
+		return aFlags >= SURVIVAL_HARD_FLAGS;
+	}
+	if (mApp->IsSurvivalExtreme(mApp->mGameMode))
+	{
+		return aFlags >= SURVIVAL_EXTREME_FLAGS;
 	}
 
 	return false;
@@ -8064,15 +8114,24 @@ void Board::DrawUIBottom(Graphics* g)
 	}
 }
 
+int Board::GetFertilizerCharges()
+{
+	if (mApp->IsSurvivalMode())
+	{
+		return mSurvivalFertilizer;
+	}
+	return mApp->mPlayerInfo->mPurchases[(int)StoreItem::STORE_ITEM_FERTILIZER] - PURCHASE_COUNT_OFFSET;
+}
+
 void Board::DrawFertilizerButton(Graphics* g)
 {
-	if (mShowShovel && mApp->CanShowZenGarden() && mApp->mPlayerInfo->mPurchases[(int)StoreItem::STORE_ITEM_FERTILIZER] >= PURCHASE_COUNT_OFFSET)
+	if (mShowShovel && (mApp->CanShowZenGarden() || mApp->IsSurvivalMode()))
 	{
 		Rect aFertilizerRect = GetFertilizerButtonRect();
 		g->DrawImage(IMAGE_SHOVELBANK, aFertilizerRect.mX, aFertilizerRect.mY);
+		int aCharges = GetFertilizerCharges();
 		if (mCursorObject->mCursorType != CURSOR_TYPE_FERTILIZER)
 		{
-			int aCharges = mApp->mPlayerInfo->mPurchases[(int)StoreItem::STORE_ITEM_FERTILIZER] - PURCHASE_COUNT_OFFSET;
 			if (aCharges == 0)
 			{
 				g->SetColorizeImages(true);
@@ -8085,7 +8144,6 @@ void Board::DrawFertilizerButton(Graphics* g)
 			}
 		}
 
-		int aCharges = mApp->mPlayerInfo->mPurchases[(int)StoreItem::STORE_ITEM_FERTILIZER] - PURCHASE_COUNT_OFFSET;
 		SexyString aChargeString = StrFormat(_S("x%d"), aCharges);
 		TodDrawString(g, aChargeString, aFertilizerRect.mX + 64, aFertilizerRect.mY + 65, FONT_HOUSEOFTERROR16, Color::White, DS_ALIGN_RIGHT);
 	}
@@ -10375,7 +10433,7 @@ int Board::GetGraveStoneCount()
 
 void Board::DropLootPiece(int thePosX, int thePosY, int theDropFactor)
 {
-	if (mApp->CanShowZenGarden() && mApp->mPlayerInfo->mPurchases[(int)StoreItem::STORE_ITEM_FERTILIZER] < PURCHASE_COUNT_OFFSET + 5)
+	if ((mApp->CanShowZenGarden() || mApp->IsSurvivalMode()) && GetFertilizerCharges() < 5)
 	{
 		if (Rand(100) < 5) // 5% chance
 		{
@@ -10832,16 +10890,25 @@ int Board::GetAllZombiesInRadius(int theRow, int theX, int theY, int theRadius, 
 
 int Board::GetNumWavesPerSurvivalStage()
 {
-	if (mApp->mGameMode == GameMode::GAMEMODE_CHALLENGE_LAST_STAND || mApp->IsSurvivalNormal(mApp->mGameMode))
+	if (mApp->mGameMode == GameMode::GAMEMODE_CHALLENGE_LAST_STAND || mApp->IsSurvivalEasy(mApp->mGameMode))
 	{
 		return 10;
 	}
-	else if (mApp->IsSurvivalHard(mApp->mGameMode) || mApp->IsSurvivalEndless(mApp->mGameMode))
+	else if (mApp->IsSurvivalNormal(mApp->mGameMode) || mApp->IsSurvivalEndless(mApp->mGameMode))
 	{
 		return 20;
 	}
+	else if (mApp->IsSurvivalHard(mApp->mGameMode))
+	{
+		return 30;
+	}
+	else if (mApp->IsSurvivalExtreme(mApp->mGameMode))
+	{
+		return 40;
+	}
 
 	TOD_ASSERT();
+	return 20;
 }
 
 void Board::RemoveParticleByType(ParticleEffect theEffectType)
@@ -10867,6 +10934,14 @@ int Board::GetCurrentPlantCost(SeedType theSeedType, SeedType theImitaterType)
 	if (PlantUsesAcceleratedPricing(theSeedType))
 	{
 		aCost += CountPlantByType(theSeedType) * 50;
+	}
+	if (mApp->IsSurvivalHard(mApp->mGameMode) || mApp->IsSurvivalEndless(mApp->mGameMode))
+	{
+		aCost = aCost * 3 / 2;
+	}
+	else if (mApp->IsSurvivalExtreme(mApp->mGameMode))
+	{
+		aCost = aCost * 2;
 	}
 	return aCost;
 }
@@ -10895,7 +10970,7 @@ bool Board::CanUseGameObject(GameObjectType theGameObject)
 	}
 	if (theGameObject == GameObjectType::OBJECT_TYPE_FERTILIZER)
 	{
-		return mApp->mPlayerInfo->mPurchases[(int)StoreItem::STORE_ITEM_FERTILIZER] > 0;
+		return GetFertilizerCharges() > 0;
 	}
 	if (theGameObject == GameObjectType::OBJECT_TYPE_BUG_SPRAY)
 	{
@@ -11169,11 +11244,18 @@ void Board::UpgradePlant(int theGridX, int theGridY)
 
 	if (aNewSeedType != SeedType::SEED_NONE)
 	{
+		bool wasAwake = !aOldPlant->mIsAsleep;
+
 		// Remove the old plant
 		aOldPlant->Die();
 
 		// Add the new upgraded plant
 		Plant* aNewPlant = AddPlant(theGridX, theGridY, aNewSeedType);
+
+		if (aNewPlant && wasAwake && aNewPlant->mIsAsleep)
+		{
+			aNewPlant->SetSleeping(false);
+		}
 
 		// Add the Imitater's "poof" effect for a nice visual
 		if (aNewPlant)

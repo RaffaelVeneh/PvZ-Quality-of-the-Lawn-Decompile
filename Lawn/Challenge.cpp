@@ -613,8 +613,10 @@ void Challenge::StartLevel()
 	if (mApp->IsSurvivalMode() && mSurvivalStage == 0)
 	{
 		SexyString aMessage =
+			mApp->IsSurvivalEasy(aGameMode) ? TodReplaceNumberString(_S("[ADVICE_SURVIVE_FLAGS]"), _S("{FLAGS}"), SURVIVAL_EASY_FLAGS) :
 			mApp->IsSurvivalNormal(aGameMode) ? TodReplaceNumberString(_S("[ADVICE_SURVIVE_FLAGS]"), _S("{FLAGS}"), SURVIVAL_NORMAL_FLAGS) :
-			mApp->IsSurvivalHard(aGameMode) ? TodReplaceNumberString(_S("[ADVICE_SURVIVE_FLAGS]"), _S("{FLAGS}"), SURVIVAL_HARD_FLAGS) : 
+			mApp->IsSurvivalHard(aGameMode) ? TodReplaceNumberString(_S("[ADVICE_SURVIVE_FLAGS]"), _S("{FLAGS}"), SURVIVAL_HARD_FLAGS) :
+			mApp->IsSurvivalExtreme(aGameMode) ? TodReplaceNumberString(_S("[ADVICE_SURVIVE_FLAGS]"), _S("{FLAGS}"), SURVIVAL_EXTREME_FLAGS) :
 			_S("[ADVICE_SURVIVE_ENDLESS]");
 		mBoard->DisplayAdvice(aMessage, MESSAGE_STYLE_HINT_FAST, ADVICE_SURVIVE_FLAGS);
 	}
@@ -2721,7 +2723,7 @@ void Challenge::InitZombieWavesSurvival()
 		if (mBoard->StageHasGraveStones() && aRandZombie == ZOMBIE_ZAMBONI)											continue;
 		if (!mBoard->StageHasRoof() && !mApp->IsSurvivalEndless(mApp->mGameMode) && aRandZombie == ZOMBIE_BUNGEE)	continue;
 		if (mBoard->GetSurvivalFlagsCompleted() < 10 && aRandZombie == ZOMBIE_REDEYE_GARGANTUAR)								continue;
-		if (mApp->IsSurvivalNormal(mApp->mGameMode) && aRandZombie > ZOMBIE_SNORKEL)								continue;
+		if (mApp->IsSurvivalEasy(mApp->mGameMode) && aRandZombie > ZOMBIE_SNORKEL)								continue;
 		if (mBoard->IsZombieTypeSpawnedOnly(aRandZombie) || Zombie::IsZombotany(aRandZombie) ||
 			aRandZombie == ZOMBIE_DUCKY_TUBE || aRandZombie == ZOMBIE_YETI)											continue;
 
@@ -2746,16 +2748,33 @@ void Challenge::InitZombieWaves()
 	{
 		if (mSurvivalStage == 0)
 		{
-			if (mApp->IsSurvivalNormal(mApp->mGameMode))
+			if (mApp->IsSurvivalEasy(mApp->mGameMode))
 			{
 				aList[ZOMBIE_NORMAL] = true;
 				aList[ZOMBIE_TRAFFIC_CONE] = true;
+			}
+			else if (mApp->IsSurvivalNormal(mApp->mGameMode))
+			{
+				aList[ZOMBIE_NORMAL] = true;
+				aList[ZOMBIE_TRAFFIC_CONE] = true;
+				aList[ZOMBIE_PAIL] = true;
+			}
+			else if (mApp->IsSurvivalHard(mApp->mGameMode))
+			{
+				aList[ZOMBIE_NORMAL] = true;
+				aList[ZOMBIE_TRAFFIC_CONE] = true;
+				aList[ZOMBIE_PAIL] = true;
+				aList[ZOMBIE_DOOR] = true;
+				aList[ZOMBIE_FOOTBALL] = true;
 			}
 			else
 			{
 				aList[ZOMBIE_NORMAL] = true;
 				aList[ZOMBIE_TRAFFIC_CONE] = true;
 				aList[ZOMBIE_PAIL] = true;
+				aList[ZOMBIE_DOOR] = true;
+				aList[ZOMBIE_FOOTBALL] = true;
+				aList[ZOMBIE_GARGANTUAR] = true;
 			}
 		}
 		else InitZombieWavesSurvival();
@@ -3204,7 +3223,7 @@ void Challenge::SpawnZombieWave()
 	if (mApp->IsSurvivalMode() && mBoard->mBackground == BACKGROUND_2_NIGHT && mBoard->mCurrentWave == mBoard->mNumWaves - 1)
 	{
 		int aNumGraves = mBoard->GetGraveStonesCount();
-		if ((mApp->IsSurvivalNormal(mApp->mGameMode) && aNumGraves < 8) || aNumGraves < 12)
+		if ((mApp->IsSurvivalEasy(mApp->mGameMode) && aNumGraves < 8) || aNumGraves < 12)
 		{
 			GraveDangerSpawnRandomGrave();
 		}

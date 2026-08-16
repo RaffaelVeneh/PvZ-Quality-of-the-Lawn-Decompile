@@ -2480,20 +2480,41 @@ Earn 10 survival trophies to unlock
 [FINISH_ADVENTURE_TOOLTIP]
 Finish adventure mode to unlock
 
+[SURVIVAL_DAY_EASY]
+Survival: Day (Easy)
+
+[SURVIVAL_NIGHT_EASY]
+Survival: Night (Easy)
+
+[SURVIVAL_POOL_EASY]
+Survival: Pool (Easy)
+
+[SURVIVAL_FOG_EASY]
+Survival: Fog (Easy)
+
+[SURVIVAL_ROOF_EASY]
+Survival: Roof (Easy)
+
+[SURVIVAL_ROOF_NIGHT_EASY]
+Survival: Night Roof (Easy)
+
 [SURVIVAL_DAY_NORMAL]
-Survival: Day
+Survival: Day (Normal)
 
 [SURVIVAL_NIGHT_NORMAL]
-Survival: Night
+Survival: Night (Normal)
 
 [SURVIVAL_POOL_NORMAL]
-Survival: Pool
+Survival: Pool (Normal)
 
 [SURVIVAL_FOG_NORMAL]
-Survival: Fog
+Survival: Fog (Normal)
 
 [SURVIVAL_ROOF_NORMAL]
-Survival: Roof
+Survival: Roof (Normal)
+
+[SURVIVAL_ROOF_NIGHT_NORMAL]
+Survival: Night Roof (Normal)
 
 [SURVIVAL_DAY_HARD]
 Survival: Day (Hard)
@@ -2510,6 +2531,27 @@ Survival: Fog (Hard)
 [SURVIVAL_ROOF_HARD]
 Survival: Roof (Hard)
 
+[SURVIVAL_ROOF_NIGHT_HARD]
+Survival: Night Roof (Hard)
+
+[SURVIVAL_DAY_EXTREME]
+Survival: Day (Extreme)
+
+[SURVIVAL_NIGHT_EXTREME]
+Survival: Night (Extreme)
+
+[SURVIVAL_POOL_EXTREME]
+Survival: Pool (Extreme)
+
+[SURVIVAL_FOG_EXTREME]
+Survival: Fog (Extreme)
+
+[SURVIVAL_ROOF_EXTREME]
+Survival: Roof (Extreme)
+
+[SURVIVAL_ROOF_NIGHT_EXTREME]
+Survival: Night Roof (Extreme)
+
 [SURVIVAL_DAY_ENDLESS]
 Survival: Day (Endless)
 
@@ -2524,6 +2566,9 @@ Survival: Fog (Endless)
 
 [SURVIVAL_ROOF_ENDLESS]
 Survival: Roof (Endless)
+
+[SURVIVAL_ROOF_NIGHT_ENDLESS]
+Survival: Night Roof (Endless)
 
 [WAR_AND_PEAS]
 ZomBotany

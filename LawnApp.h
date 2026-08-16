@@ -278,8 +278,10 @@ public:
 	/*inline*/ bool					CanShowStore();
 	/*inline*/ bool					HasBeatenChallenge(GameMode theGameMode);
 	PottedPlant*					GetPottedPlantByIndex(int thePottedPlantIndex);
+	static /*inline*/ bool			IsSurvivalEasy(GameMode theGameMode);
 	static /*inline*/ bool			IsSurvivalNormal(GameMode theGameMode);
 	static /*inline*/ bool			IsSurvivalHard(GameMode theGameMode);
+	static /*inline*/ bool			IsSurvivalExtreme(GameMode theGameMode);
 	static /*inline*/ bool			IsSurvivalEndless(GameMode theGameMode);
 	/*inline*/ bool					HasFinishedAdventure();
 	/*inline*/ bool					IsFirstTimeAdventureMode();

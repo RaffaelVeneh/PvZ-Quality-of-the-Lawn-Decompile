@@ -40,8 +40,10 @@ const int           FOG_BLOW_RETURN_TIME = 2000;
 const int           SUN_COUNTDOWN = 425;
 const int           SUN_COUNTDOWN_RANGE = 275;
 const int           SUN_COUNTDOWN_MAX = 950;
-const int           SURVIVAL_NORMAL_FLAGS = 5;
-const int           SURVIVAL_HARD_FLAGS = 10;
+const int           SURVIVAL_EASY_FLAGS = 5;
+const int           SURVIVAL_NORMAL_FLAGS = 10;
+const int           SURVIVAL_HARD_FLAGS = 15;
+const int           SURVIVAL_EXTREME_FLAGS = 20;
 
 const int           STORESCREEN_ITEMOFFSET_1_X = 422;
 const int           STORESCREEN_ITEMOFFSET_1_Y = 206;

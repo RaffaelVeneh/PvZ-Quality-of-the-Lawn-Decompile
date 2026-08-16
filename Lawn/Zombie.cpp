@@ -676,7 +676,61 @@ void Zombie::ZombieInitialize(int theRow, ZombieType theType, bool theVariant, Z
         AttachReanim(aTrackInstance->mAttachmentID, aFlagReanim, 0.0f, 0.0f);
         aBodyReanim->mFrameBasePose = 0;
 
-        if (mBoard)
+        mVelX = 0.8f;
+
+        if (mApp->IsSurvivalMode())
+        {
+            if (mApp->IsSurvivalEasy(mApp->mGameMode))
+            {
+                // Easy: normal as it is, no armor, no ability, just pure zombie flag with 1000HP and the same speed
+                mBodyHealth = 1000;
+                mHelmType = HelmType::HELMTYPE_NONE;
+                mShieldType = ShieldType::SHIELDTYPE_NONE;
+                mHelmHealth = 0;
+                mShieldHealth = 0;
+                mVelX = 0.8f;
+            }
+            else if (mApp->IsSurvivalNormal(mApp->mGameMode) || mApp->IsSurvivalEndless(mApp->mGameMode))
+            {
+                // Normal & Endless: wearing normal bucket and door armor (with both armor having 1500HP), base HP 1000, spawn grave but no zombie arise, speed the same
+                mBodyHealth = 1000;
+                mHelmHealth = 1500;
+                mShieldHealth = 1500;
+                mHelmType = HelmType::HELMTYPE_PAIL;
+                mShieldType = ShieldType::SHIELDTYPE_DOOR;
+                mVelX = 0.8f;
+
+                aBodyReanim->SetImageOverride("anim_bucket", IMAGE_REANIM_ZOMBIE_BUCKET1);
+                aBodyReanim->SetImageOverride("anim_screendoor", IMAGE_REANIM_ZOMBIE_SCREENDOOR1);
+            }
+            else if (mApp->IsSurvivalHard(mApp->mGameMode))
+            {
+                // Hard: wearing black bucket and door armor (with both armor 3000HP), base HP 2000, spawn grave + zombie arise, speed the same
+                mBodyHealth = 2000;
+                mHelmHealth = 3000;
+                mShieldHealth = 3000;
+                mHelmType = HelmType::HELMTYPE_BLACK_PAIL;
+                mShieldType = ShieldType::SHIELDTYPE_BLACK_DOOR;
+                mVelX = 0.8f;
+
+                aBodyReanim->SetImageOverride("anim_bucket", IMAGE_REANIM_ZOMBIE_BLACK_BUCKET1);
+                aBodyReanim->SetImageOverride("anim_screendoor", IMAGE_REANIM_ZOMBIE_BLACK_SCREENDOOR1);
+            }
+            else if (mApp->IsSurvivalExtreme(mApp->mGameMode))
+            {
+                // Extreme: wearing black bucket and door armor (with both armor 4000HP), base HP 3000, spawn grave + zombie arise, +50% speed
+                mBodyHealth = 3000;
+                mHelmHealth = 4000;
+                mShieldHealth = 4000;
+                mHelmType = HelmType::HELMTYPE_BLACK_PAIL;
+                mShieldType = ShieldType::SHIELDTYPE_BLACK_DOOR;
+                mVelX = 0.8f * 1.5f;
+
+                aBodyReanim->SetImageOverride("anim_bucket", IMAGE_REANIM_ZOMBIE_BLACK_BUCKET1);
+                aBodyReanim->SetImageOverride("anim_screendoor", IMAGE_REANIM_ZOMBIE_BLACK_SCREENDOOR1);
+            }
+        }
+        else if (mBoard)
         {
             int currentLevel = mBoard->mLevel; // assuming this represents the players level
             if (currentLevel >= 41)
@@ -731,7 +785,6 @@ void Zombie::ZombieInitialize(int theRow, ZombieType theType, bool theVariant, Z
             ReanimShowPrefix("anim_hair", RENDER_GROUP_HIDDEN);
         }
 
-        mVelX = 0.8f;
         UpdateAnimSpeed();
 
         break;
@@ -1726,6 +1779,16 @@ void Zombie::ZombieInitialize(int theRow, ZombieType theType, bool theVariant, Z
         mHelmHealth /= 4;
         mShieldHealth /= 4;
         mFlyingHealth /= 4;
+    }
+    else if (mApp->IsSurvivalExtreme(mApp->mGameMode))
+    {
+        if (mZombieType != ZombieType::ZOMBIE_FLAG)
+        {
+            mBodyHealth = mBodyHealth * 3 / 2;
+            mHelmHealth = mHelmHealth * 3 / 2;
+            mShieldHealth = mShieldHealth * 3 / 2;
+            mFlyingHealth = mFlyingHealth * 3 / 2;
+        }
     }
 
     UpdateAnimSpeed();
@@ -6975,28 +7038,57 @@ void Zombie::UpdatePlaying()
 
     if (mZombieType == ZOMBIE_FLAG && IsOnBoard() && !mMindControlled)
     {
-        // Get the zombie's current grid column
-        int aGridX = mBoard->PixelToGridX(mPosX, mPosY);
+        bool aCanSpawnGrave = false;
+        bool aCanAriseZombie = false;
 
-        // Check if the zombie has moved to a new column since the last check
-        if (aGridX >= 0 && aGridX != mLastGraveX)
+        if (mApp->IsSurvivalMode())
         {
-            // Check if it's possible to place a gravestone on this tile
-            if (mBoard->CanAddGraveStoneAt(aGridX, mRow))
+            if (mApp->IsSurvivalNormal(mApp->mGameMode) || mApp->IsSurvivalEndless(mApp->mGameMode))
             {
-                mBoard->AddAGraveStone(aGridX, mRow);
+                aCanSpawnGrave = true;
+                aCanAriseZombie = false;
             }
-
-            // Immediately spawn 1 rising zombie on the exact tile and row Flag Zombie stepped on
-            ZombieType aTileZombieType = mBoard->PickGraveRisingZombieType(10);
-            Zombie* aTileZombie = mBoard->AddZombieInRow(aTileZombieType, mRow, mBoard->mCurrentWave);
-            if (aTileZombie != nullptr)
+            else if (mApp->IsSurvivalHard(mApp->mGameMode) || mApp->IsSurvivalExtreme(mApp->mGameMode))
             {
-                aTileZombie->RiseFromGrave(aGridX, mRow);
+                aCanSpawnGrave = true;
+                aCanAriseZombie = true;
             }
+            // Survival Easy: aCanSpawnGrave = false, aCanAriseZombie = false
+        }
+        else
+        {
+            aCanSpawnGrave = mBoard->StageIsNight() || mBoard->StageHasPool() || (mApp->IsAdventureMode() && mBoard->mLevel >= 11);
+            aCanAriseZombie = mBoard->StageHasPool() || (mApp->IsAdventureMode() && mBoard->mLevel >= 21);
+        }
 
-            // Remember this column so we don't spawn another one on the same tile
-            mLastGraveX = aGridX;
+        if (aCanSpawnGrave)
+        {
+            // Get the zombie's current grid column
+            int aGridX = mBoard->PixelToGridX(mPosX, mPosY);
+
+            // Check if the zombie has moved to a new column since the last check
+            if (aGridX >= 0 && aGridX != mLastGraveX)
+            {
+                // Check if it's possible to place a gravestone on this tile
+                if (mBoard->CanAddGraveStoneAt(aGridX, mRow))
+                {
+                    mBoard->AddAGraveStone(aGridX, mRow);
+                }
+
+                // Immediately spawn 1 rising zombie if enabled for this difficulty/level
+                if (aCanAriseZombie)
+                {
+                    ZombieType aTileZombieType = mBoard->PickGraveRisingZombieType(10);
+                    Zombie* aTileZombie = mBoard->AddZombieInRow(aTileZombieType, mRow, mBoard->mCurrentWave);
+                    if (aTileZombie != nullptr)
+                    {
+                        aTileZombie->RiseFromGrave(aGridX, mRow);
+                    }
+                }
+
+                // Remember this column so we don't spawn another one on the same tile
+                mLastGraveX = aGridX;
+            }
         }
     }
 
@@ -9783,6 +9875,10 @@ void Zombie::EatPlant(Plant* thePlant)
     {
         aDamage /= 4; // 25% damage
     }
+    if (mApp->IsSurvivalExtreme(mApp->mGameMode))
+    {
+        aDamage *= 2; // Double damage in Extreme Mode
+    }
     aDamage = max(1, aDamage);
 
     thePlant->TakeDamage(aDamage, 0U);
@@ -10064,6 +10160,18 @@ void Zombie::DropLoot()
     if (mZombieType == ZombieType::ZOMBIE_YETI)
     {
         mBoard->mKilledYeti = true;
+    }
+
+    if (Rand(100) == 0 && mApp->mGameMode != GameMode::GAMEMODE_CHALLENGE_ZOMBIQUARIUM && !mApp->IsIZombieLevel())
+    {
+        Rect aZombieRect = GetZombieRect();
+        int aCenterX = aZombieRect.mX + aZombieRect.mWidth / 2;
+        int aCenterY = aZombieRect.mY + aZombieRect.mHeight / 4;
+        mApp->PlayFoley(FoleyType::FOLEY_SPAWN_SUN);
+        for (int i = 0; i < 6; i++)
+        {
+            mBoard->AddCoin(aCenterX - 50 + i * 20, aCenterY, CoinType::COIN_SUN, CoinMotion::COIN_MOTION_COIN);
+        }
     }
 
     TrySpawnLevelAward();

@@ -18,21 +18,36 @@ const Rect cChallengeRect = Rect((int)(BOARD_OFFSET - 220), 91, 800, 480);
 const int cButtonHeight = 118;
 
 ChallengeDefinition gChallengeDefs[NUM_CHALLENGE_MODES] = {
-	{ GameMode::GAMEMODE_SURVIVAL_NORMAL_STAGE_1,              0,   ChallengePage::CHALLENGE_PAGE_SURVIVAL,    0,  0,  _S("[SURVIVAL_DAY_NORMAL]") },
-	{ GameMode::GAMEMODE_SURVIVAL_NORMAL_STAGE_2,              1,   ChallengePage::CHALLENGE_PAGE_SURVIVAL,    0,  1,  _S("[SURVIVAL_NIGHT_NORMAL]") },
-	{ GameMode::GAMEMODE_SURVIVAL_NORMAL_STAGE_3,              2,   ChallengePage::CHALLENGE_PAGE_SURVIVAL,    0,  2,  _S("[SURVIVAL_POOL_NORMAL]") },
-	{ GameMode::GAMEMODE_SURVIVAL_NORMAL_STAGE_4,              3,   ChallengePage::CHALLENGE_PAGE_SURVIVAL,    0,  3,  _S("[SURVIVAL_FOG_NORMAL]") },
-	{ GameMode::GAMEMODE_SURVIVAL_NORMAL_STAGE_5,              4,   ChallengePage::CHALLENGE_PAGE_SURVIVAL,    0,  4,  _S("[SURVIVAL_ROOF_NORMAL]") },
-	{ GameMode::GAMEMODE_SURVIVAL_HARD_STAGE_1,                5,   ChallengePage::CHALLENGE_PAGE_SURVIVAL,    1,  0,  _S("[SURVIVAL_DAY_HARD]") },
-	{ GameMode::GAMEMODE_SURVIVAL_HARD_STAGE_2,                6,   ChallengePage::CHALLENGE_PAGE_SURVIVAL,    1,  1,  _S("[SURVIVAL_NIGHT_HARD]") },
-	{ GameMode::GAMEMODE_SURVIVAL_HARD_STAGE_3,                7,   ChallengePage::CHALLENGE_PAGE_SURVIVAL,    1,  2,  _S("[SURVIVAL_POOL_HARD]") },
-	{ GameMode::GAMEMODE_SURVIVAL_HARD_STAGE_4,                8,   ChallengePage::CHALLENGE_PAGE_SURVIVAL,    1,  3,  _S("[SURVIVAL_FOG_HARD]") },
-	{ GameMode::GAMEMODE_SURVIVAL_HARD_STAGE_5,                9,   ChallengePage::CHALLENGE_PAGE_SURVIVAL,    1,  4,  _S("[SURVIVAL_ROOF_HARD]") },
-	{ GameMode::GAMEMODE_SURVIVAL_ENDLESS_STAGE_1,             0,   ChallengePage::CHALLENGE_PAGE_SURVIVAL,    2,  0,  _S("[SURVIVAL_DAY_ENDLESS]") },
-	{ GameMode::GAMEMODE_SURVIVAL_ENDLESS_STAGE_2,             1,   ChallengePage::CHALLENGE_PAGE_SURVIVAL,    2,  1,  _S("[SURVIVAL_NIGHT_ENDLESS]") },
-	{ GameMode::GAMEMODE_SURVIVAL_ENDLESS_STAGE_3,             10,  ChallengePage::CHALLENGE_PAGE_SURVIVAL,    2,  2,  _S("[SURVIVAL_POOL_ENDLESS]") },
-	{ GameMode::GAMEMODE_SURVIVAL_ENDLESS_STAGE_4,             3,   ChallengePage::CHALLENGE_PAGE_SURVIVAL,    2,  3,  _S("[SURVIVAL_FOG_ENDLESS]") },
-	{ GameMode::GAMEMODE_SURVIVAL_ENDLESS_STAGE_5,             4,   ChallengePage::CHALLENGE_PAGE_SURVIVAL,    2,  4,  _S("[SURVIVAL_ROOF_ENDLESS]") },
+	{ GameMode::GAMEMODE_SURVIVAL_EASY_STAGE_1,                0,   ChallengePage::CHALLENGE_PAGE_SURVIVAL,    0,  0,  _S("[SURVIVAL_DAY_EASY]") },
+	{ GameMode::GAMEMODE_SURVIVAL_EASY_STAGE_2,                1,   ChallengePage::CHALLENGE_PAGE_SURVIVAL,    1,  0,  _S("[SURVIVAL_NIGHT_EASY]") },
+	{ GameMode::GAMEMODE_SURVIVAL_EASY_STAGE_3,                2,   ChallengePage::CHALLENGE_PAGE_SURVIVAL,    2,  0,  _S("[SURVIVAL_POOL_EASY]") },
+	{ GameMode::GAMEMODE_SURVIVAL_EASY_STAGE_4,                3,   ChallengePage::CHALLENGE_PAGE_SURVIVAL,    3,  0,  _S("[SURVIVAL_FOG_EASY]") },
+	{ GameMode::GAMEMODE_SURVIVAL_EASY_STAGE_5,                4,   ChallengePage::CHALLENGE_PAGE_SURVIVAL,    4,  0,  _S("[SURVIVAL_ROOF_EASY]") },
+	{ GameMode::GAMEMODE_SURVIVAL_EASY_STAGE_6,                5,   ChallengePage::CHALLENGE_PAGE_SURVIVAL,    5,  0,  _S("[SURVIVAL_ROOF_NIGHT_EASY]") },
+	{ GameMode::GAMEMODE_SURVIVAL_NORMAL_STAGE_1,              0,   ChallengePage::CHALLENGE_PAGE_SURVIVAL,    0,  1,  _S("[SURVIVAL_DAY_NORMAL]") },
+	{ GameMode::GAMEMODE_SURVIVAL_NORMAL_STAGE_2,              1,   ChallengePage::CHALLENGE_PAGE_SURVIVAL,    1,  1,  _S("[SURVIVAL_NIGHT_NORMAL]") },
+	{ GameMode::GAMEMODE_SURVIVAL_NORMAL_STAGE_3,              2,   ChallengePage::CHALLENGE_PAGE_SURVIVAL,    2,  1,  _S("[SURVIVAL_POOL_NORMAL]") },
+	{ GameMode::GAMEMODE_SURVIVAL_NORMAL_STAGE_4,              3,   ChallengePage::CHALLENGE_PAGE_SURVIVAL,    3,  1,  _S("[SURVIVAL_FOG_NORMAL]") },
+	{ GameMode::GAMEMODE_SURVIVAL_NORMAL_STAGE_5,              4,   ChallengePage::CHALLENGE_PAGE_SURVIVAL,    4,  1,  _S("[SURVIVAL_ROOF_NORMAL]") },
+	{ GameMode::GAMEMODE_SURVIVAL_NORMAL_STAGE_6,              5,   ChallengePage::CHALLENGE_PAGE_SURVIVAL,    5,  1,  _S("[SURVIVAL_ROOF_NIGHT_NORMAL]") },
+	{ GameMode::GAMEMODE_SURVIVAL_HARD_STAGE_1,                0,   ChallengePage::CHALLENGE_PAGE_SURVIVAL,    0,  2,  _S("[SURVIVAL_DAY_HARD]") },
+	{ GameMode::GAMEMODE_SURVIVAL_HARD_STAGE_2,                1,   ChallengePage::CHALLENGE_PAGE_SURVIVAL,    1,  2,  _S("[SURVIVAL_NIGHT_HARD]") },
+	{ GameMode::GAMEMODE_SURVIVAL_HARD_STAGE_3,                2,   ChallengePage::CHALLENGE_PAGE_SURVIVAL,    2,  2,  _S("[SURVIVAL_POOL_HARD]") },
+	{ GameMode::GAMEMODE_SURVIVAL_HARD_STAGE_4,                3,   ChallengePage::CHALLENGE_PAGE_SURVIVAL,    3,  2,  _S("[SURVIVAL_FOG_HARD]") },
+	{ GameMode::GAMEMODE_SURVIVAL_HARD_STAGE_5,                4,   ChallengePage::CHALLENGE_PAGE_SURVIVAL,    4,  2,  _S("[SURVIVAL_ROOF_HARD]") },
+	{ GameMode::GAMEMODE_SURVIVAL_HARD_STAGE_6,                5,   ChallengePage::CHALLENGE_PAGE_SURVIVAL,    5,  2,  _S("[SURVIVAL_ROOF_NIGHT_HARD]") },
+	{ GameMode::GAMEMODE_SURVIVAL_EXTREME_STAGE_1,             0,   ChallengePage::CHALLENGE_PAGE_SURVIVAL,    0,  3,  _S("[SURVIVAL_DAY_EXTREME]") },
+	{ GameMode::GAMEMODE_SURVIVAL_EXTREME_STAGE_2,             1,   ChallengePage::CHALLENGE_PAGE_SURVIVAL,    1,  3,  _S("[SURVIVAL_NIGHT_EXTREME]") },
+	{ GameMode::GAMEMODE_SURVIVAL_EXTREME_STAGE_3,             2,   ChallengePage::CHALLENGE_PAGE_SURVIVAL,    2,  3,  _S("[SURVIVAL_POOL_EXTREME]") },
+	{ GameMode::GAMEMODE_SURVIVAL_EXTREME_STAGE_4,             3,   ChallengePage::CHALLENGE_PAGE_SURVIVAL,    3,  3,  _S("[SURVIVAL_FOG_EXTREME]") },
+	{ GameMode::GAMEMODE_SURVIVAL_EXTREME_STAGE_5,             4,   ChallengePage::CHALLENGE_PAGE_SURVIVAL,    4,  3,  _S("[SURVIVAL_ROOF_EXTREME]") },
+	{ GameMode::GAMEMODE_SURVIVAL_EXTREME_STAGE_6,             5,   ChallengePage::CHALLENGE_PAGE_SURVIVAL,    5,  3,  _S("[SURVIVAL_ROOF_NIGHT_EXTREME]") },
+	{ GameMode::GAMEMODE_SURVIVAL_ENDLESS_STAGE_1,             0,   ChallengePage::CHALLENGE_PAGE_SURVIVAL,    0,  4,  _S("[SURVIVAL_DAY_ENDLESS]") },
+	{ GameMode::GAMEMODE_SURVIVAL_ENDLESS_STAGE_2,             1,   ChallengePage::CHALLENGE_PAGE_SURVIVAL,    1,  4,  _S("[SURVIVAL_NIGHT_ENDLESS]") },
+	{ GameMode::GAMEMODE_SURVIVAL_ENDLESS_STAGE_3,             2,   ChallengePage::CHALLENGE_PAGE_SURVIVAL,    2,  4,  _S("[SURVIVAL_POOL_ENDLESS]") },
+	{ GameMode::GAMEMODE_SURVIVAL_ENDLESS_STAGE_4,             3,   ChallengePage::CHALLENGE_PAGE_SURVIVAL,    3,  4,  _S("[SURVIVAL_FOG_ENDLESS]") },
+	{ GameMode::GAMEMODE_SURVIVAL_ENDLESS_STAGE_5,             4,   ChallengePage::CHALLENGE_PAGE_SURVIVAL,    4,  4,  _S("[SURVIVAL_ROOF_ENDLESS]") },
+	{ GameMode::GAMEMODE_SURVIVAL_ENDLESS_STAGE_6,             5,   ChallengePage::CHALLENGE_PAGE_SURVIVAL,    5,  4,  _S("[SURVIVAL_ROOF_NIGHT_ENDLESS]") },
 	{ GameMode::GAMEMODE_CHALLENGE_WAR_AND_PEAS,               0,   ChallengePage::CHALLENGE_PAGE_CHALLENGE,   0,  0,  _S("[WAR_AND_PEAS]") },
 	{ GameMode::GAMEMODE_CHALLENGE_WALLNUT_BOWLING,            6,   ChallengePage::CHALLENGE_PAGE_CHALLENGE,   0,  1,  _S("[WALL_NUT_BOWLING]") },
 	{ GameMode::GAMEMODE_CHALLENGE_SLOT_MACHINE,               2,   ChallengePage::CHALLENGE_PAGE_CHALLENGE,   0,  2,  _S("[SLOT_MACHINE]") },
@@ -213,7 +228,7 @@ ChallengeDefinition& GetChallengeDefinition(int theChallengeMode)
 	TOD_ASSERT(theChallengeMode >= 0 && theChallengeMode < NUM_CHALLENGE_MODES);
 
 	ChallengeDefinition& aDef = gChallengeDefs[theChallengeMode];
-	TOD_ASSERT(aDef.mChallengeMode == theChallengeMode + GAMEMODE_SURVIVAL_NORMAL_STAGE_1);
+	TOD_ASSERT(aDef.mChallengeMode == theChallengeMode + GAMEMODE_SURVIVAL_EASY_STAGE_1);
 
 	return gChallengeDefs[theChallengeMode];
 }
@@ -272,9 +287,9 @@ int ChallengeScreen::MoreTrophiesNeeded(int theChallengeIndex)
 		{
 			return aDef.mChallengeMode == GAMEMODE_CHALLENGE_RAINING_SEEDS ? 1 : 2;
 		}
-		else if (mPageIndex == CHALLENGE_PAGE_SURVIVAL && aDef.mChallengeMode >= GAMEMODE_SURVIVAL_NORMAL_STAGE_4)
+		else if (mPageIndex == CHALLENGE_PAGE_SURVIVAL && aDef.mChallengeMode >= GAMEMODE_SURVIVAL_EASY_STAGE_4)
 		{
-			return aDef.mChallengeMode == GAMEMODE_SURVIVAL_NORMAL_STAGE_4 ? 1 : 2;
+			return aDef.mChallengeMode == GAMEMODE_SURVIVAL_EASY_STAGE_4 ? 1 : 2;
 		}
 	}
 
@@ -323,7 +338,7 @@ int ChallengeScreen::MoreTrophiesNeeded(int theChallengeIndex)
 	}
 	else
 	{
-		int aIdxInPage = aDef.mRow * 5 + aDef.mCol;
+		int aIdxInPage = (aDef.mPage == CHALLENGE_PAGE_SURVIVAL) ? theChallengeIndex : (aDef.mRow * 5 + aDef.mCol);
 		if ((aDef.mPage == CHALLENGE_PAGE_CHALLENGE || aDef.mPage == CHALLENGE_PAGE_SURVIVAL) && !mApp->HasFinishedAdventure())
 		{
 			return aIdxInPage < 3 ? 0 : aIdxInPage == 3 ? 1 : 2;
@@ -416,7 +431,26 @@ void ChallengeScreen::DrawButton(Graphics* g, int theChallengeIndex)
 			g->SetClipRect(cChallengeRect);
 			if (mPageIndex == CHALLENGE_PAGE_SURVIVAL)
 			{
-				g->DrawImageCel(Sexy::IMAGE_SURVIVAL_THUMBNAILS, aPosX + 13, aPosY + 4, aDef.mChallengeIconIndex);
+				if (aDef.mChallengeIconIndex == 5)
+				{
+					static Image* sSurvivalNightImg = nullptr;
+					if (!sSurvivalNightImg)
+					{
+						sSurvivalNightImg = (Image*)mApp->GetImage("images/survival_night.png");
+					}
+					if (sSurvivalNightImg)
+					{
+						g->DrawImage(sSurvivalNightImg, Rect(aPosX + 13, aPosY + 4, 80, 65), Rect(0, 0, sSurvivalNightImg->GetWidth(), sSurvivalNightImg->GetHeight()));
+					}
+					else
+					{
+						g->DrawImageCel(Sexy::IMAGE_SURVIVAL_THUMBNAILS, aPosX + 13, aPosY + 4, 4);
+					}
+				}
+				else
+				{
+					g->DrawImageCel(Sexy::IMAGE_SURVIVAL_THUMBNAILS, aPosX + 13, aPosY + 4, aDef.mChallengeIconIndex);
+				}
 			}
 			else
 			{

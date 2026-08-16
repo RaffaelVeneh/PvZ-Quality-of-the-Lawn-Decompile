@@ -332,6 +332,7 @@ void DrawSeedPacket(Graphics* g, float x, float y, SeedType theSeedType, SeedTyp
 	switch (aSeedType)
 	{
 	case SeedType::SEED_TALLNUT:
+	case SeedType::SEED_DOOM_NUT:
 		aScale = 0.3f;
 		aOffsetX = 12.0f;
 		aOffsetY = 22.0f;
@@ -350,11 +351,13 @@ void DrawSeedPacket(Graphics* g, float x, float y, SeedType theSeedType, SeedTyp
 		break;
 
 	case SeedType::SEED_CACTUS:
+	case SeedType::SEED_MAD_CACTUS:
 		aOffsetX = 9.0f;
 		aOffsetY = 13.0f;
 		break;
 
 	case SeedType::SEED_POTATOMINE:
+	case SeedType::SEED_RED_POTATO_MINE:
 		aScale = 0.4f;
 		aOffsetX = 8.0f;
 		aOffsetY = 12.0f;
@@ -367,13 +370,18 @@ void DrawSeedPacket(Graphics* g, float x, float y, SeedType theSeedType, SeedTyp
 	case SeedType::SEED_FUMESHROOM:
 	case SeedType::SEED_PUMPKINSHELL:
 	case SeedType::SEED_CHOMPER:
+	case SeedType::SEED_SUPER_CHOMPER:
 	case SeedType::SEED_DOOMSHROOM:
 	case SeedType::SEED_SQUASH:
+	case SeedType::SEED_BOMBSQUASH:
 	case SeedType::SEED_HYPNOSHROOM:
+	case SeedType::SEED_HYPNOGIGA:
 	case SeedType::SEED_SPIKEWEED:
 	case SeedType::SEED_SPIKEROCK:
 	case SeedType::SEED_PLANTERN:
+	case SeedType::SEED_ICE_PLANTERN:
 	case SeedType::SEED_TORCHWOOD:
+	case SeedType::SEED_BLUE_TORCHWOOD:
 	case SeedType::SEED_TANGLEKELP:
 		aScale = 0.4f;
 		aOffsetX = 8.0f;
@@ -406,6 +414,7 @@ void DrawSeedPacket(Graphics* g, float x, float y, SeedType theSeedType, SeedTyp
 		break;
 
 	case SeedType::SEED_CABBAGEPULT:
+	case SeedType::SEED_POISONPULT:
 		aScale = 0.4f;
 		aOffsetX = 15.0f;
 		aOffsetY = 14.0f;
@@ -425,6 +434,7 @@ void DrawSeedPacket(Graphics* g, float x, float y, SeedType theSeedType, SeedTyp
 		break;
 
 	case SeedType::SEED_SPLITPEA:
+	case SeedType::SEED_SUPER_SPLITPEA:
 		aScale = 0.45f;
 		aOffsetX = 12.0f;
 		aOffsetY = 12.0f;
@@ -437,12 +447,14 @@ void DrawSeedPacket(Graphics* g, float x, float y, SeedType theSeedType, SeedTyp
 		break;
 
 	case SeedType::SEED_STARFRUIT:
+	case SeedType::SEED_SOUR_STARFRUIT:
 		aScale = 0.5f;
 		aOffsetX = 6.0f;
 		aOffsetY = 8.0f;
 		break;
 
 	case SeedType::SEED_THREEPEATER:
+	case SeedType::SEED_BLACK_THREEPEATER:
 		aScale = 0.5f;
 		aOffsetX = 5.0f;
 		aOffsetY = 10.0f;
@@ -583,12 +595,34 @@ void DrawSeedPacket(Graphics* g, float x, float y, SeedType theSeedType, SeedTyp
 			}
 			else
 			{
-				aCostStr = StrFormat(_S("%d+"), Plant::GetCost(theSeedType, theImitaterType));
+				int aBaseCost = Plant::GetCost(theSeedType, theImitaterType);
+				if (gLawnApp->IsSurvivalHard(gLawnApp->mGameMode) || gLawnApp->IsSurvivalEndless(gLawnApp->mGameMode))
+				{
+					aBaseCost = aBaseCost * 3 / 2;
+				}
+				else if (gLawnApp->IsSurvivalExtreme(gLawnApp->mGameMode))
+				{
+					aBaseCost = aBaseCost * 2;
+				}
+				aCostStr = StrFormat(_S("%d+"), aBaseCost);
 			}
+		}
+		else if (gLawnApp->mBoard)
+		{
+			aCostStr = StrFormat(_S("%d"), gLawnApp->mBoard->GetCurrentPlantCost(theSeedType, theImitaterType));
 		}
 		else
 		{
-			aCostStr = StrFormat(_S("%d"), Plant::GetCost(theSeedType, theImitaterType));
+			int aBaseCost = Plant::GetCost(theSeedType, theImitaterType);
+			if (gLawnApp->IsSurvivalHard(gLawnApp->mGameMode) || gLawnApp->IsSurvivalEndless(gLawnApp->mGameMode))
+			{
+				aBaseCost = aBaseCost * 3 / 2;
+			}
+			else if (gLawnApp->IsSurvivalExtreme(gLawnApp->mGameMode))
+			{
+				aBaseCost = aBaseCost * 2;
+			}
+			aCostStr = StrFormat(_S("%d"), aBaseCost);
 		}
 
 		Font* aTextFont = Sexy::FONT_BRIANNETOD12;

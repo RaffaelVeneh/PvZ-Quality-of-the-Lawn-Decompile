@@ -221,10 +221,6 @@ MemoryImage* ReanimatorCache::MakeCachedPlantFrame(SeedType theSeedType, DrawVar
 		aMemoryGraphics.mScaleY = 0.85f;
 		DrawReanimatorFrame(&aMemoryGraphics, -(int)(aOffsetX - 8.0f), -(int)(aOffsetY - 10.0f), aPlantDef.mReanimationType, "anim_idle", theDrawVariation);
 	}
-	else if (theSeedType == SeedType::SEED_CACTUS || theSeedType == SeedType::SEED_MAD_CACTUS)
-	{
-		DrawReanimatorFrame(&aMemoryGraphics, -aOffsetX, -(aOffsetY - 15.0f), aPlantDef.mReanimationType, "anim_idle", theDrawVariation);
-	}
 	else if (theSeedType == SeedType::SEED_CABBAGEPULT || theSeedType == SeedType::SEED_POISONPULT)
 	{
 		aMemoryGraphics.mScaleX = 0.85f;

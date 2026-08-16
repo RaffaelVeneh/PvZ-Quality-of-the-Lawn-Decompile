@@ -2287,7 +2287,7 @@ bool LawnApp::IsAdventureMode()
 
 bool LawnApp::IsSurvivalMode()
 {
-	return mGameMode >= GameMode::GAMEMODE_SURVIVAL_NORMAL_STAGE_1 && mGameMode <= GameMode::GAMEMODE_SURVIVAL_ENDLESS_STAGE_5;
+	return mGameMode >= GameMode::GAMEMODE_SURVIVAL_EASY_STAGE_1 && mGameMode <= GameMode::GAMEMODE_SURVIVAL_ENDLESS_STAGE_6;
 }
 
 bool LawnApp::IsPuzzleMode()
@@ -2302,22 +2302,34 @@ bool LawnApp::IsChallengeMode()
 	return !IsAdventureMode() && !IsPuzzleMode() && !IsSurvivalMode();
 }
 
+bool LawnApp::IsSurvivalEasy(GameMode theGameMode)
+{
+	int aLevel = theGameMode - GameMode::GAMEMODE_SURVIVAL_EASY_STAGE_1;
+	return aLevel >= 0 && aLevel <= 5;
+}
+
 bool LawnApp::IsSurvivalNormal(GameMode theGameMode)
 {
 	int aLevel = theGameMode - GameMode::GAMEMODE_SURVIVAL_NORMAL_STAGE_1;
-	return aLevel >= 0 && aLevel <= 4;
+	return aLevel >= 0 && aLevel <= 5;
 }
 
 bool LawnApp::IsSurvivalHard(GameMode theGameMode)
 {
 	int aLevel = theGameMode - GameMode::GAMEMODE_SURVIVAL_HARD_STAGE_1;
-	return aLevel >= 0 && aLevel <= 4;
+	return aLevel >= 0 && aLevel <= 5;
+}
+
+bool LawnApp::IsSurvivalExtreme(GameMode theGameMode)
+{
+	int aLevel = theGameMode - GameMode::GAMEMODE_SURVIVAL_EXTREME_STAGE_1;
+	return aLevel >= 0 && aLevel <= 5;
 }
 
 bool LawnApp::IsSurvivalEndless(GameMode theGameMode)
 {
 	int aLevel = theGameMode - GameMode::GAMEMODE_SURVIVAL_ENDLESS_STAGE_1;
-	return aLevel >= 0 && aLevel <= 4;
+	return aLevel >= 0 && aLevel <= 5;
 }
 
 bool LawnApp::IsEndlessScaryPotter(GameMode theGameMode)
@@ -2534,7 +2546,7 @@ bool LawnApp::IsNight()
 
 int LawnApp::GetCurrentChallengeIndex()
 {
-	return (int)mGameMode - (int)GameMode::GAMEMODE_SURVIVAL_NORMAL_STAGE_1;
+	return (int)mGameMode - (int)GameMode::GAMEMODE_SURVIVAL_EASY_STAGE_1;
 }
 
 ChallengeDefinition& LawnApp::GetCurrentChallengeDef()
@@ -2897,8 +2909,12 @@ bool LawnApp::HasBeatenChallenge(GameMode theGameMode)
 	if (mPlayerInfo == nullptr)
 		return false;
 
-	int aChallengeIndex = theGameMode - GameMode::GAMEMODE_SURVIVAL_NORMAL_STAGE_1;
+	int aChallengeIndex = theGameMode - GameMode::GAMEMODE_SURVIVAL_EASY_STAGE_1;
 	TOD_ASSERT(aChallengeIndex >= 0 && aChallengeIndex < NUM_CHALLENGE_MODES);
+	if (IsSurvivalEasy(theGameMode))
+	{
+		return mPlayerInfo->mChallengeRecords[aChallengeIndex] >= SURVIVAL_EASY_FLAGS;
+	}
 	if (IsSurvivalNormal(theGameMode))
 	{
 		return mPlayerInfo->mChallengeRecords[aChallengeIndex] >= SURVIVAL_NORMAL_FLAGS;
@@ -2906,6 +2922,10 @@ bool LawnApp::HasBeatenChallenge(GameMode theGameMode)
 	if (IsSurvivalHard(theGameMode))
 	{
 		return mPlayerInfo->mChallengeRecords[aChallengeIndex] >= SURVIVAL_HARD_FLAGS;
+	}
+	if (IsSurvivalExtreme(theGameMode))
+	{
+		return mPlayerInfo->mChallengeRecords[aChallengeIndex] >= SURVIVAL_EXTREME_FLAGS;
 	}
 	if (IsSurvivalEndless(theGameMode) || IsEndlessScaryPotter(theGameMode) || IsEndlessIZombie(theGameMode))
 	{
@@ -3655,12 +3675,12 @@ int LawnApp::GetNumTrophies(ChallengePage thePage)
 
 int LawnApp::GetTotalTrophies(ChallengePage thePage)
 {
-	return thePage == CHALLENGE_PAGE_SURVIVAL ? 10 : thePage == CHALLENGE_PAGE_CHALLENGE ? 20 : thePage == CHALLENGE_PAGE_PUZZLE ? 18 : thePage == CHALLENGE_PAGE_LIMBO ? 0 : 0;
+	return thePage == CHALLENGE_PAGE_SURVIVAL ? 24 : thePage == CHALLENGE_PAGE_CHALLENGE ? 20 : thePage == CHALLENGE_PAGE_PUZZLE ? 18 : thePage == CHALLENGE_PAGE_LIMBO ? 0 : 0;
 }
 
 int LawnApp::TrophiesNeedForGoldSunflower()
 {
-	return 48 - GetNumTrophies(CHALLENGE_PAGE_SURVIVAL) - GetNumTrophies(CHALLENGE_PAGE_CHALLENGE) - GetNumTrophies(CHALLENGE_PAGE_PUZZLE);
+	return 62 - GetNumTrophies(CHALLENGE_PAGE_SURVIVAL) - GetNumTrophies(CHALLENGE_PAGE_CHALLENGE) - GetNumTrophies(CHALLENGE_PAGE_PUZZLE);
 }
 
 bool LawnApp::EarnedGoldTrophy()
@@ -3800,7 +3820,7 @@ bool LawnApp::CanDoPinataMode()
 	if (mPlayerInfo == nullptr)
 		return false;
 
-	return mPlayerInfo->mChallengeRecords[(int)GameMode::GAMEMODE_TREE_OF_WISDOM - (int)GameMode::GAMEMODE_SURVIVAL_NORMAL_STAGE_1] >= 1000;
+	return mPlayerInfo->mChallengeRecords[(int)GameMode::GAMEMODE_TREE_OF_WISDOM - (int)GameMode::GAMEMODE_SURVIVAL_EASY_STAGE_1] >= 1000;
 }
 
 bool LawnApp::CanDoDanceMode()
@@ -3808,7 +3828,7 @@ bool LawnApp::CanDoDanceMode()
 	if (mPlayerInfo == nullptr)
 		return false;
 
-	return mPlayerInfo->mChallengeRecords[(int)GameMode::GAMEMODE_TREE_OF_WISDOM - (int)GameMode::GAMEMODE_SURVIVAL_NORMAL_STAGE_1] >= 500;
+	return mPlayerInfo->mChallengeRecords[(int)GameMode::GAMEMODE_TREE_OF_WISDOM - (int)GameMode::GAMEMODE_SURVIVAL_EASY_STAGE_1] >= 500;
 }
 
 bool LawnApp::CanDoDaisyMode()
@@ -3816,7 +3836,7 @@ bool LawnApp::CanDoDaisyMode()
 	if (mPlayerInfo == nullptr)
 		return false;
 
-	return mPlayerInfo->mChallengeRecords[(int)GameMode::GAMEMODE_TREE_OF_WISDOM - (int)GameMode::GAMEMODE_SURVIVAL_NORMAL_STAGE_1] >= 100;
+	return mPlayerInfo->mChallengeRecords[(int)GameMode::GAMEMODE_TREE_OF_WISDOM - (int)GameMode::GAMEMODE_SURVIVAL_EASY_STAGE_1] >= 100;
 }
 
 void LawnApp::PlaySample(int theSoundNum)
