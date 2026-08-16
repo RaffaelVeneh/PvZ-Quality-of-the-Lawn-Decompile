@@ -193,9 +193,9 @@ public:
 	int								mBoardRandSeed;											
 	ParticleSystemID				mPoolSparklyParticleID;									
 	ReanimationID					mFwooshID[MAX_GRID_SIZE_Y][12];							
-	int								mFwooshCountDown;
-	int								mFwooshColumnCountDown;
-	ReanimationID					mFwooshColumnID[MAX_GRID_SIZE_Y];
+	int								mFwooshCountDown[MAX_GRID_SIZE_Y];
+	int								mFwooshColumnCountDown[MAX_GRID_SIZE_X];
+	ReanimationID					mFwooshColumnID[MAX_GRID_SIZE_X][MAX_GRID_SIZE_Y];
 	int								mTimeStopCounter;										
 	bool							mDroppedFirstCoin;										
 	int								mFinalWaveSoundCounter;									

@@ -102,8 +102,6 @@ Board::Board(LawnApp* theApp)
 	mProgressMeterWidth = 0;
 	mPoolSparklyParticleID = ParticleSystemID::PARTICLESYSTEMID_NULL;
 	mFogBlownCountDown = 0;
-	mFwooshCountDown = 0;
-	mFwooshColumnCountDown = 0;
 	mTimeStopCounter = 0;
 	mCobCannonCursorDelayCounter = 0;
 	mCobCannonMouseX = 0;
@@ -136,9 +134,18 @@ Board::Board(LawnApp* theApp)
 	mChocolateCollected = 0;
 	for (int y = 0; y < MAX_GRID_SIZE_Y; y++)
 	{
+		mFwooshCountDown[y] = 0;
 		for (int x = 0; x < 12; x++)
 		{
 			mFwooshID[y][x] = ReanimationID::REANIMATIONID_NULL;
+		}
+	}
+	for (int x = 0; x < MAX_GRID_SIZE_X; x++)
+	{
+		mFwooshColumnCountDown[x] = 0;
+		for (int y = 0; y < MAX_GRID_SIZE_Y; y++)
+		{
+			mFwooshColumnID[x][y] = ReanimationID::REANIMATIONID_NULL;
 		}
 	}
 	mPrevMouseX = -1;
@@ -10627,6 +10634,9 @@ Plant* Board::FindUmbrellaPlant(int theGridX, int theGridY)
 
 void Board::DoFwoosh(int theRow)
 {
+	if (theRow < 0 || theRow >= MAX_GRID_SIZE_Y)
+		return;
+
 	int aRenderOrder = MakeRenderOrder(RenderLayer::RENDER_LAYER_PARTICLE, theRow, 1);
 	for (int i = 0; i < 12; i++)
 	{
@@ -10649,79 +10659,83 @@ void Board::DoFwoosh(int theRow)
 
 		mFwooshID[theRow][i] = mApp->ReanimationGetID(aFwoosh);
 	}
-	mFwooshCountDown = 100;
+	mFwooshCountDown[theRow] = 100;
 }
 
 void Board::DoFwooshColumn(int theCol)
 {
-	int aRenderOrder = MakeRenderOrder(RenderLayer::RENDER_LAYER_PARTICLE, 5, 1);
+	if (theCol < 0 || theCol >= MAX_GRID_SIZE_X)
+		return;
+
 	for (int aRow = 0; aRow < MAX_GRID_SIZE_Y; aRow++)
 	{
-		float aPosX = GridToPixelX(theCol, aRow) + 40;
+		Reanimation* aOriReanim = mApp->ReanimationTryToGet(mFwooshColumnID[theCol][aRow]);
+		if (aOriReanim)
+		{
+			aOriReanim->ReanimationDie();
+		}
+
+		int aRenderOrder = MakeRenderOrder(RenderLayer::RENDER_LAYER_PARTICLE, aRow, 1);
+		float aPosX = GridToPixelX(theCol, aRow) + 40.0f;
 		float aPosY = GridToPixelY(theCol, aRow);
 
 		Reanimation* aFwoosh = mApp->AddReanimation(aPosX, aPosY, aRenderOrder, ReanimationType::REANIM_JALAPENO_FIRE);
 		aFwoosh->SetFramesForLayer("anim_flame");
-		aFwoosh->mLoopType = ReanimLoopType::REANIM_PLAY_ONCE_AND_HOLD;
+		aFwoosh->mLoopType = ReanimLoopType::REANIM_LOOP_FULL_LAST_FRAME;
 		aFwoosh->mAnimRate *= RandRangeFloat(0.7f, 1.3f);
 
-		SexyMatrix3 aMatrix;
-		ReanimatorTransform aTransform;
-		aFwoosh->GetCurrentTransform(0, &aTransform); 
-		Reanimation::MatrixFromTransform(aTransform, aMatrix);
-		SexyMatrix3 rotMatrix;
-		rotMatrix.LoadIdentity();
-		rotMatrix.m00 = 0.0f;
-		rotMatrix.m01 = -1.0f;
-		rotMatrix.m10 = 1.0f;
-		rotMatrix.m11 = 0.0f;
-		aMatrix *= rotMatrix;
+		float aScale = RandRangeFloat(0.9f, 1.1f);
+		float aFlip = Rand(2) ? 1.0f : -1.0f;
+		aFwoosh->OverrideScale(aScale * aFlip, 1);
 
-		mFwooshColumnID[aRow] = mApp->ReanimationGetID(aFwoosh);
+		mFwooshColumnID[theCol][aRow] = mApp->ReanimationGetID(aFwoosh);
 	}
-	mFwooshColumnCountDown = 100;
+	mFwooshColumnCountDown[theCol] = 100;
 }
 
 void Board::UpdateFwoosh()
 {
-	if (mFwooshCountDown == 0)
-		return;
-
-	int aFwooshRemaining = TodAnimateCurve(50, 0, --mFwooshCountDown, 12, 0, TodCurves::CURVE_LINEAR);
 	for (int aRow = 0; aRow < MAX_GRID_SIZE_Y; aRow++)
 	{
-		for (int i = 0; i < 12 - aFwooshRemaining; i++)
+		if (mFwooshCountDown[aRow] > 0)
 		{
-			Reanimation* aFwoosh = mApp->ReanimationTryToGet(mFwooshID[aRow][i]);
-			if (aFwoosh)
+			mFwooshCountDown[aRow]--;
+			int aFwooshRemaining = TodAnimateCurve(50, 0, mFwooshCountDown[aRow], 12, 0, TodCurves::CURVE_LINEAR);
+			for (int i = 0; i < 12 - aFwooshRemaining; i++)
 			{
-				aFwoosh->SetFramesForLayer("anim_done");
-				aFwoosh->mAnimRate = 15;
-				aFwoosh->mLoopType = ReanimLoopType::REANIM_PLAY_ONCE_FULL_LAST_FRAME;
+				Reanimation* aFwoosh = mApp->ReanimationTryToGet(mFwooshID[aRow][i]);
+				if (aFwoosh)
+				{
+					aFwoosh->SetFramesForLayer("anim_done");
+					aFwoosh->mAnimRate = 15.0f;
+					aFwoosh->mLoopType = ReanimLoopType::REANIM_PLAY_ONCE_FULL_LAST_FRAME;
+				}
+				mFwooshID[aRow][i] = ReanimationID::REANIMATIONID_NULL;
 			}
-			mFwooshID[aRow][i] = ReanimationID::REANIMATIONID_NULL;
 		}
 	}
 }
 
 void Board::UpdateFwooshColumn()
 {
-	if (mFwooshColumnCountDown == 0)
-		return;
-
-	mFwooshColumnCountDown--;
-	int aFwooshRemaining = TodAnimateCurve(50, 0, mFwooshColumnCountDown, MAX_GRID_SIZE_Y, 0, TodCurves::CURVE_LINEAR);
-
-	for (int aRow = 0; aRow < MAX_GRID_SIZE_Y - aFwooshRemaining; aRow++)
+	for (int aCol = 0; aCol < MAX_GRID_SIZE_X; aCol++)
 	{
-		Reanimation* aFwoosh = mApp->ReanimationTryToGet(mFwooshColumnID[aRow]);
-		if (aFwoosh)
+		if (mFwooshColumnCountDown[aCol] > 0)
 		{
-			aFwoosh->SetFramesForLayer("anim_done");
-			aFwoosh->mAnimRate = 15;
-			aFwoosh->mLoopType = ReanimLoopType::REANIM_PLAY_ONCE_FULL_LAST_FRAME;
+			mFwooshColumnCountDown[aCol]--;
+			int aFwooshRemaining = TodAnimateCurve(50, 0, mFwooshColumnCountDown[aCol], MAX_GRID_SIZE_Y, 0, TodCurves::CURVE_LINEAR);
+			for (int aRow = 0; aRow < MAX_GRID_SIZE_Y - aFwooshRemaining; aRow++)
+			{
+				Reanimation* aFwoosh = mApp->ReanimationTryToGet(mFwooshColumnID[aCol][aRow]);
+				if (aFwoosh)
+				{
+					aFwoosh->SetFramesForLayer("anim_done");
+					aFwoosh->mAnimRate = 15.0f;
+					aFwoosh->mLoopType = ReanimLoopType::REANIM_PLAY_ONCE_FULL_LAST_FRAME;
+				}
+				mFwooshColumnID[aCol][aRow] = ReanimationID::REANIMATIONID_NULL;
+			}
 		}
-		mFwooshColumnID[aRow] = REANIMATIONID_NULL;
 	}
 }
 
