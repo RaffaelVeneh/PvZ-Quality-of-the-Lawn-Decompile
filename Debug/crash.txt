@@ -1,16 +1,16 @@
-Exception: Access Violation (code 0xc0000005) at address 00E1EE78 in thread 45C0
+Exception: Access Violation (code 0xc0000005) at address 00E7133C in thread 11D0
 Module: LawnProject.exe
-Logical Address: 0002:002EEE78
+Logical Address: 0002:0004933C
 
-015B8B04 00E1EE78 TodDrawImageCelScaledF+18
-Params: 015BF204 00000000 C2D20000 C3808000
+01AFF70C 00E7133C std::exchange<std::_Iterator_base12 *,std::nullptr_t>+C
+Params: 10FB2954 01AFF728 00E381D0 00E381D0
 
 StackWalk failed (error 299)
 
-EAX:00000000 EBX:01665000 ECX:00000000 EDX:2C3E7270 ESI:00B303A2 EDI:00B303A2
-EIP:00E1EE78 ESP:015B8A68  EBP:015B8B04
+EAX:10FB2954 EBX:01876000 ECX:04BC9794 EDX:10FB2954 ESI:00E381D0 EDI:00E381D0
+EIP:00E7133C ESP:01AFF6BC  EBP:01AFF70C
 CS:0023 SS:002B DS:002B ES:002B FS:0053 GS:002B
-Flags:00010246
+Flags:00010202
 
 Windows Ver: NT 6.2  Build 9200
 DDraw Ver: 10.0.26100.1
@@ -18,8 +18,8 @@ DSound Ver: 10.0.26100.1
 
 Product: PlantsVsZombies
 Version: 1.0.0.1
-Time Loaded: 00:36:35
-Fullscreen: Yes
-Primary ThreadId: 45C0
+Time Loaded: 01:50:48
+Fullscreen: No
+Primary ThreadId: 11D0
 Times Played: 0
 

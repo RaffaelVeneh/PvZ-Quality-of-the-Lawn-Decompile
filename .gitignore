@@ -24,3 +24,15 @@ Debug/LawnProject.exe
 /Debug/savefiles
 /enc_temp_folder
 PopcapTools/projects.txt
+
+# Build directories & intermediate files
+[Bb]uild/
+[Dd]ebug/
+[Rr]elease/
+*.pdb
+*.ilk
+*.idb
+*.zip
+*.exe
+!bass.dll
+
