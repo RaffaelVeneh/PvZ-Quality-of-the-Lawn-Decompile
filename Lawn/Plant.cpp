@@ -5948,18 +5948,24 @@ void Plant::Draw(Graphics* g)
         float centerX = aOffsetX + 40.0f;
         float centerY = aOffsetY + 40.0f;
 
-        // Expanding custom golden shockwave ring
+        // Expanding custom golden shockwave full circle (both bottom and flipped top halves)
         float shockwaveScale = aProgress * 12.0f;
         int shockwaveAlpha = (int)((1.0f - aProgress) * 220.0f);
         if (shockwaveAlpha > 0 && shockwaveScale > 0.05f)
         {
             g->SetColor(Color(255, 215, 0, shockwaveAlpha));
+            // Bottom half
             TodDrawImageCelScaledF(g, IMAGE_DOOMSHROOM_EXPLOSION_BASE,
                 centerX - (IMAGE_DOOMSHROOM_EXPLOSION_BASE->GetCelWidth() * shockwaveScale / 2.0f),
                 centerY - (IMAGE_DOOMSHROOM_EXPLOSION_BASE->GetCelHeight() * shockwaveScale / 2.0f),
                 0, 0, shockwaveScale, shockwaveScale);
+            // Top half (flipped vertically)
+            TodDrawImageCelScaledF(g, IMAGE_DOOMSHROOM_EXPLOSION_BASE,
+                centerX - (IMAGE_DOOMSHROOM_EXPLOSION_BASE->GetCelWidth() * shockwaveScale / 2.0f),
+                centerY - (IMAGE_DOOMSHROOM_EXPLOSION_BASE->GetCelHeight() * shockwaveScale / 2.0f),
+                0, 0, shockwaveScale, -shockwaveScale);
 
-            // Outer electric golden fringe
+            // Outer electric golden fringe (full circle)
             float outerScale = shockwaveScale * 1.12f;
             int outerAlpha = shockwaveAlpha / 2;
             g->SetColor(Color(255, 245, 150, outerAlpha));
@@ -5967,9 +5973,13 @@ void Plant::Draw(Graphics* g)
                 centerX - (IMAGE_DOOMSHROOM_EXPLOSION_BASE->GetCelWidth() * outerScale / 2.0f),
                 centerY - (IMAGE_DOOMSHROOM_EXPLOSION_BASE->GetCelHeight() * outerScale / 2.0f),
                 0, 0, outerScale, outerScale);
+            TodDrawImageCelScaledF(g, IMAGE_DOOMSHROOM_EXPLOSION_BASE,
+                centerX - (IMAGE_DOOMSHROOM_EXPLOSION_BASE->GetCelWidth() * outerScale / 2.0f),
+                centerY - (IMAGE_DOOMSHROOM_EXPLOSION_BASE->GetCelHeight() * outerScale / 2.0f),
+                0, 0, outerScale, -outerScale);
         }
 
-        // Golden magnetic core pulse around the Gold Magnet
+        // Golden magnetic core pulse around the Gold Magnet (full circle)
         float coreScale = 1.0f + sinf(aProgress * 3.14159f) * 1.3f;
         int coreAlpha = (int)((1.0f - aProgress) * 240.0f);
         if (coreAlpha > 0)
@@ -5979,6 +5989,19 @@ void Plant::Draw(Graphics* g)
                 centerX - (IMAGE_DOOMSHROOM_EXPLOSION_BASE->GetCelWidth() * coreScale / 2.0f),
                 centerY - (IMAGE_DOOMSHROOM_EXPLOSION_BASE->GetCelHeight() * coreScale / 2.0f),
                 0, 0, coreScale, coreScale);
+            TodDrawImageCelScaledF(g, IMAGE_DOOMSHROOM_EXPLOSION_BASE,
+                centerX - (IMAGE_DOOMSHROOM_EXPLOSION_BASE->GetCelWidth() * coreScale / 2.0f),
+                centerY - (IMAGE_DOOMSHROOM_EXPLOSION_BASE->GetCelHeight() * coreScale / 2.0f),
+                0, 0, coreScale, -coreScale);
+
+            // Additional radial center glow
+            if (IMAGE_AWARDPICKUPGLOW)
+            {
+                TodDrawImageCelScaledF(g, IMAGE_AWARDPICKUPGLOW,
+                    centerX - (IMAGE_AWARDPICKUPGLOW->GetCelWidth() * coreScale * 0.6f / 2.0f),
+                    centerY - (IMAGE_AWARDPICKUPGLOW->GetCelHeight() * coreScale * 0.6f / 2.0f),
+                    0, 0, coreScale * 0.6f, coreScale * 0.6f);
+            }
         }
 
         g->SetColorizeImages(false);
