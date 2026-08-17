@@ -1599,7 +1599,7 @@ bool LawnApp::UpdatePlayerProfileForFinishingLevel()
 		if (aUnlockedNewChallenge && (HasFinishedAdventure() || aLevel > 60))
 		{
 			int aNumTrophies = GetNumTrophies(ChallengePage::CHALLENGE_PAGE_CHALLENGE);
-			if (aNumTrophies <= 17)
+			if (aNumTrophies < GetTotalTrophies(ChallengePage::CHALLENGE_PAGE_CHALLENGE))
 			{
 				mPlayerInfo->mHasNewMiniGame = 1;
 			}
@@ -3675,12 +3675,13 @@ int LawnApp::GetNumTrophies(ChallengePage thePage)
 
 int LawnApp::GetTotalTrophies(ChallengePage thePage)
 {
-	return thePage == CHALLENGE_PAGE_SURVIVAL ? 24 : thePage == CHALLENGE_PAGE_CHALLENGE ? 20 : thePage == CHALLENGE_PAGE_PUZZLE ? 18 : thePage == CHALLENGE_PAGE_LIMBO ? 0 : 0;
+	return thePage == CHALLENGE_PAGE_SURVIVAL ? 24 : thePage == CHALLENGE_PAGE_CHALLENGE ? 32 : thePage == CHALLENGE_PAGE_PUZZLE ? 18 : thePage == CHALLENGE_PAGE_LIMBO ? 0 : 0;
 }
 
 int LawnApp::TrophiesNeedForGoldSunflower()
 {
-	return 62 - GetNumTrophies(CHALLENGE_PAGE_SURVIVAL) - GetNumTrophies(CHALLENGE_PAGE_CHALLENGE) - GetNumTrophies(CHALLENGE_PAGE_PUZZLE);
+	return (GetTotalTrophies(CHALLENGE_PAGE_SURVIVAL) + GetTotalTrophies(CHALLENGE_PAGE_CHALLENGE) + GetTotalTrophies(CHALLENGE_PAGE_PUZZLE)) 
+		- GetNumTrophies(CHALLENGE_PAGE_SURVIVAL) - GetNumTrophies(CHALLENGE_PAGE_CHALLENGE) - GetNumTrophies(CHALLENGE_PAGE_PUZZLE);
 }
 
 bool LawnApp::EarnedGoldTrophy()
