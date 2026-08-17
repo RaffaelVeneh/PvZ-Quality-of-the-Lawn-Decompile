@@ -2832,8 +2832,8 @@ void Plant::MagnetShroomAttractItem(Zombie* theZombie)
 
         aMagnetItem->mPosX -= IMAGE_REANIM_ZOMBIE_BUCKET1->GetWidth() / 2;
         aMagnetItem->mPosY -= IMAGE_REANIM_ZOMBIE_BUCKET1->GetHeight() / 2;
-        aMagnetItem->mDestOffsetX = RandRangeFloat(-10.0f, 10.0f) + 25.0f;
-        aMagnetItem->mDestOffsetY = RandRangeFloat(-10.0f, 10.0f) + 20.0f;
+        aMagnetItem->mDestOffsetX = RandRangeFloat(-5.0f, 5.0f) + 22.0f;
+        aMagnetItem->mDestOffsetY = RandRangeFloat(-5.0f, 5.0f) - 30.0f;
         aMagnetItem->mItemType = (MagnetItemType)((int)MagnetItemType::MAGNET_ITEM_PAIL_1 + aDamageIndex);
     }
     else if (theZombie->mHelmType == HelmType::HELMTYPE_FOOTBALL)
@@ -2848,8 +2848,8 @@ void Plant::MagnetShroomAttractItem(Zombie* theZombie)
 
         aMagnetItem->mPosX += 37.0f;
         aMagnetItem->mPosY -= 60.0f;
-        aMagnetItem->mDestOffsetX = RandRangeFloat(-10.0f, 10.0f) + 20.0f;
-        aMagnetItem->mDestOffsetY = RandRangeFloat(-10.0f, 10.0f) + 20.0f;
+        aMagnetItem->mDestOffsetX = RandRangeFloat(-5.0f, 5.0f) + 20.0f;
+        aMagnetItem->mDestOffsetY = RandRangeFloat(-5.0f, 5.0f) - 30.0f;
         aMagnetItem->mItemType = (MagnetItemType)((int)MagnetItemType::MAGNET_ITEM_FOOTBALL_HELMET_1 + aDamageIndex);
     }
     else if (theZombie->mHelmType == HelmType::HELMTYPE_BLACK_CONE)
@@ -2862,8 +2862,8 @@ void Plant::MagnetShroomAttractItem(Zombie* theZombie)
         theZombie->ReanimShowPrefix("anim_hair", RENDER_GROUP_NORMAL);
         aMagnetItem->mPosX -= IMAGE_REANIM_ZOMBIE_BLACK_CONE1->GetWidth() / 2;
         aMagnetItem->mPosY -= IMAGE_REANIM_ZOMBIE_BLACK_CONE1->GetHeight() / 2;
-        aMagnetItem->mDestOffsetX = RandRangeFloat(-10.0f, 10.0f) + 25.0f;
-        aMagnetItem->mDestOffsetY = RandRangeFloat(-10.0f, 10.0f) + 20.0f;
+        aMagnetItem->mDestOffsetX = RandRangeFloat(-5.0f, 5.0f) + 22.0f;
+        aMagnetItem->mDestOffsetY = RandRangeFloat(-5.0f, 5.0f) - 35.0f;
         aMagnetItem->mItemType = (MagnetItemType)((int)MagnetItemType::MAGNET_ITEM_BLACK_CONE_1 + aDamageIndex);
     }
     else if (theZombie->mHelmType == HelmType::HELMTYPE_BLACK_PAIL)
@@ -2876,8 +2876,8 @@ void Plant::MagnetShroomAttractItem(Zombie* theZombie)
         theZombie->ReanimShowPrefix("anim_hair", RENDER_GROUP_NORMAL);
         aMagnetItem->mPosX -= IMAGE_REANIM_ZOMBIE_BLACK_BUCKET1->GetWidth() / 2;
         aMagnetItem->mPosY -= IMAGE_REANIM_ZOMBIE_BLACK_BUCKET1->GetHeight() / 2;
-        aMagnetItem->mDestOffsetX = RandRangeFloat(-10.0f, 10.0f) + 25.0f;
-        aMagnetItem->mDestOffsetY = RandRangeFloat(-10.0f, 10.0f) + 20.0f;
+        aMagnetItem->mDestOffsetX = RandRangeFloat(-5.0f, 5.0f) + 22.0f;
+        aMagnetItem->mDestOffsetY = RandRangeFloat(-5.0f, 5.0f) - 30.0f;
         aMagnetItem->mItemType = (MagnetItemType)((int)MagnetItemType::MAGNET_ITEM_BLACK_PAIL_1 + aDamageIndex);
     }
     else if (theZombie->mShieldType == ShieldType::SHIELDTYPE_BLACK_DOOR)
@@ -2893,8 +2893,8 @@ void Plant::MagnetShroomAttractItem(Zombie* theZombie)
         theZombie->GetTrackPosition("anim_screendoor", aMagnetItem->mPosX, aMagnetItem->mPosY);
         aMagnetItem->mPosX -= IMAGE_REANIM_ZOMBIE_BLACK_SCREENDOOR1->GetWidth() / 2;
         aMagnetItem->mPosY -= IMAGE_REANIM_ZOMBIE_BLACK_SCREENDOOR1->GetHeight() / 2;
-        aMagnetItem->mDestOffsetX = RandRangeFloat(-10.0f, 10.0f) + 30.0f;
-        aMagnetItem->mDestOffsetY = RandRangeFloat(-10.0f, 10.0f);
+        aMagnetItem->mDestOffsetX = RandRangeFloat(-5.0f, 5.0f) + 25.0f;
+        aMagnetItem->mDestOffsetY = RandRangeFloat(-5.0f, 5.0f) - 35.0f;
         aMagnetItem->mItemType = (MagnetItemType)((int)MagnetItemType::MAGNET_ITEM_BLACK_DOOR_1 + aDamageIndex);
     }
     else if (theZombie->mShieldType == ShieldType::SHIELDTYPE_DOOR)
@@ -2912,8 +2912,8 @@ void Plant::MagnetShroomAttractItem(Zombie* theZombie)
 
         aMagnetItem->mPosX -= IMAGE_REANIM_ZOMBIE_SCREENDOOR1->GetWidth() / 2;
         aMagnetItem->mPosY -= IMAGE_REANIM_ZOMBIE_SCREENDOOR1->GetHeight() / 2;
-        aMagnetItem->mDestOffsetX = RandRangeFloat(-10.0f, 10.0f) + 30.0f;
-        aMagnetItem->mDestOffsetY = RandRangeFloat(-10.0f, 10.0f);
+        aMagnetItem->mDestOffsetX = RandRangeFloat(-5.0f, 5.0f) + 25.0f;
+        aMagnetItem->mDestOffsetY = RandRangeFloat(-5.0f, 5.0f) - 35.0f;
         aMagnetItem->mItemType = (MagnetItemType)((int)MagnetItemType::MAGNET_ITEM_DOOR_1 + aDamageIndex);
     }
     else if (theZombie->mShieldType == ShieldType::SHIELDTYPE_LADDER)
@@ -2926,8 +2926,8 @@ void Plant::MagnetShroomAttractItem(Zombie* theZombie)
         aMagnetItem->mPosY = theZombie->mPosY + 20.0f;
         aMagnetItem->mPosX -= IMAGE_REANIM_ZOMBIE_LADDER_5->GetWidth() / 2;
         aMagnetItem->mPosY -= IMAGE_REANIM_ZOMBIE_LADDER_5->GetHeight() / 2;
-        aMagnetItem->mDestOffsetX = RandRangeFloat(-10.0f, 10.0f) + 30.0f;
-        aMagnetItem->mDestOffsetY = RandRangeFloat(-10.0f, 10.0f);
+        aMagnetItem->mDestOffsetX = RandRangeFloat(-5.0f, 5.0f) + 25.0f;
+        aMagnetItem->mDestOffsetY = RandRangeFloat(-5.0f, 5.0f) - 35.0f;
         aMagnetItem->mItemType = (MagnetItemType)((int)MagnetItemType::MAGNET_ITEM_LADDER_1 + aDamageIndex);
     }
     else if (theZombie->mZombieType == ZombieType::ZOMBIE_POGO)
@@ -2937,8 +2937,8 @@ void Plant::MagnetShroomAttractItem(Zombie* theZombie)
 
         aMagnetItem->mPosX += 40.0f - IMAGE_REANIM_ZOMBIE_LADDER_5->GetWidth() / 2;
         aMagnetItem->mPosY += 84.0f - IMAGE_REANIM_ZOMBIE_LADDER_5->GetHeight() / 2;
-        aMagnetItem->mDestOffsetX = RandRangeFloat(-10.0f, 10.0f) + 30.0f;
-        aMagnetItem->mDestOffsetY = RandRangeFloat(-10.0f, 10.0f);
+        aMagnetItem->mDestOffsetX = RandRangeFloat(-5.0f, 5.0f) + 25.0f;
+        aMagnetItem->mDestOffsetY = RandRangeFloat(-5.0f, 5.0f) - 35.0f;
         aMagnetItem->mItemType = theZombie->mHasArm ? MagnetItemType::MAGNET_ITEM_POGO_1 : MagnetItemType::MAGNET_ITEM_POGO_3;
     }
     else if (theZombie->mZombiePhase == ZombiePhase::PHASE_JACK_IN_THE_BOX_RUNNING)
@@ -2952,8 +2952,8 @@ void Plant::MagnetShroomAttractItem(Zombie* theZombie)
 
         aMagnetItem->mPosX -= IMAGE_REANIM_ZOMBIE_JACKBOX_BOX->GetWidth() / 2;
         aMagnetItem->mPosY -= IMAGE_REANIM_ZOMBIE_JACKBOX_BOX->GetHeight() / 2;
-        aMagnetItem->mDestOffsetX = RandRangeFloat(-10.0f, 10.0f) + 20.0f;
-        aMagnetItem->mDestOffsetY = RandRangeFloat(-10.0f, 10.0f) + 15.0f;
+        aMagnetItem->mDestOffsetX = RandRangeFloat(-5.0f, 5.0f) + 20.0f;
+        aMagnetItem->mDestOffsetY = RandRangeFloat(-5.0f, 5.0f) - 30.0f;
         aMagnetItem->mItemType = MagnetItemType::MAGNET_ITEM_JACK_IN_THE_BOX;
     }
     else if (theZombie->mZombieType == ZombieType::ZOMBIE_DIGGER)
@@ -2963,8 +2963,8 @@ void Plant::MagnetShroomAttractItem(Zombie* theZombie)
 
         aMagnetItem->mPosX -= IMAGE_REANIM_ZOMBIE_DIGGER_PICKAXE->GetWidth() / 2;
         aMagnetItem->mPosY -= IMAGE_REANIM_ZOMBIE_DIGGER_PICKAXE->GetHeight() / 2;
-        aMagnetItem->mDestOffsetX = RandRangeFloat(-10.0f, 10.0f) + 45.0f;
-        aMagnetItem->mDestOffsetY = RandRangeFloat(-10.0f, 10.0f) + 15.0f;
+        aMagnetItem->mDestOffsetX = RandRangeFloat(-5.0f, 5.0f) + 30.0f;
+        aMagnetItem->mDestOffsetY = RandRangeFloat(-5.0f, 5.0f) - 30.0f;
         aMagnetItem->mItemType = MagnetItemType::MAGNET_ITEM_PICK_AXE;
     }
 }
@@ -3179,8 +3179,8 @@ void Plant::UpdateMagnetShroom()
             {
                 aMagnetItem->mPosX = mBoard->GridToPixelX(aClosestLadder->mGridX, aClosestLadder->mGridY) + 40;
                 aMagnetItem->mPosY = mBoard->GridToPixelY(aClosestLadder->mGridX, aClosestLadder->mGridY);
-                aMagnetItem->mDestOffsetX = RandRangeFloat(-10.0f, 10.0f) + 10.0f;
-                aMagnetItem->mDestOffsetY = RandRangeFloat(-10.0f, 10.0f);
+                aMagnetItem->mDestOffsetX = RandRangeFloat(-5.0f, 5.0f) + 25.0f;
+                aMagnetItem->mDestOffsetY = RandRangeFloat(-5.0f, 5.0f) - 35.0f;
                 aMagnetItem->mItemType = MagnetItemType::MAGNET_ITEM_LADDER_PLACED;
             }
         }
@@ -3193,13 +3193,21 @@ void Plant::FireMagnet(Zombie* theTargetZombie)
     int aOriginX = mX + 19;
     int aOriginY = mY - 37;
 
-    Projectile* aProjectile = mBoard->AddProjectile(aOriginX, aOriginY, mRenderOrder - 1, mRow, PROJECTILE_ARMOR);
-    aProjectile->mDamageRangeFlags = GetDamageRangeFlags(WEAPON_PRIMARY);
-    aProjectile->mArmorType = mMagnetItems[0].mItemType;
+    for (int i = 0; i < MAX_MAGNET_ITEMS; i++)
+    {
+        if (mMagnetItems[i].mItemType != MagnetItemType::MAGNET_ITEM_NONE)
+        {
+            Projectile* aProjectile = mBoard->AddProjectile(aOriginX, aOriginY, mRenderOrder - 1, mRow, PROJECTILE_ARMOR);
+            aProjectile->mDamageRangeFlags = GetDamageRangeFlags(WEAPON_PRIMARY);
+            aProjectile->mArmorType = mMagnetItems[i].mItemType;
 
-    // Set the motion type to straight and give it some spin for visual effect
-    aProjectile->mMotionType = MOTION_STRAIGHT;
-    aProjectile->mRotationSpeed = RandRangeFloat(-0.08f, 0.08f);
+            // Set the motion type to straight and give it some spin for visual effect
+            aProjectile->mMotionType = MOTION_STRAIGHT;
+            aProjectile->mRotationSpeed = RandRangeFloat(-0.08f, 0.08f);
+
+            mMagnetItems[i].mItemType = MagnetItemType::MAGNET_ITEM_NONE;
+        }
+    }
 }
 
 Coin* Plant::FindGoldMagnetTarget()
