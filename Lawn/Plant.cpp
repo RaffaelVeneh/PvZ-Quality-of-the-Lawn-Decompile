@@ -5946,7 +5946,7 @@ void Plant::Draw(Graphics* g)
         float aProgress = (50.0f - (float)mGoldMagnetBlastTimer) / 50.0f;
 
         float centerX = aOffsetX + 40.0f;
-        float centerY = aOffsetY + 40.0f;
+        float centerY = aOffsetY + 65.0f;
 
         // Expanding custom golden shockwave full circle (both bottom and flipped top halves)
         float shockwaveScale = aProgress * 12.0f;
