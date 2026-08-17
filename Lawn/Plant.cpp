@@ -5319,13 +5319,42 @@ void Plant::DrawMagnetItems(Graphics* g)
 {
     float aOffsetX = 0.0f;
     float aOffsetY = PlantDrawHeightOffset(mBoard, this, mSeedType, mPlantCol, mRow);
-    static Reanimation* sSunReanim = nullptr;
 
     for (int i = 0; i < MAX_MAGNET_ITEMS; i++)
     {
         MagnetItem* aMagnetItem = &mMagnetItems[i];
         if (aMagnetItem->mItemType != MagnetItemType::MAGNET_ITEM_NONE)
         {
+            // Handle all sun types with proper animated REANIM_SUN
+            if (aMagnetItem->mItemType == MAGNET_ITEM_NORMAL_SUN ||
+                aMagnetItem->mItemType == MAGNET_ITEM_SMALL_SUN ||
+                aMagnetItem->mItemType == MAGNET_ITEM_LARGE_SUN ||
+                aMagnetItem->mItemType == MAGNET_ITEM_WHITE_SUN ||
+                aMagnetItem->mItemType == MAGNET_ITEM_BIG_WHITE_SUN)
+            {
+                float aSunScale = 1.0f;
+                if (aMagnetItem->mItemType == MAGNET_ITEM_SMALL_SUN)
+                    aSunScale = 0.5f;
+                else if (aMagnetItem->mItemType == MAGNET_ITEM_LARGE_SUN || aMagnetItem->mItemType == MAGNET_ITEM_BIG_WHITE_SUN)
+                    aSunScale = 2.0f;
+
+                Reanimation aSunReanim;
+                aSunReanim.ReanimationInitializeType(0.0f, 0.0f, ReanimationType::REANIM_SUN);
+                aSunReanim.mAnimTime = (float)(mBoard->mMainCounter % 100) / 100.0f;
+                aSunReanim.OverrideScale(aSunScale, aSunScale);
+
+                if (aMagnetItem->mItemType == MAGNET_ITEM_WHITE_SUN || aMagnetItem->mItemType == MAGNET_ITEM_BIG_WHITE_SUN)
+                {
+                    aSunReanim.mColorOverride = Color(255, 255, 255, 255);
+                    aSunReanim.mFilterEffect = FilterEffect::FILTER_EFFECT_WHITE;
+                    aSunReanim.mExtraOverlayColor = Color(200, 200, 200, 150);
+                }
+
+                aSunReanim.SetPosition(aMagnetItem->mPosX - mX + aOffsetX, aMagnetItem->mPosY - mY + aOffsetY);
+                aSunReanim.Draw(g);
+                continue;
+            }
+
             int aCelRow = 0, aCelCol = 0;
             Image* aImage = nullptr;
             float aScale = 0.8f;
@@ -5446,120 +5475,14 @@ void Plant::DrawMagnetItems(Graphics* g)
                 aScale = 1.0f;
                 aImage = IMAGE_REANIM_DIAMOND;
             }
-            else if (aMagnetItem->mItemType == MAGNET_ITEM_NORMAL_SUN)
-            {
-                aScale = 1.0f;
-                if (sSunReanim == nullptr)
-                {
-                    sSunReanim = mApp->AddReanimation(0.0f, 0.0f, 0, ReanimationType::REANIM_SUN);
-                    sSunReanim->mLoopType = ReanimLoopType::REANIM_LOOP;
-                    sSunReanim->mAnimRate = 6.0f;
-                }
-
-                float magnetTargetX = 200.0f;
-                float magnetTargetY = 200.0f;
-
-                sSunReanim->SetPosition(magnetTargetX, magnetTargetY);
-                aImage = sSunReanim->GetCurrentTrackImage("TrackName");
-            }
-            else if (aMagnetItem->mItemType == MAGNET_ITEM_SMALL_SUN)
-            {
-                aScale = 0.5f;
-                if (sSunReanim == nullptr)
-                {
-                    sSunReanim = mApp->AddReanimation(0.0f, 0.0f, 0, ReanimationType::REANIM_SUN);
-                    sSunReanim->mLoopType = ReanimLoopType::REANIM_LOOP;
-                    sSunReanim->mAnimRate = 6.0f;
-                }
-
-                float magnetTargetX = 20.0f;
-                float magnetTargetY = 20.0f;
-
-                sSunReanim->SetPosition(magnetTargetX, magnetTargetY);
-                aImage = sSunReanim->GetCurrentTrackImage("TrackName");
-            }
-            else if (aMagnetItem->mItemType == MAGNET_ITEM_LARGE_SUN)
-            {
-                aScale = 2.0f;
-                if (sSunReanim == nullptr)
-                {
-                    sSunReanim = mApp->AddReanimation(0.0f, 0.0f, 0, ReanimationType::REANIM_SUN);
-                    sSunReanim->mLoopType = ReanimLoopType::REANIM_LOOP;
-                    sSunReanim->mAnimRate = 6.0f;
-                }
-
-                float magnetTargetX = 20.0f;
-                float magnetTargetY = 20.0f;
-
-                sSunReanim->SetPosition(magnetTargetX, magnetTargetY);
-                aImage = sSunReanim->GetCurrentTrackImage("TrackName");
-            }
-            
-            else if (aMagnetItem->mItemType == MAGNET_ITEM_WHITE_SUN)
-            {
-                aScale = 1.0f;
-                if (sSunReanim == nullptr)
-                {
-                    sSunReanim = mApp->AddReanimation(0.0f, 0.0f, 0, ReanimationType::REANIM_SUN);
-                    sSunReanim->mLoopType = ReanimLoopType::REANIM_LOOP;
-                    sSunReanim->mAnimRate = 6.0f;
-                }
-
-                float magnetTargetX = 20.0f;
-                float magnetTargetY = 20.0f;
-
-                sSunReanim->mColorOverride = Color(255, 255, 255, 255);
-                sSunReanim->mFilterEffect = FilterEffect::FILTER_EFFECT_WHITE;
-                sSunReanim->mExtraOverlayColor = Color(200, 200, 200, 150);
-
-                sSunReanim->SetPosition(magnetTargetX, magnetTargetY);
-                aImage = sSunReanim->GetCurrentTrackImage("TrackName");
-            }
-            else if (aMagnetItem->mItemType == MAGNET_ITEM_BIG_WHITE_SUN)
-            {
-                aScale = 2.0f;
-                if (sSunReanim == nullptr)
-                {
-                    sSunReanim = mApp->AddReanimation(0.0f, 0.0f, 0, ReanimationType::REANIM_SUN);
-                    sSunReanim->mLoopType = ReanimLoopType::REANIM_LOOP;
-                    sSunReanim->mAnimRate = 6.0f;
-                }
-
-                float magnetTargetX = 20.0f;
-                float magnetTargetY = 20.0f;
-
-                sSunReanim->mColorOverride = Color(255, 255, 255, 255);
-                sSunReanim->mFilterEffect = FilterEffect::FILTER_EFFECT_WHITE;
-                sSunReanim->mExtraOverlayColor = Color(200, 200, 200, 150);
-
-                aImage = sSunReanim->GetCurrentTrackImage("TrackName");
-            }
             else
             {
                 TOD_ASSERT();
             }
 
-            if (aScale == 1.0f || aScale == 0.5f)
+            if (aImage)
             {
-                if (aMagnetItem->mItemType == MAGNET_ITEM_NORMAL_SUN || aMagnetItem->mItemType == MAGNET_ITEM_SMALL_SUN || aMagnetItem->mItemType == MAGNET_ITEM_WHITE_SUN)
-                {
-                    g->DrawImageCel(aImage, aMagnetItem->mPosX - mX - 10, aMagnetItem->mPosY - mY - 70, aCelCol, aCelRow);
-                }
-                else
-                {
-                    g->DrawImageCel(aImage, aMagnetItem->mPosX - mX + aOffsetX, aMagnetItem->mPosY - mY + aOffsetY, aCelCol, aCelRow);
-                }
-            }
-            else
-            {
-                if (aMagnetItem->mItemType == MAGNET_ITEM_LARGE_SUN || aMagnetItem->mItemType == MAGNET_ITEM_BIG_WHITE_SUN)
-                {
-                    TodDrawImageCelScaledF(g, aImage, aMagnetItem->mPosX - mX - 50, aMagnetItem->mPosY - mY - 160, aCelCol, aCelRow, aScale, aScale);
-                }
-                else
-                {
-                    TodDrawImageCelScaledF(g, aImage, aMagnetItem->mPosX - mX + aOffsetX, aMagnetItem->mPosY - mY + aOffsetY, aCelCol, aCelRow, aScale, aScale);
-                }
+                TodDrawImageCelScaledF(g, aImage, aMagnetItem->mPosX - mX + aOffsetX, aMagnetItem->mPosY - mY + aOffsetY, aCelCol, aCelRow, aScale, aScale);
             }
         }
     }
