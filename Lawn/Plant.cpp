@@ -190,6 +190,7 @@ void Plant::PlantInitialize(int theGridX, int theGridY, SeedType theSeedType, Se
     mEatingZombieID = ZOMBIEID_NULL;
     mIsBlowing = false;
     mGoldMagnetCollectCount = 0;
+    mGoldMagnetBlastTimer = 0;
     mShieldHealth = 0;
     mShieldMaxHealth = 0;
     if (mSeedType == SeedType::SEED_PLANTERN || mImitaterType == SeedType::SEED_PLANTERN)
@@ -3262,6 +3263,11 @@ bool Plant::IsAGoldMagnetAboutToSuck()
 
 void Plant::UpdateGoldMagnetShroom()
 {
+    if (mGoldMagnetBlastTimer > 0)
+    {
+        mGoldMagnetBlastTimer--;
+    }
+
     Reanimation* aBodyReanim = mApp->ReanimationGet(mBodyReanimID);
 
     bool aIsSuckingCoin = false;
@@ -3357,39 +3363,19 @@ void Plant::GoldMagnetBlastEnergy()
         return;
 
     // 1. Audio & Screen Shake
-    mBoard->ShakeBoard(3, -4);
-    mApp->PlayFoley(FoleyType::FOLEY_THUNDER);
+    mBoard->ShakeBoard(2, -3);
     mApp->PlayFoley(FoleyType::FOLEY_MAGNETSHROOM);
     mApp->PlayFoley(FoleyType::FOLEY_SHIELD_HIT);
 
-    // 2. Visual Blast at Gold Magnet
-    mApp->AddTodParticle(mX + 40.0f, mY + 40.0f, mRenderOrder + 1, ParticleEffect::PARTICLE_JACKEXPLODE);
-    mApp->AddTodParticle(mX + 40.0f, mY + 40.0f, mRenderOrder + 1, ParticleEffect::PARTICLE_LANTERN_SHINE);
-    mApp->AddTodParticle(mX + 40.0f, mY + 40.0f, mRenderOrder + 1, ParticleEffect::PARTICLE_POWIE);
+    // 2. Activate custom golden electromagnetic shockwave visual effect
+    mGoldMagnetBlastTimer = 50;
 
-    // 3. Grid-wide energy pulse across the lawn
-    for (int aGridX = 0; aGridX < MAX_GRID_SIZE_X; aGridX++)
-    {
-        for (int aGridY = 0; aGridY < MAX_GRID_SIZE_Y; aGridY++)
-        {
-            if (mBoard->mGridSquareType[aGridX][aGridY] != GridSquareType::GRIDSQUARE_NONE)
-            {
-                float aPX = mBoard->GridToPixelX(aGridX, aGridY) + 40.0f;
-                float aPY = mBoard->GridToPixelY(aGridX, aGridY) + 40.0f;
-                mApp->AddTodParticle(aPX, aPY, mRenderOrder + 1, ParticleEffect::PARTICLE_ICE_SPARKLE);
-            }
-        }
-    }
-
-    // 4. Shatter every zombie's armor across the entire map
+    // 3. Shatter every zombie's armor across the entire map
     Zombie* aZombie = nullptr;
     while (mBoard->IterateZombies(aZombie))
     {
         if (aZombie->IsDeadOrDying())
             continue;
-
-        // Visual impact burst on each zombie
-        mApp->AddTodParticle(aZombie->mPosX + 40.0f, aZombie->mPosY + 40.0f, aZombie->mRenderOrder + 1, ParticleEffect::PARTICLE_POWIE);
 
         // Break Helm (Cone, Bucket, Football Helmet, Miner Hat, etc.)
         if (aZombie->mHelmHealth > 0)
@@ -5947,6 +5933,53 @@ void Plant::Draw(Graphics* g)
             centerX - (IMAGE_DOOMSHROOM_EXPLOSION_BASE->GetCelWidth() * scale / 2),
             centerY - (IMAGE_DOOMSHROOM_EXPLOSION_BASE->GetCelHeight() * scale / 2),
             0, 0, scale, scale);
+
+        g->SetColorizeImages(false);
+        g->SetDrawMode(Graphics::DRAWMODE_NORMAL);
+    }
+
+    if (mSeedType == SeedType::SEED_GOLD_MAGNET && mGoldMagnetBlastTimer > 0 && mBoard != nullptr && IsInPlay())
+    {
+        g->SetDrawMode(Graphics::DRAWMODE_ADDITIVE);
+        g->SetColorizeImages(true);
+
+        float aProgress = (50.0f - (float)mGoldMagnetBlastTimer) / 50.0f;
+
+        float centerX = aOffsetX + 40.0f;
+        float centerY = aOffsetY + 40.0f;
+
+        // Expanding custom golden shockwave ring
+        float shockwaveScale = aProgress * 12.0f;
+        int shockwaveAlpha = (int)((1.0f - aProgress) * 220.0f);
+        if (shockwaveAlpha > 0 && shockwaveScale > 0.05f)
+        {
+            g->SetColor(Color(255, 215, 0, shockwaveAlpha));
+            TodDrawImageCelScaledF(g, IMAGE_DOOMSHROOM_EXPLOSION_BASE,
+                centerX - (IMAGE_DOOMSHROOM_EXPLOSION_BASE->GetCelWidth() * shockwaveScale / 2.0f),
+                centerY - (IMAGE_DOOMSHROOM_EXPLOSION_BASE->GetCelHeight() * shockwaveScale / 2.0f),
+                0, 0, shockwaveScale, shockwaveScale);
+
+            // Outer electric golden fringe
+            float outerScale = shockwaveScale * 1.12f;
+            int outerAlpha = shockwaveAlpha / 2;
+            g->SetColor(Color(255, 245, 150, outerAlpha));
+            TodDrawImageCelScaledF(g, IMAGE_DOOMSHROOM_EXPLOSION_BASE,
+                centerX - (IMAGE_DOOMSHROOM_EXPLOSION_BASE->GetCelWidth() * outerScale / 2.0f),
+                centerY - (IMAGE_DOOMSHROOM_EXPLOSION_BASE->GetCelHeight() * outerScale / 2.0f),
+                0, 0, outerScale, outerScale);
+        }
+
+        // Golden magnetic core pulse around the Gold Magnet
+        float coreScale = 1.0f + sinf(aProgress * 3.14159f) * 1.3f;
+        int coreAlpha = (int)((1.0f - aProgress) * 240.0f);
+        if (coreAlpha > 0)
+        {
+            g->SetColor(Color(255, 230, 80, coreAlpha));
+            TodDrawImageCelScaledF(g, IMAGE_DOOMSHROOM_EXPLOSION_BASE,
+                centerX - (IMAGE_DOOMSHROOM_EXPLOSION_BASE->GetCelWidth() * coreScale / 2.0f),
+                centerY - (IMAGE_DOOMSHROOM_EXPLOSION_BASE->GetCelHeight() * coreScale / 2.0f),
+                0, 0, coreScale, coreScale);
+        }
 
         g->SetColorizeImages(false);
         g->SetDrawMode(Graphics::DRAWMODE_NORMAL);

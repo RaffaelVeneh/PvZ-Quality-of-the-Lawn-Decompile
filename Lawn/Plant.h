@@ -266,6 +266,7 @@ public:
     ZombieID                mEatingZombieID;        // To track the zombie that eats this plant
     bool                    mIsBlowing;
     int                     mGoldMagnetCollectCount;
+    int                     mGoldMagnetBlastTimer;
 
 public:
     Plant();
