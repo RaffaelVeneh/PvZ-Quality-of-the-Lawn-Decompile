@@ -350,6 +350,7 @@ public:
     void                    UpdateScaredyShroom();
     int                     DistanceToClosestZombie();
     void                    UpdateSpikeweed();
+    void                    MagnetShroomAttractItem(Zombie* theZombie);
     void                    MagnetShroomAttactItem(Zombie* theZombie);
     void                    UpdateSunShroom();
     void                    UpdateBowling();

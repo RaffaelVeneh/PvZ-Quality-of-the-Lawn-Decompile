@@ -1079,6 +1079,13 @@ void Projectile::PlayImpactSound(Zombie* theZombie)
 		mApp->PlayFoley(FoleyType::FOLEY_MELONIMPACT);
 		aPlaySplatSound = false;
 	}
+	else if (mProjectileType == ProjectileType::PROJECTILE_ARMOR)
+	{
+		mApp->PlayFoley(FoleyType::FOLEY_SHIELD_HIT);
+		mApp->PlayFoley(FoleyType::FOLEY_BONK);
+		aPlayHelmSound = false;
+		aPlaySplatSound = false;
+	}
 
 	if (aPlayHelmSound && theZombie)
 	{

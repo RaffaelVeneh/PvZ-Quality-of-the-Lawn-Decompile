@@ -2810,13 +2810,16 @@ MagnetItem* Plant::GetFreeMagnetItem()
     return &mMagnetItems[0];
 }
 
-void Plant::MagnetShroomAttactItem(Zombie* theZombie)
+void Plant::MagnetShroomAttractItem(Zombie* theZombie)
 {
     mState = PlantState::STATE_MAGNETSHROOM_SUCKING;
     PlayBodyReanim("anim_attract", ReanimLoopType::REANIM_PLAY_ONCE_AND_HOLD, 20, 18.0f);
     mApp->PlayFoley(FoleyType::FOLEY_MAGNETSHROOM);
 
     MagnetItem* aMagnetItem = GetFreeMagnetItem();
+    if (aMagnetItem == nullptr)
+        return;
+
     if (theZombie->mHelmType == HelmType::HELMTYPE_PAIL)
     {
         int aDamageIndex = theZombie->GetHelmDamageIndex();
@@ -2930,8 +2933,6 @@ void Plant::MagnetShroomAttactItem(Zombie* theZombie)
     else if (theZombie->mZombieType == ZombieType::ZOMBIE_POGO)
     {
         theZombie->PogoBreak(16U);
-        // ZombieDrawPosition aDrawPos;
-        // theZombie->GetDrawPos(aDrawPos);
         theZombie->GetTrackPosition("Zombie_pogo_stick", aMagnetItem->mPosX, aMagnetItem->mPosY);
 
         aMagnetItem->mPosX += 40.0f - IMAGE_REANIM_ZOMBIE_LADDER_5->GetWidth() / 2;
@@ -2968,6 +2969,11 @@ void Plant::MagnetShroomAttactItem(Zombie* theZombie)
     }
 }
 
+void Plant::MagnetShroomAttactItem(Zombie* theZombie)
+{
+    MagnetShroomAttractItem(theZombie);
+}
+
 bool Plant::DrawMagnetItemsOnTop()
 {
     if (mSeedType == SeedType::SEED_GOLD_MAGNET)
@@ -3000,10 +3006,15 @@ bool Plant::DrawMagnetItemsOnTop()
 
         return false;
     }
+
+    return false;
 }
 
 void Plant::UpdateMagnetShroom()
 {
+    if (mIsAsleep || mSquished || mDead || mBoard == nullptr)
+        return;
+
     // Handle the countdown and item pulling visuals
     for (int i = 0; i < MAX_MAGNET_ITEMS; i++)
     {
@@ -3011,15 +3022,24 @@ void Plant::UpdateMagnetShroom()
         if (aMagnetItem->mItemType != MagnetItemType::MAGNET_ITEM_NONE)
         {
             SexyVector2 aVectorToPlant(mX + aMagnetItem->mDestOffsetX - aMagnetItem->mPosX, mY + aMagnetItem->mDestOffsetY - aMagnetItem->mPosY);
-            if (aVectorToPlant.Magnitude() > 20.0f)
+            float aDist = aVectorToPlant.Magnitude();
+            if (aDist > 5.0f)
             {
-                aMagnetItem->mPosX += aVectorToPlant.x * 0.05f;
-                aMagnetItem->mPosY += aVectorToPlant.y * 0.05f;
+                float aSpeed = TodAnimateCurveFloatTime(30.0f, 0.0f, aDist, 0.05f, 0.15f, TodCurves::CURVE_LINEAR);
+                aMagnetItem->mPosX += aVectorToPlant.x * aSpeed;
+                aMagnetItem->mPosY += aVectorToPlant.y * aSpeed;
+            }
+            else
+            {
+                aMagnetItem->mPosX = mX + aMagnetItem->mDestOffsetX;
+                aMagnetItem->mPosY = mY + aMagnetItem->mDestOffsetY;
             }
         }
     }
 
     Reanimation* aBodyReanim = mApp->ReanimationTryToGet(mBodyReanimID);
+    if (!aBodyReanim)
+        return;
 
     // STATE: Sucking an item towards the plant
     if (mState == STATE_MAGNETSHROOM_SUCKING)
@@ -3030,7 +3050,8 @@ void Plant::UpdateMagnetShroom()
             if (mApp->IsIZombieLevel())
             {
                 aBodyReanim = mApp->ReanimationTryToGet(mBodyReanimID);
-                aBodyReanim->mAnimRate = 0.0f;
+                if (aBodyReanim)
+                    aBodyReanim->mAnimRate = 0.0f;
             }
             mState = STATE_MAGNETSHROOM_CHARGING;
             mStateCountdown = 300; // Cooldown before it can fire
@@ -3048,7 +3069,7 @@ void Plant::UpdateMagnetShroom()
             Zombie* aTargetZombie = FindTargetZombie(mRow, WEAPON_PRIMARY);
             if (aTargetZombie != nullptr)
             {
-                mState = STATE_MAGNETSHROOM_FIRING; // Use the new FIRING state
+                mState = STATE_MAGNETSHROOM_FIRING;
                 PlayBodyReanim("anim_shooting", REANIM_PLAY_ONCE_AND_HOLD, 20, 24.0f);
                 FireMagnet(aTargetZombie);
             }
@@ -3076,14 +3097,13 @@ void Plant::UpdateMagnetShroom()
         while (mBoard->IterateZombies(aZombie))
         {
             if (aZombie->mIsMagnetized) continue;
-
-            int aDiffY = aZombie->mRow - mRow;
-            Rect aZombieRect = aZombie->GetZombieRect();
-
             if (aZombie->mMindControlled) continue;
             if (!aZombie->mHasHead) continue;
             if (aZombie->mZombieHeight != ZombieHeight::HEIGHT_ZOMBIE_NORMAL || aZombie->mZombiePhase == ZombiePhase::PHASE_RISING_FROM_GRAVE) continue;
             if (aZombie->IsDeadOrDying()) continue;
+
+            int aDiffY = aZombie->mRow - mRow;
+            Rect aZombieRect = aZombie->GetZombieRect();
             if (aZombieRect.mX > BOARD_WIDTH || aDiffY > 2 || aDiffY < -2) continue;
 
             if (aZombie->mZombiePhase == ZombiePhase::PHASE_DIGGER_TUNNELING ||
@@ -3096,7 +3116,6 @@ void Plant::UpdateMagnetShroom()
             else if (aZombie->mZombieType == ZombieType::ZOMBIE_FLAG ||
                 !(aZombie->mHelmType == HelmType::HELMTYPE_PAIL ||
                 aZombie->mHelmType == HelmType::HELMTYPE_FOOTBALL ||
-                aZombie->mHelmType == HelmType::HELMTYPE_TRAFFIC_CONE ||
                 aZombie->mHelmType == HelmType::HELMTYPE_BLACK_CONE ||
                 aZombie->mHelmType == HelmType::HELMTYPE_BLACK_PAIL ||
                 aZombie->mShieldType == ShieldType::SHIELDTYPE_DOOR ||
@@ -3122,7 +3141,7 @@ void Plant::UpdateMagnetShroom()
         if (aClosestZombie)
         {
             aClosestZombie->mIsMagnetized = true;
-            MagnetShroomAttactItem(aClosestZombie);
+            MagnetShroomAttractItem(aClosestZombie);
             return;
         }
 
@@ -3152,16 +3171,18 @@ void Plant::UpdateMagnetShroom()
         if (aClosestLadder)
         {
             mState = PlantState::STATE_MAGNETSHROOM_SUCKING;
-            mStateCountdown = 1500;
-            PlayBodyReanim("anim_shooting", ReanimLoopType::REANIM_PLAY_ONCE_AND_HOLD, 20, 12.0f);
+            PlayBodyReanim("anim_attract", ReanimLoopType::REANIM_PLAY_ONCE_AND_HOLD, 20, 18.0f);
             mApp->PlayFoley(FoleyType::FOLEY_MAGNETSHROOM);
             aClosestLadder->GridItemDie();
             MagnetItem* aMagnetItem = GetFreeMagnetItem();
-            aMagnetItem->mPosX = mBoard->GridToPixelX(aClosestLadder->mGridX, aClosestLadder->mGridY) + 40;
-            aMagnetItem->mPosY = mBoard->GridToPixelY(aClosestLadder->mGridX, aClosestLadder->mGridY);
-            aMagnetItem->mDestOffsetX = RandRangeFloat(-10.0f, 10.0f) + 10.0f;
-            aMagnetItem->mDestOffsetY = RandRangeFloat(-10.0f, 10.0f);
-            aMagnetItem->mItemType = MagnetItemType::MAGNET_ITEM_LADDER_PLACED;
+            if (aMagnetItem)
+            {
+                aMagnetItem->mPosX = mBoard->GridToPixelX(aClosestLadder->mGridX, aClosestLadder->mGridY) + 40;
+                aMagnetItem->mPosY = mBoard->GridToPixelY(aClosestLadder->mGridX, aClosestLadder->mGridY);
+                aMagnetItem->mDestOffsetX = RandRangeFloat(-10.0f, 10.0f) + 10.0f;
+                aMagnetItem->mDestOffsetY = RandRangeFloat(-10.0f, 10.0f);
+                aMagnetItem->mItemType = MagnetItemType::MAGNET_ITEM_LADDER_PLACED;
+            }
         }
     }
 }
