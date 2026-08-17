@@ -2993,14 +2993,9 @@ bool Plant::DrawMagnetItemsOnTop()
     {
         for (int i = 0; i < MAX_MAGNET_ITEMS; i++)
         {
-            MagnetItem* aMagnetItem = &mMagnetItems[i];
-            if (aMagnetItem->mItemType != MagnetItemType::MAGNET_ITEM_NONE)
+            if (mMagnetItems[i].mItemType != MagnetItemType::MAGNET_ITEM_NONE)
             {
-                SexyVector2 aVectorToPlant(mX + aMagnetItem->mDestOffsetX - aMagnetItem->mPosX, mY + aMagnetItem->mDestOffsetY - aMagnetItem->mPosY);
-                if (aVectorToPlant.Magnitude() > 20.0f)
-                {
-                    return true;
-                }
+                return true;
             }
         }
 
@@ -3016,6 +3011,7 @@ void Plant::UpdateMagnetShroom()
         return;
 
     // Handle the countdown and item pulling visuals
+    bool aIsPulling = false;
     for (int i = 0; i < MAX_MAGNET_ITEMS; i++)
     {
         MagnetItem* aMagnetItem = &mMagnetItems[i];
@@ -3023,11 +3019,20 @@ void Plant::UpdateMagnetShroom()
         {
             SexyVector2 aVectorToPlant(mX + aMagnetItem->mDestOffsetX - aMagnetItem->mPosX, mY + aMagnetItem->mDestOffsetY - aMagnetItem->mPosY);
             float aDist = aVectorToPlant.Magnitude();
-            if (aDist > 5.0f)
+            if (aDist > 4.0f)
             {
-                float aSpeed = TodAnimateCurveFloatTime(30.0f, 0.0f, aDist, 0.05f, 0.15f, TodCurves::CURVE_LINEAR);
-                aMagnetItem->mPosX += aVectorToPlant.x * aSpeed;
-                aMagnetItem->mPosY += aVectorToPlant.y * aSpeed;
+                aIsPulling = true;
+                float aMoveStep = max(10.0f, aDist * 0.12f);
+                if (aMoveStep >= aDist)
+                {
+                    aMagnetItem->mPosX = mX + aMagnetItem->mDestOffsetX;
+                    aMagnetItem->mPosY = mY + aMagnetItem->mDestOffsetY;
+                }
+                else
+                {
+                    aMagnetItem->mPosX += (aVectorToPlant.x / aDist) * aMoveStep;
+                    aMagnetItem->mPosY += (aVectorToPlant.y / aDist) * aMoveStep;
+                }
             }
             else
             {
@@ -3044,7 +3049,7 @@ void Plant::UpdateMagnetShroom()
     // STATE: Sucking an item towards the plant
     if (mState == STATE_MAGNETSHROOM_SUCKING)
     {
-        if (aBodyReanim->mLoopCount > 0)
+        if (aBodyReanim->mLoopCount > 0 && !aIsPulling)
         {
             PlayBodyReanim("anim_nonactive_idle", ReanimLoopType::REANIM_LOOP, 20, 2.0f);
             if (mApp->IsIZombieLevel())
