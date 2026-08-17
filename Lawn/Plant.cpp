@@ -189,6 +189,7 @@ void Plant::PlantInitialize(int theGridX, int theGridY, SeedType theSeedType, Se
     mGraveBusterPlantTarget = nullptr;
     mEatingZombieID = ZOMBIEID_NULL;
     mIsBlowing = false;
+    mGoldMagnetCollectCount = 0;
     mShieldHealth = 0;
     mShieldMaxHealth = 0;
     if (mSeedType == SeedType::SEED_PLANTERN || mImitaterType == SeedType::SEED_PLANTERN)
@@ -3301,6 +3302,13 @@ void Plant::UpdateGoldMagnetShroom()
                 }
 
                 aMagnetItem->mItemType = MagnetItemType::MAGNET_ITEM_NONE;
+
+                mGoldMagnetCollectCount++;
+                if (mGoldMagnetCollectCount >= 20)
+                {
+                    mGoldMagnetCollectCount -= 20;
+                    GoldMagnetBlastEnergy();
+                }
             }
             else
             {
@@ -3340,6 +3348,94 @@ void Plant::UpdateGoldMagnetShroom()
         mBoard->ShowCoinBank();
         mState = PlantState::STATE_MAGNETSHROOM_SUCKING;
         PlayBodyReanim("anim_attract", ReanimLoopType::REANIM_PLAY_ONCE_AND_HOLD, 20, 12.0f);
+    }
+}
+
+void Plant::GoldMagnetBlastEnergy()
+{
+    if (mBoard == nullptr)
+        return;
+
+    // 1. Audio & Screen Shake
+    mBoard->ShakeBoard(3, -4);
+    mApp->PlayFoley(FoleyType::FOLEY_THUNDER);
+    mApp->PlayFoley(FoleyType::FOLEY_MAGNETSHROOM);
+    mApp->PlayFoley(FoleyType::FOLEY_SHIELD_HIT);
+
+    // 2. Visual Blast at Gold Magnet
+    mApp->AddTodParticle(mX + 40.0f, mY + 40.0f, mRenderOrder + 1, ParticleEffect::PARTICLE_JACKEXPLODE);
+    mApp->AddTodParticle(mX + 40.0f, mY + 40.0f, mRenderOrder + 1, ParticleEffect::PARTICLE_LANTERN_SHINE);
+    mApp->AddTodParticle(mX + 40.0f, mY + 40.0f, mRenderOrder + 1, ParticleEffect::PARTICLE_POWIE);
+
+    // 3. Grid-wide energy pulse across the lawn
+    for (int aGridX = 0; aGridX < MAX_GRID_SIZE_X; aGridX++)
+    {
+        for (int aGridY = 0; aGridY < MAX_GRID_SIZE_Y; aGridY++)
+        {
+            if (mBoard->mGridSquareType[aGridX][aGridY] != GridSquareType::GRIDSQUARE_NONE)
+            {
+                float aPX = mBoard->GridToPixelX(aGridX, aGridY) + 40.0f;
+                float aPY = mBoard->GridToPixelY(aGridX, aGridY) + 40.0f;
+                mApp->AddTodParticle(aPX, aPY, mRenderOrder + 1, ParticleEffect::PARTICLE_ICE_SPARKLE);
+            }
+        }
+    }
+
+    // 4. Shatter every zombie's armor across the entire map
+    Zombie* aZombie = nullptr;
+    while (mBoard->IterateZombies(aZombie))
+    {
+        if (aZombie->IsDeadOrDying())
+            continue;
+
+        // Visual impact burst on each zombie
+        mApp->AddTodParticle(aZombie->mPosX + 40.0f, aZombie->mPosY + 40.0f, aZombie->mRenderOrder + 1, ParticleEffect::PARTICLE_POWIE);
+
+        // Break Helm (Cone, Bucket, Football Helmet, Miner Hat, etc.)
+        if (aZombie->mHelmHealth > 0)
+        {
+            aZombie->TakeHelmDamage(aZombie->mHelmHealth, 0U);
+        }
+        else if (aZombie->mHelmType != HelmType::HELMTYPE_NONE)
+        {
+            aZombie->DropHelm(0U);
+        }
+        aZombie->mHelmHealth = 0;
+        aZombie->mHelmType = HelmType::HELMTYPE_NONE;
+
+        // Break Shield (Door, Newspaper, Ladder, Black Door, etc.)
+        if (aZombie->mShieldHealth > 0)
+        {
+            aZombie->TakeShieldDamage(aZombie->mShieldHealth, 0U);
+        }
+        else if (aZombie->mShieldType != ShieldType::SHIELDTYPE_NONE)
+        {
+            aZombie->DropShield(0U);
+        }
+        aZombie->mShieldHealth = 0;
+        aZombie->mShieldType = ShieldType::SHIELDTYPE_NONE;
+
+        // Strip special equipment
+        if (aZombie->mZombieType == ZombieType::ZOMBIE_POGO)
+        {
+            aZombie->PogoBreak(0U);
+        }
+        else if (aZombie->mZombieType == ZombieType::ZOMBIE_DIGGER)
+        {
+            aZombie->DiggerLoseAxe();
+        }
+        else if (aZombie->mZombiePhase == ZombiePhase::PHASE_JACK_IN_THE_BOX_RUNNING)
+        {
+            aZombie->StopZombieSound();
+            aZombie->PickRandomSpeed();
+            aZombie->mZombiePhase = ZombiePhase::PHASE_ZOMBIE_NORMAL;
+            aZombie->ReanimShowPrefix("Zombie_jackbox_box", RENDER_GROUP_HIDDEN);
+            aZombie->ReanimShowPrefix("Zombie_jackbox_handle", RENDER_GROUP_HIDDEN);
+        }
+        else if (aZombie->mZombieType == ZombieType::ZOMBIE_LADDER)
+        {
+            aZombie->DetachShield();
+        }
     }
 }
 

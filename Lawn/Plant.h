@@ -265,6 +265,7 @@ public:
     bool                    mIsHiding;
     ZombieID                mEatingZombieID;        // To track the zombie that eats this plant
     bool                    mIsBlowing;
+    int                     mGoldMagnetCollectCount;
 
 public:
     Plant();
@@ -365,6 +366,7 @@ public:
     void                    UpdateCobCannon();
     void                    CobCannonFire(int theTargetX, int theTargetY);
     void                    UpdateGoldMagnetShroom();
+    void                    GoldMagnetBlastEnergy();
     /*inline*/ bool         IsOnBoard();
     void                    RemoveEffects();
     void                    UpdateCoffeeBean();
